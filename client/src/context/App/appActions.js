@@ -1,0 +1,5 @@
+export const SET_ALERT = 'SET_ALERT';
+export const CLEAR_ALERT = 'CLEAR_ALERT';
+export const USER_SETUP_BEGIN = 'USER_SETUP_BEGIN';
+export const USER_SETUP_SUCCESS = 'USER_SETUP_SUCCESS';
+export const USER_SETUP_ERROR = 'USER_SETUP_ERROR';
