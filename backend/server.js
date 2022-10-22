@@ -4,11 +4,21 @@ const express = require('express');
 const app = express();
 const cors = require('cors');
 const morgan = require('morgan');
-const authRouter = require('./routes/authRoutes');
-const { errorHandlerMiddleware, notFoundMiddleware } = require('./middlewares');
+
+// db
 const connectDB = require('./db');
 
-// middlewares
+// middleware
+const {
+  errorHandlerMiddleware,
+  notFoundMiddleware,
+  authMiddleware,
+} = require('./middlewares');
+
+// Routes
+const authRouter = require('./routes/authRoutes');
+const courseRouter = require('./routes/courseRoutes');
+
 const corsOptions = {
   origin:
     process.env.ENV === 'development'
@@ -21,6 +31,7 @@ app.use(cors(corsOptions));
 app.use(morgan('tiny'));
 app.use(express.json());
 app.use('/api/v1/auth', authRouter);
+app.use('/api/v1/course', authMiddleware, courseRouter);
 
 app.use(notFoundMiddleware);
 app.use(errorHandlerMiddleware);

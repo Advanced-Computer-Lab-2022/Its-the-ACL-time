@@ -23,10 +23,25 @@ const UserSchema = mongoose.Schema({
     type: String,
     required: [true, 'please provide user password'],
   },
-  type: {
-    enum: ['Instructor', 'Individual trainee', 'Admin', 'Corporate trainee'],
-    // message: 'This category is not supported',
+  country: {
+    type: String,
   },
+  type: {
+    type: String,
+    required: [true, 'please provide type'],
+    enum: ['Instructor', 'Individual trainee', 'Admin', 'Corporate trainee'],
+    message:
+      'type must be Instructor or Individual trainee or Admin or Corporate trainee',
+  },
+  biography: {
+    type: String,
+  },
+  courses: [
+    {
+      type: mongoose.Types.ObjectId,
+      ref: 'Course',
+    },
+  ],
 });
 
 UserSchema.pre('save', async function () {
