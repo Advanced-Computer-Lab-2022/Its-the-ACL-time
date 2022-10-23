@@ -7,18 +7,9 @@ const {
   updateCourse,
 } = require('../controllers/courseController');
 
-
 router.route('/').post(createCourse);
 router.route('/').get(getAllCourses);
 router.route('/:courseId').get(getCourse).patch(updateCourse);
-
-
-const {
-  createExercise,
-  getAllExercises,
-  getExercise,
-  updateExercise,
-} = require('../controllers/exerciseController');
 
 const {
   createSubTitle,
@@ -30,11 +21,6 @@ const {
 router.route('/').post(createCourse);
 router.route('/').get(getAllCourses);
 router.route('/:courseId').get(getCourse).patch(updateCourse);
-router.route('/:courseId/exercise/').post(createExercise).get(getAllExercises);
-router
-  .route('/:courseId/exercise/:exerciseId')
-  .get(getExercise)
-  .patch(updateExercise);
 
 router.route('/:courseId/subtitle/').post(createSubTitle).get(getAllSubTitles);
 router
