@@ -18,7 +18,6 @@ const SubTitleSchema = new mongoose.Schema({
     ref: 'Course',
     required: [true, 'Please provide a course id'],
   },
-  required: [true, 'Please provide a course id'],
   description: {
     type: String,
     required: [true, 'Please provide a course description'],
