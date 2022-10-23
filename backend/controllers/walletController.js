@@ -14,7 +14,6 @@ exports.findWallet = async (req, res) => {
         }
     })
 }
-
 // allowed only for admin
 exports.addWallet = async (req, res) => {
     const { owner, balance } = req.body;
