@@ -1,6 +1,6 @@
 const User = require('./User');
 const Course = require('./Course');
-const Wallet = require('./Wallet');
+const Wallet = require('./WalletModel');
 
 module.exports = {
   User,

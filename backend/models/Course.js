@@ -12,6 +12,7 @@ const CourseSchema = mongoose.Schema({
   price: {
     type: Number,
     required: [true, 'Please provide a course price'],
+    min:[0, "please provide valid price"]
   },
   summary: {
     type: String,
