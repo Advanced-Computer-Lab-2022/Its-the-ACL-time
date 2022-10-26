@@ -47,7 +47,7 @@ const CourseGroup = ({ courses }) => {
       {/* make the courses scrollable  */}
 
       <CardGroup overflow='scroll'>
-        {course.map((course) => {
+        {courses.map((course) => {
           console.log(course.title);
           return (
             <Course

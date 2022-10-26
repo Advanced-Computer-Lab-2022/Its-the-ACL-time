@@ -3,19 +3,11 @@ const { Course, User } = require('../models');
 const { UnauthorizedError, BadRequestError } = require('../Errors');
 
 const createCourse = async (req, res) => {
-  console.log('add course');
-  const {
-    title,
-    subject,
-    price,
-    summary,
-    previewLink,
-    numberOfHours,
-    promotion,
-  } = req.body;
+  console.log('req.body ' + req.body);
+  const { title, subject, price, summary, previewLink, numberOfHours } =
+    req.body;
 
   const { userId, type } = req.user;
-  console.log(req.user);
   if (type !== 'Instructor')
     throw new UnauthorizedError("you don't have permissions");
   if (
@@ -29,19 +21,10 @@ const createCourse = async (req, res) => {
     throw new BadRequestError('Please provide all course values');
   }
 
-  const course = await Course.create({
-    title,
-    subject,
-    price,
-    summary,
-    previewLink,
-    numberOfHours,
-    promotion,
-    createdBy: userId,
-  });
-  console.log(course);
+  req.body.createdBy = userId;
 
-  res.status(StatusCodes.OK).json({ course });
+  const course = await Course.create(req.body);
+  res.status(StatusCodes.CREATED).json({ course });
 };
 
 const getCourse = async (req, res) => {

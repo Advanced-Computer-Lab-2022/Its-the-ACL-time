@@ -4,6 +4,8 @@ import {
   USER_SETUP_BEGIN,
   USER_SETUP_SUCCESS,
   USER_SETUP_ERROR,
+  START_ACTION,
+  END_ACTION,
 } from './appActions';
 
 const appReducer = (state, action) => {
@@ -51,6 +53,20 @@ const appReducer = (state, action) => {
         alert: true,
         alertText: action.payload.msg,
         alertType: 'error',
+      };
+    }
+
+    case START_ACTION: {
+      return {
+        ...state,
+        isLoading: true,
+      };
+    }
+
+    case END_ACTION: {
+      return {
+        ...state,
+        isLoading: false,
       };
     }
 

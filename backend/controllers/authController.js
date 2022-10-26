@@ -5,6 +5,7 @@ const { BadRequestError, UnauthorizedError } = require('../Errors');
 
 const register = async (req, res) => {
   const { username, password, email, type } = req.body;
+  console.log(type);
   if (!username || !password || !email || !type)
     throw new BadRequestError('please provide all values');
   console.log(req.body);
