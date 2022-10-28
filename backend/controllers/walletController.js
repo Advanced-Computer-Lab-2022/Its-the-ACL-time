@@ -2,7 +2,7 @@ const { Wallet } = require('../models');
 const { StatusCodes } = require('http-status-codes');
 
 // allowed for the wallet owner
-exports.findWallet = async (req, res) => {
+const findWallet = async (req, res) => {
   const id = req.params.id;
   Wallet.findById(id, (err, wallet) => {
     if (err) {
