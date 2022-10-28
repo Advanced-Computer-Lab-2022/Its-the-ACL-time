@@ -56,7 +56,9 @@ const getAllCourses = async (req, res) => {
 
     return res.status(StatusCodes.OK).json(courses);
   }
-  courses = await Course.find({}).select(`${query}`);
+  courses = await Course.find({})
+    .select(`${query}`)
+    .populate('createdBy', 'username');
   return res.status(StatusCodes.OK).json({ courses });
 };
 

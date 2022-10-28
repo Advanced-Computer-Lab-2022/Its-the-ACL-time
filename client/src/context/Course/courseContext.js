@@ -22,6 +22,7 @@ const CourseProvider = ({ children }) => {
         },
       })
       .then(({ data }) => {
+        console.log(data);
         dispatch({
           type: GET_COURSES,
           payload: {

@@ -7,6 +7,15 @@ const {
   updateWallet,
   deleteWallet,
 } = require('../controllers/walletController');
+
+const {
+  findCertification,
+  allCertifications,
+  createCertification,
+  updateCertification,
+  deleteCertification,
+} = require('../controllers/CertificationController');
+
 const { authOwner, authAdmin, authMiddleware } = require('../middlewares');
 
 // wallet router
