@@ -25,4 +25,5 @@ router.delete('/certification/:id',authAdmin,deleteCertification);
 // end certification router
 
 
+
 module.exports = router;
