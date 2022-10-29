@@ -13,6 +13,10 @@ const mongoose=require('mongoose');
 
 const createQuestion= async(req,res) => {
     const{title,image,choices,answer}=req.body;
+    if(choices?.length != 4){
+        res.status(400).json({error : "Add 4"})
+    }
+    
     try{
       const question =await Question.create({title,image,choices,answer});
       res.status(200).json(question);

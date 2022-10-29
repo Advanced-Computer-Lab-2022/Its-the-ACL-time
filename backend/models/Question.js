@@ -13,7 +13,7 @@ const questionSchema=new Schema({
         
     },
     
-    choices:[{String, min:4,max:4,required:true}],
+    choices:[{String,required:true}],
 
     answer:{
         type:Number,
