@@ -7,10 +7,6 @@ const {
   updateCourse,
 } = require('../controllers/courseController');
 
-router.route('/').post(createCourse);
-router.route('/').get(getAllCourses);
-router.route('/:courseId').get(getCourse).patch(updateCourse);
-
 const {
   createSubTitle,
   getAllSubTitles,
@@ -18,9 +14,10 @@ const {
   updateSubTitle,
 } = require('../controllers/subTitleController');
 
-router.route('/').post(createCourse);
-router.route('/').get(getAllCourses);
+router.route('/').post(createCourse).get(getAllCourses);
 router.route('/:courseId').get(getCourse).patch(updateCourse);
+
+// SubTitle Routes
 
 router.route('/:courseId/subtitle/').post(createSubTitle).get(getAllSubTitles);
 router

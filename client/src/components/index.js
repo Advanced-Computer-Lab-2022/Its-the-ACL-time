@@ -1,6 +1,7 @@
 import Loading from './Loading';
 import NavBar from './NavBar';
-import Course from './Course';
-import CourseGroup from './CourseGroup';
+import CourseGroup from './course/CourseGroup';
+import CourseForm from './course/CourseForm';
+import Course from './course/Course';
 
-export { Loading, NavBar, Course, CourseGroup };
+export { Loading, NavBar, Course, CourseGroup, CourseForm };

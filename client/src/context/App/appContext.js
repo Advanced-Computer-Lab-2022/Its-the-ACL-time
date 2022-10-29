@@ -6,6 +6,8 @@ import {
   USER_SETUP_ERROR,
   SET_ALERT,
   CLEAR_ALERT,
+  START_ACTION,
+  END_ACTION,
 } from './appActions';
 import axios from 'axios';
 
