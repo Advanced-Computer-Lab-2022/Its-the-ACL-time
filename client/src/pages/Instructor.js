@@ -17,7 +17,9 @@ export default function Instructor() {
       .then((res) => res.json()).then((res) => { console.log(res.data); setInstCourses(res.data); setIsLoading(false) })
       .catch((err) => { setError("failed to load courses"); setIsLoading(false) });
   }, [])
-
+  function addCourseFront(courseData){
+    setInstCourses({...instCourses,courseData})
+  }
   return (
     <>
       <nav class="m-0 m-md-3 navbar navbar-light bg-light row">
@@ -33,10 +35,10 @@ export default function Instructor() {
         {!showCreateCourse && <button className = "btn btn-outline-primary m-3 col" onClick={()=>setShowCreateCourse(true)}>Add Course</button>}
         {showCreateCourse && <button className = "btn btn-outline-primary m-3 col" onClick={()=>setShowCreateCourse(false)}>Hide Form</button>}
       </nav>
-      {showCreateCourse && <CourseForm></CourseForm>}
+      {showCreateCourse && <CourseForm addCourseFront={addCourseFront} instId={instId}></CourseForm>}
       <div className='container w-100'>
         {isLoading && <div>is loading .......</div>}
-        {instCourses && < CourseGroup courses={instCourses} />}
+        {instCourses && <CourseGroup courses={instCourses} />}
         {error && <div className="text-danger">{error}</div>}
       </div>
     </>

@@ -42,6 +42,6 @@ const CourseSchema = mongoose.Schema({
     required: [true, 'Please provide the creator'],
     ref: 'User',
   },
-});
+},{ timestamps: true });
 
 module.exports = mongoose.model('Course', CourseSchema);

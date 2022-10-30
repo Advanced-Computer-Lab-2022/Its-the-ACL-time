@@ -4,10 +4,13 @@ const { UnauthorizedError, BadRequestError } = require('../Errors');
 
 const createCourse = async (req, res) => {
   console.log('req.body ' + req.body);
-  const { title, subject, price, summary, previewLink, numberOfHours } =
-    req.body;
-
-  const { userId, type } = req.user;
+  const { title, subject, price, summary, previewLink, numberOfHours,instructorId } = req.body;
+  let type = req.user?.type;
+  let userId = req.user?.userId;
+  if(instructorId) {
+    userId = instructorId;
+    type = "Instructor";
+  }
   if (type !== 'Instructor')
     throw new UnauthorizedError("you don't have permissions");
   if (

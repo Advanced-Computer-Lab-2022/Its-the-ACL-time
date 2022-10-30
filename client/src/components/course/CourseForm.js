@@ -26,7 +26,7 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-function AddCourseForm() {
+function AddCourseForm({ addCourseFront, instId }) {
   const classes = useStyles();
 
   const { courseId } = useParams();
@@ -51,6 +51,7 @@ function AddCourseForm() {
       promotion,
       previewLink,
       summary,
+      instructorId: instId
     };
 
     try {
@@ -72,76 +73,82 @@ function AddCourseForm() {
         'success',
         `Course ${courseId ? 'Updated' : 'Created'} successfully`
       );
-      clearAlert();
-    } catch (error) {
-      const { msg } = error.response.data;
 
-      console.log(error.response.data.msg);
+      setTimeout(() =>
+        clearAlert()
+      ,3000);
+  if (addCourseFront) {
+    addCourseFront(course)
+  }
+} catch (error) {
+  const { msg } = error.response.data;
 
-      setAlert('error', msg);
+  console.log(error.response.data.msg);
 
-      clearAlert();
+  setAlert('error', msg);
 
-      console.log(error);
-    }
+  clearAlert();
+
+  console.log(error);
+}
   };
 
-  return (
-    <div className="border-3 m-0 m-md-5" style={{background:"#cccccc"}}>
-      <h1 className={`${classes.title}`}>
+return (
+  <div className="border-3 m-0 m-md-5" style={{ background: "#cccccc" }}>
+    <h1 className={`${classes.title}`}>
+      {courseId ? 'Update' : 'Add'} Course
+    </h1>
+    {/* make the alert small */}
+
+    {alert && (
+      <Alert variant='filled' severity={alertType} sx={{ width: 20 }}>
+        {alertText}
+      </Alert>
+    )}
+    <Form className={`${classes.form}`} onSubmit={handleSubmit}>
+      <Row className='mb-3'>
+        <Form.Group as={Col} controlId='formGridTitle'>
+          <Form.Label>Title</Form.Label>
+          <Form.Control type='text' placeholder='Enter course title' />
+        </Form.Group>
+
+        <Form.Group as={Col} controlId='formGridSubject'>
+          <Form.Label>Subject</Form.Label>
+          <Form.Control type='text' placeholder='Subject' />
+        </Form.Group>
+      </Row>
+      <Row className='mb-3'>
+        <Form.Group as={Col} controlId='formGridPrice'>
+          <Form.Label>Price</Form.Label>
+          <Form.Control type='text' placeholder='Enter course price' />
+        </Form.Group>
+
+        <Form.Group as={Col} controlId='formGridNumberOfHours'>
+          <Form.Label>Number Of Hours</Form.Label>
+          <Form.Control type='text' placeholder='Number Of Hours' />
+        </Form.Group>
+
+        <Form.Group as={Col} controlId='formGridPromotion'>
+          <Form.Label>Promotion</Form.Label>
+          <Form.Control type='text' placeholder='Promotion' />
+        </Form.Group>
+      </Row>
+      <Form.Group className='mb-3' controlId='formGridPreviewLink'>
+        <Form.Label>Preview Link</Form.Label>
+        <Form.Control placeholder='Preview Link' />
+      </Form.Group>
+
+      <Form.Group className='mb-3' controlId='formGridSummary'>
+        <Form.Label>Summary</Form.Label>
+        <Form.Control as='textarea' placeholder='Summary' />
+      </Form.Group>
+
+      <Button variant='primary' type='submit'>
         {courseId ? 'Update' : 'Add'} Course
-      </h1>
-      {/* make the alert small */}
-
-      {alert && (
-        <Alert variant='filled' severity={alertType} sx={{ width: 20 }}>
-          {alertText}
-        </Alert>
-      )}
-      <Form className={`${classes.form}`} onSubmit={handleSubmit}>
-        <Row className='mb-3'>
-          <Form.Group as={Col} controlId='formGridTitle'>
-            <Form.Label>Title</Form.Label>
-            <Form.Control type='text' placeholder='Enter course title' />
-          </Form.Group>
-
-          <Form.Group as={Col} controlId='formGridSubject'>
-            <Form.Label>Subject</Form.Label>
-            <Form.Control type='text' placeholder='Subject' />
-          </Form.Group>
-        </Row>
-        <Row className='mb-3'>
-          <Form.Group as={Col} controlId='formGridPrice'>
-            <Form.Label>Price</Form.Label>
-            <Form.Control type='text' placeholder='Enter course price' />
-          </Form.Group>
-
-          <Form.Group as={Col} controlId='formGridNumberOfHours'>
-            <Form.Label>Number Of Hours</Form.Label>
-            <Form.Control type='text' placeholder='Number Of Hours' />
-          </Form.Group>
-
-          <Form.Group as={Col} controlId='formGridPromotion'>
-            <Form.Label>Promotion</Form.Label>
-            <Form.Control type='text' placeholder='Promotion' />
-          </Form.Group>
-        </Row>
-        <Form.Group className='mb-3' controlId='formGridPreviewLink'>
-          <Form.Label>Preview Link</Form.Label>
-          <Form.Control placeholder='Preview Link' />
-        </Form.Group>
-
-        <Form.Group className='mb-3' controlId='formGridSummary'>
-          <Form.Label>Summary</Form.Label>
-          <Form.Control as='textarea' placeholder='Summary' />
-        </Form.Group>
-
-        <Button variant='primary' type='submit'>
-          {courseId ? 'Update' : 'Add'} Course
-        </Button>
-      </Form>
-    </div>
-  );
+      </Button>
+    </Form>
+  </div>
+);
 }
 
 export default AddCourseForm;
