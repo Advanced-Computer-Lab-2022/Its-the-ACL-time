@@ -1,8 +1,8 @@
 import Card from 'react-bootstrap/Card';
 import ListGroup from 'react-bootstrap/ListGroup';
 
-function Course({ courseTitle, courseDescription, courseInstructor }) {
-  console.log({ courseTitle, courseDescription, courseInstructor });
+function Course({ courseTitle, courseDescription, courseInstructor,coursePrice,courseSubject,courseSummary }) {
+  // console.log({ courseTitle, courseDescription, courseInstructor ,coursePrice});
   return (
     <Card style={{ width: '20rem', margin: '8px' }}>
       <Card.Img variant='top' src='../Images/course1.png' />
@@ -12,6 +12,9 @@ function Course({ courseTitle, courseDescription, courseInstructor }) {
       </Card.Body>
       <ListGroup className='list-group-flush'>
         <ListGroup.Item>{courseInstructor}</ListGroup.Item>
+        {coursePrice && <span>price : {coursePrice}</span>}
+        {courseSubject && <span>subject : {courseSubject}</span>}
+        {courseSummary && <span>summary : {courseSummary}</span>}
         <ListGroup.Item></ListGroup.Item>
       </ListGroup>
       <Card.Body>

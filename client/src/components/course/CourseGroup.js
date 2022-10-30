@@ -27,6 +27,10 @@ const CourseGroup = ({ courses }) => {
                 courseTitle={course.title}
                 courseDescription={course.description}
                 courseInstructor={course.instructor}
+                coursePrice = {course.price}
+                courseSubject = {course.subject}
+                courseSummary = {course.summary}
+                courseNumberOfHours = {course.numberOfHours}
               />
             </div>
           );

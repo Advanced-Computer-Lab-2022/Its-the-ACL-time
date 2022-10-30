@@ -87,7 +87,7 @@ function AddCourseForm() {
   };
 
   return (
-    <div className={`${classes.container}`}>
+    <div className="border-3 m-0 m-md-5" style={{background:"#cccccc"}}>
       <h1 className={`${classes.title}`}>
         {courseId ? 'Update' : 'Add'} Course
       </h1>
