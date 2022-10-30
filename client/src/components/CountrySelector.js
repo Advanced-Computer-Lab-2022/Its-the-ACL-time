@@ -7,7 +7,7 @@ function CountrySelector({setCountry}) {
   const options = useMemo(() => countryList().getData(), [])
   options.forEach((element,index)=>{
      if(element.label === "Israel"){
-      element.label = "Israel do you mean Palestine"
+      element.label = "Israel?? do you mean Palestine"
      }
   })
 

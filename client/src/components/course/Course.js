@@ -4,8 +4,8 @@ import ListGroup from 'react-bootstrap/ListGroup';
 function Course({ courseTitle, courseDescription, courseInstructor }) {
   console.log({ courseTitle, courseDescription, courseInstructor });
   return (
-    <Card style={{ width: '5rem', margin: '8px' }}>
-      <Card.Img variant='top' src='holder.js/100px180?text=Image cap' />
+    <Card style={{ width: '20rem', margin: '8px' }}>
+      <Card.Img variant='top' src='../Images/course1.png' />
       <Card.Body>
         <Card.Title>{courseTitle}</Card.Title>
         <Card.Text>{courseDescription}</Card.Text>
