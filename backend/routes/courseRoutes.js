@@ -5,6 +5,7 @@ const {
   getAllCourses,
   getCourse,
   updateCourse,
+  getCoursesInstructor
 } = require('../controllers/courseController');
 
 const {
@@ -16,6 +17,7 @@ const {
 
 router.route('/').post(createCourse).get(getAllCourses);
 router.route('/:courseId').get(getCourse).patch(updateCourse);
+router.get('/instructor/:id',getCoursesInstructor);
 
 // SubTitle Routes
 

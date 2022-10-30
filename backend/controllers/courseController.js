@@ -86,9 +86,22 @@ const updateCourse = async (req, res) => {
   res.status(StatusCodes.OK).json({ updatedCourse });
 };
 
+
+const getCoursesInstructor = async (req,res) =>{
+  const instructor = req.params.id;
+  Course.find({createdBy:instructor},(err,data)=>{
+    if (err) {
+      res.status(StatusCodes.BAD_REQUEST).send(err);
+    } else {
+      res.status(StatusCodes.OK).json({ data });
+    }
+  });
+} 
+
 module.exports = {
   createCourse,
   getCourse,
   getAllCourses,
   updateCourse,
+  getCoursesInstructor
 };
