@@ -8,36 +8,37 @@ import { CourseProvider } from './context/Course/courseContext';
 function App() {
   return (
     <BrowserRouter>
-      <Routes>
-        <Route path='/login' element={<Login />} />
-        <Route path='/register' element={<Register />} />
-        <Route element={<NavBar />}>
-          <Route path='/landing' element={<Landing />} />
+      <CourseProvider>
+        <Routes>
+          <Route path='/login' element={<Login />} />
+          <Route path='/register' element={<Register />} />
+          <Route element={<NavBar />}>
+            <Route path='/landing' element={<Landing />} />
+            <Route
+              index
+              element={
+                <ProtectedRoute>
+                  <Home />
+                </ProtectedRoute>
+              }
+            />
+          </Route>
+          <Route path='/courses' element={<CourseGroup />} />
+          <Route path='/course' element={<CourseForm />} />
+          <Route path='/course/:courseId' element={<CourseForm />} />
           <Route
-            index
+            path='/search'
             element={
-              <ProtectedRoute>
-                <Home />
-              </ProtectedRoute>
+              <Search />
             }
           />
-        </Route>
-        <Route path='/courses' element={<CourseGroup />} />
-        <Route path='/course' element={<CourseForm />} />
-        <Route path='/course/:courseId' element={<CourseForm />} />
-        <Route
-          path='/search'
-          element={
-            <CourseProvider>
-              <Search />
-            </CourseProvider>
-          }
-        />
-        <Route
-          path='/course/:courseId/subtitle'
-          element={<AddSubtitleForm />}
-        />
-      </Routes>
+          <Route
+            path='/course/:courseId/subtitle'
+            element={<AddSubtitleForm />}
+          />
+
+        </Routes>
+      </CourseProvider>
     </BrowserRouter>
   );
 }

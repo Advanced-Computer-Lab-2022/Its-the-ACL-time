@@ -3,7 +3,7 @@ import Card from 'react-bootstrap/Card';
 import ListGroup from 'react-bootstrap/ListGroup';
 import { CourseGroup, Course } from '../components';
 import { makeStyles } from '@material-ui/core/styles';
-
+import {useCourseContext} from '../context/Course/courseContext'
 const useStyles = makeStyles((theme) => ({
   main: {
     height: '80vh',
@@ -31,6 +31,8 @@ const courses = [
 
 const Home = () => {
   const classes = useStyles();
+  const courses1 = useCourseContext()
+  console.log(courses1);
   return (
     <main className={`${classes.main}`}>
       <CourseGroup courses={courses} />

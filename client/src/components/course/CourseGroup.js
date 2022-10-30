@@ -11,34 +11,6 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-const course = [
-  {
-    title: 'csen701',
-    description: 'new course',
-    instructor: 'slim',
-  },
-  {
-    title: 'csen701',
-    description: 'new course',
-    instructor: 'slim',
-  },
-  {
-    title: 'csen701',
-    description: 'new course',
-    instructor: 'slim',
-  },
-  {
-    title: 'csen701',
-    description: 'new course',
-    instructor: 'slim',
-  },
-  {
-    title: 'csen701',
-    description: 'new course',
-    instructor: 'slim',
-  },
-];
-
 const CourseGroup = ({ courses }) => {
   const classes = useStyles();
   return (
