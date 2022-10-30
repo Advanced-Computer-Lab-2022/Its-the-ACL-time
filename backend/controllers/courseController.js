@@ -37,7 +37,6 @@ const getCourse = async (req, res) => {
 };
 
 const getAllCourses = async (req, res) => {
-  const { userId, type } = req.user;
   const { myCourses } = req.query;
   const query = Object.keys(req.query)
     .map((key) => (req.query[key] === 'false' ? `-${key}` : ''))
@@ -46,6 +45,7 @@ const getAllCourses = async (req, res) => {
   let courses;
   console.log(query);
   if (myCourses === 'true') {
+    const { userId, type } = req.user;
     if (type === 'Instructor') {
       courses = await Course.find({ createdBy: userId }).select(`${query}`);
       return res.status(StatusCodes.OK).json({ courses });
