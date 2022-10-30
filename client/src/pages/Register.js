@@ -1,4 +1,4 @@
-import React, { useRef } from 'react';
+import React, { useRef ,useState} from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import {
   Avatar,
@@ -14,7 +14,7 @@ import {
   Container,
   MenuItem,
 } from '@material-ui/core';
-import { Loading } from '../components';
+import { Loading, CountrySelector } from '../components';
 import Alert from '@material-ui/lab/Alert';
 import LockOutlinedIcon from '@material-ui/icons/LockOutlined';
 import { makeStyles } from '@material-ui/core/styles';
@@ -69,20 +69,21 @@ export default function Register() {
   const username = useRef(null);
   const email = useRef(null);
   const category = useRef(null);
+  const [country,setCountry] = useState('Country');
 
   const handleRegister = (e) => {
     e.preventDefault();
     // get the values from the form
-
     const user = {
       username: username.current.value,
       password: password.current.value,
       email: email.current.value,
       type: category.current.value,
+      country:country,
       endPoint: 'register',
     };
 
-    if (!user.username || !user.password || !user.email || !user.type) {
+    if (!user.username || !user.password || !user.email || !user.type || !user.country) {
       console.log('error');
       setAlert('error', 'Please Provide all values');
       setTimeout(() => clearAlert(), 3000);
@@ -168,6 +169,10 @@ export default function Register() {
                 </MenuItem>
                 <MenuItem value='Corporate trainee'>Corporate trainee</MenuItem>
               </TextField>
+            </Grid>
+            <Grid item xs={12}>
+              <label>Country</label>
+              <CountrySelector setCountry={setCountry} />
             </Grid>
             {/* <Grid item xs={12}>
               <InputLabel id='label'>Category</InputLabel>

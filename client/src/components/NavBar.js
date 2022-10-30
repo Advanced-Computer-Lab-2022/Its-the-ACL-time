@@ -7,6 +7,7 @@ import NavDropdown from 'react-bootstrap/NavDropdown';
 import Offcanvas from 'react-bootstrap/Offcanvas';
 import { makeStyles } from '@material-ui/core/styles';
 import { Outlet } from 'react-router-dom';
+import CountrySelector from './CountrySelector';
 
 const useStyles = makeStyles((theme) => ({
   name: {

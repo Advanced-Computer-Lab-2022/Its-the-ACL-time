@@ -52,7 +52,7 @@ const AppProvider = ({ children }) => {
     localStorage.removeItem('token');
   };
 
-  const setup = async ({ email, password, username, type, endPoint }) => {
+  const setup = async ({ email, password, username,country, type, endPoint }) => {
     dispatch({ type: USER_SETUP_BEGIN });
     const url = `http://localhost:8080/api/v1/auth/${endPoint}`;
 
@@ -60,6 +60,7 @@ const AppProvider = ({ children }) => {
       let body = {
         email,
         password,
+        country
       };
 
       if (endPoint === 'register')
