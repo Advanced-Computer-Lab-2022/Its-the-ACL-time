@@ -22,10 +22,7 @@ const examRouter = require('./routes/examRoutes');
 //const questionRouter = require('./routes/questionRoutes');
 
 const corsOptions = {
-  origin:
-    process.env.ENV === 'development'
-      ? 'http://localhost:3000'
-      : process.env.CLIENT_URL,
+  origin:'http://localhost:3000',
   optionsSuccessStatus: 200,
 };
 
