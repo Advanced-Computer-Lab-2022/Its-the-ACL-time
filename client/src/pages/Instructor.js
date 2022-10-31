@@ -23,7 +23,7 @@ export default function Instructor() {
   console.log(priceTo);
 
   let instId = useParams().instId;
-  instId = '6355735013d973de4410cbf7';
+  instId = '635e894524fe8f2ac3fc4919';
 
   function handleUnique(data) {
     let unique = ['all'];
