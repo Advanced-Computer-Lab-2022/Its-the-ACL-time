@@ -210,14 +210,16 @@ export default function Instructor() {
               {sub}
             </button>
           ))}
-        {filteredCourses && filteredCourses.map((course) => {
-          return (
-            <section className='container m-2 w-100' style={{
-              width: '80vw',
-              margin: '1rem 40vw 5rem 5vw'
-            }}>
-              <h1>Your Courses</h1>
-              <div className='d-flex '>
+        <section className='container m-2 w-100' style={{
+          width: '80vw',
+          margin: '1rem 40vw 5rem 5vw'
+        }}>
+          <h1>Your Courses</h1>
+          <div className='d-flex flex-wrap'>
+
+            {filteredCourses && filteredCourses.map((course) => {
+              return (
+
                 <CourseCard
                   courseTitle={course.title}
                   courseDescription={course.description}
@@ -225,11 +227,12 @@ export default function Instructor() {
                   courseSubject={course.subject}
                   courseSummary={course.summary}
                 />
-              </div>
-            </section>
-          );
-        })
-        }
+              );
+            })
+            }
+          </div>
+        </section>
+
         {error && <div className='text-danger'>{error}</div>}
       </div>
     </>
