@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useSearchParams } from 'react-router-dom';
-import { CourseForm } from '../components/course';
-import Courses from './Courses';
+import { CourseForm,Course } from '../components/course';
+
 
 export default function Instructor() {
   const [instCourses, setInstCourses] = useState([]);
@@ -40,7 +40,7 @@ export default function Instructor() {
   useEffect(() => {
     // fetch courses add them to the filterCourses and Courses
     // runs only once while first rendering
-    fetch(`/api/v1/course/instructor/${instId}`)
+    fetch(`http://localhost:8080/api/v1/course/instructor/${instId}`)
       .then((res) => res.json())
       .then((res) => {
         setInstCourses((old) => res.data);
@@ -208,7 +208,18 @@ export default function Instructor() {
               {sub}
             </button>
           ))}
-        {/* {filteredCourses && <Courses />} */}
+        {filteredCourses && filteredCourses.map((course) => {
+            return (
+              <Course
+                key={course._id}
+                title={course.title}
+                subject={course.subject}
+                description={course.description}
+                instructor={course.instructor}
+                price={course.price}
+              />
+            );})
+          }
         {error && <div className='text-danger'>{error}</div>}
       </div>
     </>
