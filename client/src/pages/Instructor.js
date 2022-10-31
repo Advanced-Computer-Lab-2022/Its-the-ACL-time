@@ -211,13 +211,15 @@ export default function Instructor() {
         {filteredCourses && filteredCourses.map((course) => {
           return (
             <div className='d-flex flex-wrap'>
-              <CourseCard
-                courseTitle={course.title}
-                courseDescription={course.description}
-                coursePrice={course.price}
-                courseSubject={course.subject}
-                courseSummary={course.summary}
-              />
+              <div>
+                <CourseCard
+                  courseTitle={course.title}
+                  courseDescription={course.description}
+                  coursePrice={course.price}
+                  courseSubject={course.subject}
+                  courseSummary={course.summary}
+                />
+              </div>
             </div>
           );
         })
