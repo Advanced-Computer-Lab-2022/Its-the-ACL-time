@@ -1,8 +1,7 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useState } from 'react';
 import { useParams, useSearchParams } from 'react-router-dom';
-import { CourseForm, CourseGroup } from '../components/course';
-
-
+import { CourseForm } from '../components/course';
+import Courses from './Courses';
 
 export default function Instructor() {
   const [instCourses, setInstCourses] = useState([]);
@@ -11,11 +10,15 @@ export default function Instructor() {
   const [showCreateCourse, setShowCreateCourse] = useState(false);
   const [showFilterPrice, setShowFilterPrice] = useState(false);
   const [filteredCourses, setFilterCourses] = useState([]);
-  const [searchQuery, setSearchQuery] = useSearchParams({ search: "" });
-  const [search, setSearch] = useState(searchQuery.get("search"));
+  const [searchQuery, setSearchQuery] = useSearchParams({ search: '' });
+  const [search, setSearch] = useState(searchQuery.get('search'));
   const [uniqueSubject, setUniqueSubject] = useState([]);
-  const [priceFrom, setPriceFrom] = useState(Number(searchQuery.get("priceFrom")) || 0);
-  const [priceTo, setPriceTo] = useState(Number(searchQuery.get("priceTo")) || 100000);
+  const [priceFrom, setPriceFrom] = useState(
+    Number(searchQuery.get('priceFrom')) || 0
+  );
+  const [priceTo, setPriceTo] = useState(
+    Number(searchQuery.get('priceTo')) || 100000
+  );
   console.log(priceFrom);
   console.log(priceTo);
 
@@ -23,9 +26,9 @@ export default function Instructor() {
   instId = '6355735013d973de4410cbf7';
 
   function handleUnique(data) {
-    let unique = ["all"]
-    let lookUp = {}
-    data.forEach(e => {
+    let unique = ['all'];
+    let lookUp = {};
+    data.forEach((e) => {
       if (!(e.subject in lookUp)) {
         unique.push(e.subject);
         lookUp[e.subject] = 1;
@@ -38,98 +41,176 @@ export default function Instructor() {
     // fetch courses add them to the filterCourses and Courses
     // runs only once while first rendering
     fetch(`http://localhost:8080/api/v1/course/instructor/${instId}`)
-      .then((res) => res.json()).then((res) => {
+      .then((res) => res.json())
+      .then((res) => {
         setInstCourses((old) => res.data);
         let filteredCourses = res.data.filter(
-          (course) => course.title.toLowerCase().startsWith(search) ||
+          (course) =>
+            course.title.toLowerCase().startsWith(search) ||
             course.subject.toLowerCase().startsWith(search)
-        )
-        filteredCourses = filteredCourses.filter((course) => course.price >= priceFrom && course.price <= priceTo);
+        );
+        filteredCourses = filteredCourses.filter(
+          (course) => course.price >= priceFrom && course.price <= priceTo
+        );
         setFilterCourses(filteredCourses);
         setIsLoading(false);
         handleUnique(res.data);
       })
-      .catch((err) => { setError("failed to load courses"); setIsLoading(false) });
-  }, [])
+      .catch((err) => {
+        setError('failed to load courses');
+        setIsLoading(false);
+      });
+  }, []);
   function addCourseFront(courseData) {
     instCourses.unshift(courseData);
     setInstCourses([...instCourses]);
     setFilterCourses([...instCourses]);
-    setTimeout(()=>
-    setShowCreateCourse(false)
-    ,3000)
+    setTimeout(() => setShowCreateCourse(false), 3000);
   }
   function filter(filter, subject) {
     filter = filter.toLowerCase();
-    let filteredCourses = []
+    let filteredCourses = [];
     console.log(subject);
     if (!subject) {
       filteredCourses = instCourses.filter(
-        (course) => course.title.toLowerCase().startsWith(filter) ||
-          course.subject.toLowerCase().startsWith(filter));
+        (course) =>
+          course.title.toLowerCase().startsWith(filter) ||
+          course.subject.toLowerCase().startsWith(filter)
+      );
       console.log(filteredCourses);
-
     } else {
-      if (filter === "all") {
+      if (filter === 'all') {
         filteredCourses = instCourses;
       } else {
         filteredCourses = instCourses.filter(
-          (course) => course.subject.toLowerCase() === (filter))
+          (course) => course.subject.toLowerCase() === filter
+        );
       }
     }
-    filteredCourses = filteredCourses.filter((course) => course.price >= priceFrom && course.price <= priceTo);
+    filteredCourses = filteredCourses.filter(
+      (course) => course.price >= priceFrom && course.price <= priceTo
+    );
     setFilterCourses(filteredCourses);
   }
   function handleSubmit(e) {
     e.preventDefault();
-    setSearchQuery({ "search": search })
+    setSearchQuery({ search: search });
   }
   function handleSubmitPrice(e) {
     e.preventDefault();
-    setSearchQuery({ "priceFrom": priceFrom, "priceTo": priceTo });
-    setSearch("");
-    filter("all", true);
+    setSearchQuery({ priceFrom: priceFrom, priceTo: priceTo });
+    setSearch('');
+    filter('all', true);
   }
   return (
     <>
-      <nav className="m-0 m-md-3 navbar navbar-light bg-light row">
-        <div className="container-fluid col">
-          <span className="navbar-brand mb-0 h1">Instructor Page</span>
+      <nav className='m-0 m-md-3 navbar navbar-light bg-light row'>
+        <div className='container-fluid col'>
+          <span className='navbar-brand mb-0 h1'>Instructor Page</span>
         </div>
-        <div className="container-fluid col">
-          <form className="d-flex" onSubmit={handleSubmit}>
-            <input className="form-control me-2" name="search" value={search} onChange={(e) => { setSearch(e.target.value); filter(e.target.value, false); }} type="search" placeholder="Search" aria-label="Search" />
-            <button className="btn btn-outline-success" type="submit">Search</button>
+        <div className='container-fluid col'>
+          <form className='d-flex' onSubmit={handleSubmit}>
+            <input
+              className='form-control me-2'
+              name='search'
+              value={search}
+              onChange={(e) => {
+                setSearch(e.target.value);
+                filter(e.target.value, false);
+              }}
+              type='search'
+              placeholder='Search'
+              aria-label='Search'
+            />
+            <button className='btn btn-outline-success' type='submit'>
+              Search
+            </button>
           </form>
         </div>
-        {!showCreateCourse && <button className="btn btn-outline-primary m-3 col" onClick={() => setShowCreateCourse(true)}>Add Course</button>}
-        {showCreateCourse && <button className="btn btn-outline-primary m-4 col" onClick={() => setShowCreateCourse(false)}>Hide Form </button>}
+        {!showCreateCourse && (
+          <button
+            className='btn btn-outline-primary m-3 col'
+            onClick={() => setShowCreateCourse(true)}
+          >
+            Add Course
+          </button>
+        )}
+        {showCreateCourse && (
+          <button
+            className='btn btn-outline-primary m-4 col'
+            onClick={() => setShowCreateCourse(false)}
+          >
+            Hide Form{' '}
+          </button>
+        )}
       </nav>
-      {showCreateCourse && <CourseForm addCourseFront={addCourseFront} instId={instId}></CourseForm>}
+      {showCreateCourse && (
+        <CourseForm
+          addCourseFront={addCourseFront}
+          instId={instId}
+        ></CourseForm>
+      )}
       <div className='container w-100'>
         {isLoading && <div>is loading .......</div>}
         <div className='d-block'>
-          {!showFilterPrice && <button onClick={() => setShowFilterPrice(true)} className="btn btn-outline-primary">filter with price</button>}
-          {showFilterPrice && <button onClick={() => setShowFilterPrice(false)} className="btn btn-outline-primary">hide filter</button>}
-          {showFilterPrice &&
+          {!showFilterPrice && (
+            <button
+              onClick={() => setShowFilterPrice(true)}
+              className='btn btn-outline-primary'
+            >
+              filter with price
+            </button>
+          )}
+          {showFilterPrice && (
+            <button
+              onClick={() => setShowFilterPrice(false)}
+              className='btn btn-outline-primary'
+            >
+              hide filter
+            </button>
+          )}
+          {showFilterPrice && (
             <form onSubmit={handleSubmitPrice}>
-              <label for="from">from</label>
-              <input value={priceFrom} onChange={(e) => setPriceFrom(e.target.value)} id="from" type="number"></input>
-              <label for="from">to</label>
-              <input value={priceTo} onChange={(e) => setPriceTo(e.target.value)} id="to" type="number"></input>
-              <input className="btn btn-outline-primary m-2 py-1" type="submit" value="show courses"></input>
-              <button className="btn btn-outline-primary m-2 py-1" onClick={() => { setPriceFrom(0); setPriceTo(10000); }}>reset</button>
+              <label for='from'>from</label>
+              <input
+                value={priceFrom}
+                onChange={(e) => setPriceFrom(e.target.value)}
+                id='from'
+                type='number'
+              ></input>
+              <label for='from'>to</label>
+              <input
+                value={priceTo}
+                onChange={(e) => setPriceTo(e.target.value)}
+                id='to'
+                type='number'
+              ></input>
+              <input
+                className='btn btn-outline-primary m-2 py-1'
+                type='submit'
+                value='show courses'
+              ></input>
+              <button
+                className='btn btn-outline-primary m-2 py-1'
+                onClick={() => {
+                  setPriceFrom(0);
+                  setPriceTo(10000);
+                }}
+              >
+                reset
+              </button>
             </form>
-          }
+          )}
         </div>
-        {uniqueSubject && uniqueSubject.map((sub) =>
-          <button onClick={() => filter(sub, true)} className="btn btn-link">{sub}</button>
-        )}
-        {filteredCourses && <CourseGroup courses={filteredCourses} />}
-        {error && <div className="text-danger">{error}</div>}
+        {uniqueSubject &&
+          uniqueSubject.map((sub) => (
+            <button onClick={() => filter(sub, true)} className='btn btn-link'>
+              {sub}
+            </button>
+          ))}
+        {filteredCourses && <Courses />}
+        {error && <div className='text-danger'>{error}</div>}
       </div>
     </>
-  )
+  );
 }
-
-

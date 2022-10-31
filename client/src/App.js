@@ -7,15 +7,16 @@ import {
   ProtectedRoute,
   Instructor,
 } from './pages';
-import { CourseGroup, NavBar, CourseForm } from './components';
+import Admin from './pages/Admin';
+import { NavBar, CourseForm, Courses } from './components';
 import AddSubtitleForm from './components/subtitle/AddSubtitleForm';
 import Search from './components/Search';
 import { CourseProvider } from './context/Course/courseContext';
 
 function App() {
   return (
-    <CourseProvider>
-      <BrowserRouter>
+    <BrowserRouter>
+      <CourseProvider>
         <Routes>
           <Route path='/Admin' element={<Admin />} />
           <Route path='/login' element={<Login />} />
@@ -41,8 +42,8 @@ function App() {
             element={<AddSubtitleForm />}
           />
         </Routes>
-      </BrowserRouter>
-    </CourseProvider>
+      </CourseProvider>
+    </BrowserRouter>
   );
 }
 

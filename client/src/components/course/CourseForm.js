@@ -26,7 +26,7 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-function AddCourseForm() {
+function CourseForm() {
   const classes = useStyles();
 
   const { courseId } = useParams();
@@ -55,26 +55,18 @@ function AddCourseForm() {
     };
 
     try {
-      const response = await axios.request({
-        baseURL: courseId
-          ? `http://localhost:8080/api/v1/course/${courseId}`
-          : 'http://localhost:8080/api/v1/course/',
-        method: courseId ? 'PATCH' : 'POST',
-        data: course,
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${localStorage.getItem('token')}`,
-        },
-      });
-
-      console.log(response);
-
+      if (courseId) {
+        await updateCourse(courseId, course);
+      } else {
+        await createCourse(course);
+      }
       setAlert(
         'success',
         `Course ${courseId ? 'Updated' : 'Created'} successfully`
       );
       clearAlert();
     } catch (error) {
+      console.log('error' + error);
       const { msg } = error.response.data;
 
       console.log(error.response.data.msg);
@@ -82,10 +74,41 @@ function AddCourseForm() {
       setAlert('error', msg);
 
       clearAlert();
-
-      console.log(error);
     }
   };
+
+  //   try {
+  //     const response = await axios.request({
+  //       baseURL: courseId
+  //         ? `http://localhost:8080/api/v1/course/${courseId}`
+  //         : 'http://localhost:8080/api/v1/course/',
+  //       method: courseId ? 'PATCH' : 'POST',
+  //       data: course,
+  //       headers: {
+  //         'Content-Type': 'application/json',
+  //         Authorization: `Bearer ${localStorage.getItem('token')}`,
+  //       },
+  //     });
+
+  //     console.log(response);
+
+  //     setAlert(
+  //       'success',
+  //       `Course ${courseId ? 'Updated' : 'Created'} successfully`
+  //     );
+  //     clearAlert();
+  //   } catch (error) {
+  //     const { msg } = error.response.data;
+
+  //     console.log(error.response.data.msg);
+
+  //     setAlert('error', msg);
+
+  //     clearAlert();
+
+  //     console.log(error);
+  //   }
+  // };
 
   return (
     <div className={`${classes.container}`}>
@@ -114,17 +137,17 @@ function AddCourseForm() {
         <Row className='mb-3'>
           <Form.Group as={Col} controlId='formGridPrice'>
             <Form.Label>Price</Form.Label>
-            <Form.Control type='text' placeholder='Enter course price' />
+            <Form.Control type='number' placeholder='Enter course price' />
           </Form.Group>
 
           <Form.Group as={Col} controlId='formGridNumberOfHours'>
             <Form.Label>Number Of Hours</Form.Label>
-            <Form.Control type='text' placeholder='Number Of Hours' />
+            <Form.Control type='number' placeholder='Number Of Hours' />
           </Form.Group>
 
           <Form.Group as={Col} controlId='formGridPromotion'>
             <Form.Label>Promotion</Form.Label>
-            <Form.Control type='text' placeholder='Promotion' />
+            <Form.Control type='number' placeholder='Promotion' />
           </Form.Group>
         </Row>
         <Form.Group className='mb-3' controlId='formGridPreviewLink'>

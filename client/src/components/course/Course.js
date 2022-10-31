@@ -3,24 +3,63 @@ import Typography from '@material-ui/core/Typography';
 import ButtonBase from '@material-ui/core/ButtonBase';
 import { makeStyles } from '@material-ui/core/styles';
 
-function Course({ courseTitle, courseDescription, courseInstructor }) {
-  console.log({ courseTitle, courseDescription, courseInstructor });
+const useStyles = makeStyles((theme) => ({
+  root: {
+    margin: '2rem',
+  },
+  image: {
+    width: 128,
+    height: 128,
+  },
+  img: {
+    margin: 'auto',
+    display: 'block',
+    maxWidth: '100%',
+    maxHeight: '100%',
+  },
+}));
+
+function Course({ title, description, instructor, price }) {
+  const classes = useStyles();
+
   return (
-    <Card style={{ width: '5rem', margin: '8px' }}>
-      <Card.Img variant='top' src='holder.js/100px180?text=Image cap' />
-      <Card.Body>
-        <Card.Title>{courseTitle}</Card.Title>
-        <Card.Text>{courseDescription}</Card.Text>
-      </Card.Body>
-      <ListGroup className='list-group-flush'>
-        <ListGroup.Item>{courseInstructor}</ListGroup.Item>
-        <ListGroup.Item></ListGroup.Item>
-      </ListGroup>
-      <Card.Body>
-        <Card.Link href='#'>Card Link</Card.Link>
-        <Card.Link href='#'>Another Link</Card.Link>
-      </Card.Body>
-    </Card>
+    <div className={`${classes.root}`}>
+      <Grid container spacing={2}>
+        <Grid item>
+          <ButtonBase className={classes.image}>
+            <img
+              className={classes.img}
+              alt='complex'
+              src='/static/images/grid/complex.jpg'
+            />
+          </ButtonBase>
+        </Grid>
+        <Grid item xs={12} sm container>
+          <Grid item xs container direction='column' spacing={2}>
+            <Grid item xs>
+              <Typography gutterBottom variant='subtitle1'>
+                {title || 'Course Title'}
+              </Typography>
+              <Typography variant='body2' gutterBottom>
+                {instructor || 'Course Instructor'}
+              </Typography>
+              <Typography variant='body2' color='textSecondary'>
+                {description || 'Course Description'}
+              </Typography>
+            </Grid>
+            <Grid item>
+              <Typography variant='body2' style={{ cursor: 'pointer' }}>
+                Add to Cart
+              </Typography>
+            </Grid>
+          </Grid>
+          <Grid item>
+            <Typography variant='subtitle1'>${price}</Typography>
+          </Grid>
+        </Grid>
+      </Grid>
+      <hr />
+    </div>
   );
 }
 
