@@ -1,20 +1,19 @@
-import Card from 'react-bootstrap/Card';
-import ListGroup from 'react-bootstrap/ListGroup';
+import Grid from '@material-ui/core/Grid';
+import Typography from '@material-ui/core/Typography';
+import ButtonBase from '@material-ui/core/ButtonBase';
+import { makeStyles } from '@material-ui/core/styles';
 
-function Course({ courseTitle, courseDescription, courseInstructor,coursePrice,courseSubject,courseSummary }) {
-  // console.log({ courseTitle, courseDescription, courseInstructor ,coursePrice});
+function Course({ courseTitle, courseDescription, courseInstructor }) {
+  console.log({ courseTitle, courseDescription, courseInstructor });
   return (
-    <Card style={{ width: '20rem', margin: '8px' }}>
-      <Card.Img variant='top' src='../Images/course1.png' />
+    <Card style={{ width: '5rem', margin: '8px' }}>
+      <Card.Img variant='top' src='holder.js/100px180?text=Image cap' />
       <Card.Body>
         <Card.Title>{courseTitle}</Card.Title>
         <Card.Text>{courseDescription}</Card.Text>
       </Card.Body>
       <ListGroup className='list-group-flush'>
         <ListGroup.Item>{courseInstructor}</ListGroup.Item>
-        {coursePrice && <span>price : {coursePrice}</span>}
-        {courseSubject && <span>subject : {courseSubject}</span>}
-        {courseSummary && <span>summary : {courseSummary}</span>}
         <ListGroup.Item></ListGroup.Item>
       </ListGroup>
       <Card.Body>

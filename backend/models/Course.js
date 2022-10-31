@@ -26,7 +26,7 @@ const CourseSchema = mongoose.Schema({
     required: [true, 'Please provide number of hours'],
   },
   ratings: {
-    type: [Number],
+    type: Number,
   },
   reviews: [
     {
@@ -34,6 +34,9 @@ const CourseSchema = mongoose.Schema({
       review: { type: String },
     },
   ],
+  numberOfStudents: {
+    type: Number,
+  },
   promotion: {
     type: Number,
   },

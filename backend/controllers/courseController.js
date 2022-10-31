@@ -68,7 +68,7 @@ const getAllCourses = async (req, res) => {
 const updateCourse = async (req, res) => {
   const { type, userId } = req.user;
   const { courseId } = req.params;
-
+  console.log(req.body);
   if (!courseId) throw new BadRequestError('Please provide course id');
 
   if (type !== 'Instructor')
@@ -83,7 +83,7 @@ const updateCourse = async (req, res) => {
 
   const updatedCourse = await Course.findOneAndUpdate(
     { _id: courseId },
-    req.body,
+    { ...req.body },
     { new: true }
   );
   res.status(StatusCodes.OK).json({ updatedCourse });

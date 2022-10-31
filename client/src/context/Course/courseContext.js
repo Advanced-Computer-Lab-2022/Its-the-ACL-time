@@ -1,6 +1,6 @@
 import React, { useContext, useReducer, useEffect } from 'react';
 import courseReducer from './courseReducer';
-import { CREATE_COURSE, GET_COURSES } from './courseActions';
+import { CREATE_COURSE, GET_COURSES, UPDATE_COURSE } from './courseActions';
 import axios from 'axios';
 import { useAppContext } from '../App/appContext';
 
@@ -22,7 +22,6 @@ const CourseProvider = ({ children }) => {
         },
       })
       .then(({ data }) => {
-        console.log(data);
         dispatch({
           type: GET_COURSES,
           payload: {
@@ -33,10 +32,55 @@ const CourseProvider = ({ children }) => {
       .catch((error) => console.log(error));
   }, []);
 
+  const createCourse = async (course) => {
+    console.log(course);
+    try {
+      const response = await axios.post(
+        'http://localhost:8080/api/v1/course',
+        course,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      dispatch({
+        type: CREATE_COURSE,
+        payload: { course: response.data.course },
+      });
+      console.log(response.data);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const updateCourse = async (courseId, course) => {
+    try {
+      const response = await axios.patch(
+        `http://localhost:8080/api/v1/course/${courseId}`,
+        course,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      dispatch({
+        type: UPDATE_COURSE,
+        payload: { course: response.data.updatedCourse },
+      });
+      console.log(response.data);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
   return (
     <CourseContext.Provider
       value={{
         ...state,
+        createCourse,
+        updateCourse,
       }}
     >
       {children}

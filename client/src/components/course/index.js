@@ -1,5 +1,5 @@
 import CourseForm from './CourseForm';
-import CourseGroup from './CourseGroup';
+import Courses from '../../pages/Courses';
 import Course from './Course';
 
-export { CourseForm, CourseGroup, Course };
+export { CourseForm, Courses, Course };

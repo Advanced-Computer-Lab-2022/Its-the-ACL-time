@@ -1,4 +1,4 @@
-import { CREATE_COURSE, GET_COURSES } from './courseActions';
+import { CREATE_COURSE, GET_COURSES, UPDATE_COURSE } from './courseActions';
 
 const courseReducer = (state, action) => {
   switch (action.type) {
@@ -13,6 +13,18 @@ const courseReducer = (state, action) => {
       return {
         ...state,
         courses: action.payload.courses,
+      };
+    }
+
+    case UPDATE_COURSE: {
+      return {
+        ...state,
+        courses: state.courses.map((course) => {
+          if (course._id === action.payload.course._id) {
+            return action.payload.course;
+          }
+          return course;
+        }),
       };
     }
 
