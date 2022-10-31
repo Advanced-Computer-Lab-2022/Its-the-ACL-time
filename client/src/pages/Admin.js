@@ -39,22 +39,66 @@ export default function Admin() {
       console.log(data); // JSON data parsed by `data.json()` call
     });
   }
+  
 
   return (
     <>
-
-    <div>
-      <label for user>Username</label><br></br>
-      <input type="text" id="user" size="50"></input><br></br>
-      <label for pass>Password</label><br></br>
-      <input type="password" id="pass" size="50"></input><br></br>
-      <select name="type" id="cars" width="100"><br></br>
-      <option value="Instructor">Instructor</option>
-      <option value="Coporate trainee">Coporate trainee</option>
-      <option value="Adminstrator">Adminstrator</option>
-  </select>
-    </div>
-     
+      <form
+        onSubmit={handleSubmit}
+        className="container m-5 border border-5 shadow d-flex flex-column align-items-center"
+      >
+        <label for user>
+          Username
+        </label>
+        <br></br>
+        <input
+          value={username}
+          onChange={(e) => setUsername(e.target.value)}
+          type="text"
+          id="user"
+          size="50"
+        ></input>
+        <br></br>
+        <label for email>
+          Email
+        </label>
+        <br></br>
+        <input
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          type="email"
+          id="email"
+          size="50"
+        ></input>
+        <br></br>
+        <label for pass>
+          Password
+        </label>
+        <br></br>
+        <input
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+          type="password"
+          id="pass"
+          size="50"
+        ></input>
+        <br></br>
+        <select
+          value={type}
+          onChange={changeHandler}
+          name="type"
+          id="cars"
+          width="100"
+        >
+          <br></br>
+          <option value="Instructor">Instructor</option>
+          <option value="Coporate trainee">Coporate trainee</option>
+          <option value="Adminstrator">Adminstrator</option>
+        </select>
+        <br />
+        <input type="submit" className="btn btn-outline-primary m-2" onClick={() => {alert('Added Succeesfully');}}></input>
+      </form>
+ 
     </>
   );
 }
