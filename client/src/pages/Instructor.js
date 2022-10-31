@@ -1,7 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useSearchParams } from 'react-router-dom';
-import { CourseForm } from '../components/course';
-import Courses from './Courses';
+import { CourseForm, CourseCard } from '../components/course';
+import CardGroup from 'react-bootstrap/CardGroup';
+
+
 
 export default function Instructor() {
   const [instCourses, setInstCourses] = useState([]);
@@ -23,7 +25,7 @@ export default function Instructor() {
   console.log(priceTo);
 
   let instId = useParams().instId;
-  instId = '6355735013d973de4410cbf7';
+  instId = '635e894524fe8f2ac3fc4919';
 
   function handleUnique(data) {
     let unique = ['all'];
@@ -208,7 +210,29 @@ export default function Instructor() {
               {sub}
             </button>
           ))}
-        {filteredCourses && <Courses />}
+        <section className='container m-2 w-100' style={{
+          width: '80vw',
+          margin: '1rem 40vw 5rem 5vw'
+        }}>
+          <h1>Your Courses</h1>
+          <div className='d-flex flex-wrap'>
+
+            {filteredCourses && filteredCourses.map((course) => {
+              return (
+
+                <CourseCard
+                  courseTitle={course.title}
+                  courseDescription={course.description}
+                  coursePrice={course.price}
+                  courseSubject={course.subject}
+                  courseSummary={course.summary}
+                />
+              );
+            })
+            }
+          </div>
+        </section>
+
         {error && <div className='text-danger'>{error}</div>}
       </div>
     </>
