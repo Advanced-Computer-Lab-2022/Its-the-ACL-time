@@ -17,6 +17,8 @@ export default function Admin() {
       <option value="Instructor">Instructor</option>
       <option value="Coporate trainee">Coporate trainee</option>
       <option value="Adminstrator">Adminstrator</option>
+      <button type="button">submit</button>
+
   </select>
     </div>
      
