@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useSearchParams } from 'react-router-dom';
-import { CourseForm,Course } from '../components/course';
+import { CourseForm,CourseCard } from '../components/course';
 
 
 export default function Instructor() {
@@ -210,13 +210,12 @@ export default function Instructor() {
           ))}
         {filteredCourses && filteredCourses.map((course) => {
             return (
-              <Course
-                key={course._id}
-                title={course.title}
-                subject={course.subject}
-                description={course.description}
-                instructor={course.instructor}
-                price={course.price}
+              <CourseCard
+              courseTitle={course.title}
+              courseDescription={course.description} 
+              coursePrice = {course.price}
+              courseSubject = {course.subject}
+              courseSummary = {course.summary}
               />
             );})
           }
