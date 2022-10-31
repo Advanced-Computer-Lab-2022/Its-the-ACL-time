@@ -1,5 +1,5 @@
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
-import { Landing, Register, Login, Home, ProtectedRoute, Instructor } from './pages';
+import { Landing, Register, Login, Home, ProtectedRoute, Instructor,Admin } from './pages';
 import { CourseGroup, NavBar, CourseForm } from './components';
 import AddSubtitleForm from './components/subtitle/AddSubtitleForm';
 import Search from './components/Search';
@@ -10,6 +10,7 @@ function App() {
     <BrowserRouter>
       <CourseProvider>
         <Routes>
+           <Route path='/Admin' element={<Admin />} />
           <Route path='/login' element={<Login />} />
           <Route path='/register' element={<Register />} />
           <Route path='/instructor/:instId' element={<Instructor />}/>
