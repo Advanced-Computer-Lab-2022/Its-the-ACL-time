@@ -22,11 +22,8 @@ type:Boolean,
 },
 VideoNode:{
     type:Schema.Types.ObjectId,
-    ref:"VideoNotesModel.js"
+    ref:"VideoNotesModel",
 }
-
-
-
 
 });
 

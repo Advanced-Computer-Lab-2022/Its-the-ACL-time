@@ -19,6 +19,7 @@ const {
 const { authRouter, courseRouter, userRouter } = require('./routes');
 //Michael
 const examRouter = require('./routes/examRoutes');
+const adminroutes=require('./routes/AdminRoutes');
 //const questionRouter = require('./routes/questionRoutes');
 
 const corsOptions = {
@@ -32,6 +33,8 @@ app.use(express.json());
 app.use('/api/v1/auth', authRouter);
 app.use('/api/v1/user', authMiddleware, userRouter);
 app.use('/api/v1/course', authMiddleware, courseRouter);
+app.use('/api/v1/admin', adminroutes);
+
 
 //Michael
 app.use('/api/v1/exam',examRouter);
