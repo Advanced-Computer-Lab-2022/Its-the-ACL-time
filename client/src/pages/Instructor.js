@@ -20,7 +20,7 @@ export default function Instructor() {
   console.log(priceTo);
 
   let instId = useParams().instId;
-  // instId = '6355735013d973de4410cbf7';
+  instId = '6355735013d973de4410cbf7';
 
   function handleUnique(data) {
     let unique = ["all"]
@@ -55,9 +55,9 @@ export default function Instructor() {
     instCourses.unshift(courseData);
     setInstCourses([...instCourses]);
     setFilterCourses([...instCourses]);
-    // setTimeout(()=>
-    // setShowCreateCourse(false)
-    // ,3000)
+    setTimeout(()=>
+    setShowCreateCourse(false)
+    ,3000)
   }
   function filter(filter, subject) {
     filter = filter.toLowerCase();
@@ -117,8 +117,8 @@ export default function Instructor() {
               <input value={priceFrom} onChange={(e) => setPriceFrom(e.target.value)} id="from" type="number"></input>
               <label for="from">to</label>
               <input value={priceTo} onChange={(e) => setPriceTo(e.target.value)} id="to" type="number"></input>
-              <button className="btn btn-outline-primary m-2 py-1" onClick={() => { setPriceFrom(0); setPriceTo(10000); }}>reset</button>
               <input className="btn btn-outline-primary m-2 py-1" type="submit" value="show courses"></input>
+              <button className="btn btn-outline-primary m-2 py-1" onClick={() => { setPriceFrom(0); setPriceTo(10000); }}>reset</button>
             </form>
           }
         </div>
