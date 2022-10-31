@@ -1,7 +1,7 @@
 import Card from 'react-bootstrap/Card';
 import ListGroup from 'react-bootstrap/ListGroup';
 
-function Course({ courseTitle, courseDescription, courseInstructor,coursePrice,courseSubject,courseSummary }) {
+function CourseCard({ courseTitle, courseDescription, courseInstructor,coursePrice,courseSubject,courseSummary }) {
   // console.log({ courseTitle, courseDescription, courseInstructor ,coursePrice});
   return (
     <Card style={{ width: '20rem', margin: '8px' }}>
@@ -25,4 +25,4 @@ function Course({ courseTitle, courseDescription, courseInstructor,coursePrice,c
   );
 }
 
-export default Course;
+export default CourseCard;

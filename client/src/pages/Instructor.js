@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useSearchParams } from 'react-router-dom';
-import { CourseForm,CourseCard } from '../components/course';
+import { CourseForm, CourseCard } from '../components/course';
 
 
 export default function Instructor() {
@@ -209,16 +209,19 @@ export default function Instructor() {
             </button>
           ))}
         {filteredCourses && filteredCourses.map((course) => {
-            return (
+          return (
+            <div className='d-flex flex-wrap'>
               <CourseCard
-              courseTitle={course.title}
-              courseDescription={course.description} 
-              coursePrice = {course.price}
-              courseSubject = {course.subject}
-              courseSummary = {course.summary}
+                courseTitle={course.title}
+                courseDescription={course.description}
+                coursePrice={course.price}
+                courseSubject={course.subject}
+                courseSummary={course.summary}
               />
-            );})
-          }
+            </div>
+          );
+        })
+        }
         {error && <div className='text-danger'>{error}</div>}
       </div>
     </>
