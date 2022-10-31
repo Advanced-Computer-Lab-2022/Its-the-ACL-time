@@ -217,14 +217,13 @@ export default function Instructor() {
               margin: '1rem 40vw 5rem 5vw'
             }}>
               <h1>Your Courses</h1>
-              <div className='d-flex flex-column-reverse w-100'>
+              <div className='d-flex '>
                 <CourseCard
                   courseTitle={course.title}
                   courseDescription={course.description}
                   coursePrice={course.price}
                   courseSubject={course.subject}
                   courseSummary={course.summary}
-
                 />
               </div>
             </section>
