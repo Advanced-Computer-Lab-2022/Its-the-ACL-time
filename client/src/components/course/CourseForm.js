@@ -67,7 +67,6 @@ function AddCourseForm({ addCourseFront, instId }) {
         },
       });
 
-      console.log(response);
 
       setAlert(
         'success',
@@ -78,7 +77,7 @@ function AddCourseForm({ addCourseFront, instId }) {
         clearAlert()
       ,3000);
   if (addCourseFront) {
-    addCourseFront(course)
+    addCourseFront(response.data.course)
   }
 } catch (error) {
   const { msg } = error.response.data;

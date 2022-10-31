@@ -7,13 +7,12 @@ const useStyles = makeStyles((theme) => ({
   courses: {
     /* full width of the screen and make 30% off from left an right*/
     width: '80vw',
-    margin: '10rem 40vw 5rem 5vw',
+    margin: '1rem 40vw 5rem 5vw',
   },
 }));
 
 const CourseGroup = ({ courses }) => {
   const classes = useStyles();
-  console.log(courses);
   return (
     <section className={`${classes.courses}`}>
       <h1>Your Courses</h1>
