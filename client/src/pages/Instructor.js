@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useSearchParams } from 'react-router-dom';
 import { CourseForm, CourseCard } from '../components/course';
+import CardGroup from 'react-bootstrap/CardGroup';
+
 
 
 export default function Instructor() {
@@ -210,17 +212,22 @@ export default function Instructor() {
           ))}
         {filteredCourses && filteredCourses.map((course) => {
           return (
-            <div className='d-flex flex-wrap'>
-              <div>
+            <section className='container m-2 w-100' style={{
+              width: '80vw',
+              margin: '1rem 40vw 5rem 5vw'
+            }}>
+              <h1>Your Courses</h1>
+              <div className='d-flex flex-column-reverse w-100'>
                 <CourseCard
                   courseTitle={course.title}
                   courseDescription={course.description}
                   coursePrice={course.price}
                   courseSubject={course.subject}
                   courseSummary={course.summary}
+
                 />
               </div>
-            </div>
+            </section>
           );
         })
         }
