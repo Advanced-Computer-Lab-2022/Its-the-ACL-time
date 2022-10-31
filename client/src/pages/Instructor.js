@@ -40,7 +40,7 @@ export default function Instructor() {
   useEffect(() => {
     // fetch courses add them to the filterCourses and Courses
     // runs only once while first rendering
-    fetch(`http://localhost:8080/api/v1/course/instructor/${instId}`)
+    fetch(`/api/v1/course/instructor/${instId}`)
       .then((res) => res.json())
       .then((res) => {
         setInstCourses((old) => res.data);
@@ -208,7 +208,7 @@ export default function Instructor() {
               {sub}
             </button>
           ))}
-        {filteredCourses && <Courses />}
+        {/* {filteredCourses && <Courses />} */}
         {error && <div className='text-danger'>{error}</div>}
       </div>
     </>
