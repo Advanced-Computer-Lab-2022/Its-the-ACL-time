@@ -79,7 +79,7 @@ export default function Register() {
       password: password.current.value,
       email: email.current.value,
       type: category.current.value,
-      country:country,
+      country:country.label,
       endPoint: 'register',
     };
 

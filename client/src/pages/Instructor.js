@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useSearchParams } from 'react-router-dom';
-import { CourseForm, CourseCard } from '../components/course';
+import { CourseFormInst, CourseCard } from '../components/course';
 import CardGroup from 'react-bootstrap/CardGroup';
 
 
@@ -147,10 +147,10 @@ export default function Instructor() {
         )}
       </nav>
       {showCreateCourse && (
-        <CourseForm
+        <CourseFormInst
           addCourseFront={addCourseFront}
           instId={instId}
-        ></CourseForm>
+        ></CourseFormInst>
       )}
       <div className='container w-100'>
         {isLoading && <div>is loading .......</div>}
