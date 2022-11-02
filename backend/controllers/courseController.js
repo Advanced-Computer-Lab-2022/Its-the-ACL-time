@@ -4,12 +4,20 @@ const { UnauthorizedError, BadRequestError } = require('../Errors');
 
 const createCourse = async (req, res) => {
   console.log('req.body ' + req.body);
-  const { title, subject, price, summary, previewLink, numberOfHours,instructorId } = req.body;
+  const {
+    title,
+    subject,
+    price,
+    summary,
+    previewLink,
+    numberOfHours,
+    instructorId,
+  } = req.body;
   let type = req.user?.type;
   let userId = req.user?.userId;
-  if(instructorId) {
+  if (instructorId) {
     userId = instructorId;
-    type = "Instructor";
+    type = 'Instructor';
   }
   if (type !== 'Instructor')
     throw new UnauthorizedError("you don't have permissions");
@@ -23,9 +31,7 @@ const createCourse = async (req, res) => {
   ) {
     throw new BadRequestError('Please provide all course values');
   }
-
   req.body.createdBy = userId;
-
   const course = await Course.create(req.body);
   res.status(StatusCodes.CREATED).json({ course });
 };
@@ -89,22 +95,21 @@ const updateCourse = async (req, res) => {
   res.status(StatusCodes.OK).json({ updatedCourse });
 };
 
-
-const getCoursesInstructor = async (req,res) =>{
+const getCoursesInstructor = async (req, res) => {
   const instructor = req.params.id;
-  Course.find({createdBy:instructor},(err,data)=>{
+  Course.find({ createdBy: instructor }, (err, data) => {
     if (err) {
       res.status(StatusCodes.BAD_REQUEST).send(err);
     } else {
       res.status(StatusCodes.OK).json({ data });
     }
   });
-} 
+};
 
 module.exports = {
   createCourse,
   getCourse,
   getAllCourses,
   updateCourse,
-  getCoursesInstructor
+  getCoursesInstructor,
 };

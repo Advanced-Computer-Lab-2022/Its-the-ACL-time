@@ -1,22 +1,45 @@
 const { StatusCodes } = require('http-status-codes');
 const { UnauthorizedError } = require('../Errors');
+const { Course } = require('../models');
 const SubTitle = require('../models/SubTitle');
 
 const createSubTitle = async (req, res) => {
-  const { type } = req.user;
-  if (type !== 'Instructor') {
-    throw new UnauthorizedError('You are not allowed to add subtitle');
-  }
+  // const { type, userId } = req.user;
+
+  // if (type !== 'Instructor') {
+  //   throw new UnauthorizedError('You are not allowed to add subtitle');
+  // }
+
+  // const course = await Course.findOne({ _id: courseId });
+
+  // if (course.createdBy.toString() !== userId.toString()) {
+  //   throw new UnauthorizedError('You are not allowed to add subtitle');
+  //}
   const { courseId } = req.params;
-  const { subTitle } = req.body;
-  subTitle.course = courseId;
-  let newSubTitle = await SubTitle.create({ ...subTitle });
-  res.status(StatusCodes.CREATED).json({ newSubTitle });
+
+  const subTitles = req.body;
+
+  subTitles.map(async (item) => {
+    const { title, link, duration, description } = item;
+    const newSubtitle = new SubTitle({
+      title,
+      link,
+      duration,
+      description,
+      course: courseId,
+    });
+    await newSubtitle.save();
+  });
+
+  res
+    .status(StatusCodes.CREATED)
+    .json({ msg: 'Subtitles created successfully' });
 };
 
 const getAllSubTitles = async (req, res) => {
   const { courseId } = req.params;
   const subTitles = await SubTitle.find({ course: courseId });
+  console.log(subTitles);
   res.status(StatusCodes.OK).json({ subTitles });
 };
 

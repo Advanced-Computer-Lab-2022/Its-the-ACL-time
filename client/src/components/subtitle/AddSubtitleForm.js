@@ -4,6 +4,8 @@ import Form from 'react-bootstrap/Form';
 import Row from 'react-bootstrap/Row';
 import { makeStyles } from '@material-ui/core/styles';
 import { useState } from 'react';
+import axios from 'axios';
+import { useParams } from 'react-router-dom';
 
 const useStyles = makeStyles((theme) => ({
   container: {
@@ -23,7 +25,7 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-function Question() {
+function SubTitle() {
   return (
     <div>
       <Form.Group className='mb-3' controlId='formGridTitle'>
@@ -39,7 +41,7 @@ function Question() {
 
         <Form.Group as={Col} controlId='formGridDuration'>
           <Form.Label>Duration</Form.Label>
-          <Form.Control type='text' placeholder='Duration' />
+          <Form.Control type='number' placeholder='Duration' />
         </Form.Group>
       </Row>
 
@@ -53,13 +55,33 @@ function Question() {
 
 function AddSubtitleForm() {
   const classes = useStyles();
-  const [questions, setQuestions] = useState(0);
-  const handleSubmit = (e) => {
+  const [subtitles, setSubtitles] = useState(0);
+  const { courseId } = useParams();
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
     const numOfQuestions = e.target[0].value;
-    if (questions === 0) setQuestions(parseInt(numOfQuestions));
+    if (subtitles === 0) setSubtitles(parseInt(numOfQuestions));
     else {
-      console.log('submit');
+      let subTitle = [];
+      for (let i = 0; i < subtitles; i++) {
+        subTitle[i] = {
+          title: e.target[i * 4].value,
+          link: e.target[i * 4 + 1].value,
+          duration: e.target[i * 4 + 2].value,
+          description: e.target[i * 4 + 3].value,
+        };
+      }
+
+      try {
+        const response = await axios.post(
+          `http://localhost:8080/api/v1/course/${courseId}/subtitle`,
+          subTitle
+        );
+        console.log(response);
+      } catch (error) {
+        console.log(error);
+      }
     }
   };
   return (
@@ -67,16 +89,16 @@ function AddSubtitleForm() {
       <h1 className={`${classes.title}`}>Add SubTitle</h1>
 
       <Form className={`${classes.form}`} onSubmit={handleSubmit}>
-        {[...Array(questions)].map((e, i) => {
+        {[...Array(subtitles)].map((e, i) => {
           return (
             <>
-              <h2>Question {i + 1}</h2>
-              <Question key={i} />
+              <h2>Subtitle {i + 1}</h2>
+              <SubTitle key={'subtitle' + i} />
               <hr />
             </>
           );
         })}
-        {questions === 0 && (
+        {subtitles === 0 && (
           <Form.Group className='mb-3' controlId='formGridNumberOfSubtitles'>
             <Form.Label>Number Of Subtitles</Form.Label>
             <Form.Control type='number' placeholder='Number Of Subtitles' />

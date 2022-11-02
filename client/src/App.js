@@ -10,8 +10,8 @@ import {
 import Admin from './pages/Admin';
 import { NavBar, CourseForm, Courses } from './components';
 import AddSubtitleForm from './components/subtitle/AddSubtitleForm';
-import Search from './components/Search';
 import { CourseProvider } from './context/Course/courseContext';
+import Course from './pages/Course';
 
 function App() {
   return (
@@ -32,15 +32,16 @@ function App() {
                 </ProtectedRoute>
               }
             />
+            <Route path='/courses' element={<Courses />} />
+            <Route path='/course' element={<CourseForm />} />
+            {/* <Route path='/course/:courseId' element={<CourseForm />} /> */}
+            <Route
+              path='/course/:courseId/subtitle'
+              element={<AddSubtitleForm />}
+            />
+
+            <Route path='/course/:courseId' element={<Course />} />
           </Route>
-          <Route path='/courses' element={<Courses />} />
-          <Route path='/course' element={<CourseForm />} />
-          <Route path='/course/:courseId' element={<CourseForm />} />
-          <Route path='/search' element={<Search />} />
-          <Route
-            path='/course/:courseId/subtitle'
-            element={<AddSubtitleForm />}
-          />
         </Routes>
       </CourseProvider>
     </BrowserRouter>

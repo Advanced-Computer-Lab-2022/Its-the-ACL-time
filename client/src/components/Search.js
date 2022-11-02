@@ -10,11 +10,12 @@ const Search = () => {
   const { courses } = useCourseContext();
 
   const search = () => {
+    console.log('searching');
     return courses.filter(
       (course) =>
-        course.title.toLowerCase().includes(query) ||
-        course.subject.toLowerCase().includes(query) ||
-        course.createdBy?.username.toLowerCase().includes(query)
+        course.title.toLowerCase().includes(query.toLowerCase()) ||
+        course.subject.toLowerCase().includes(query.toLowerCase()) ||
+        course.createdBy?.username.toLowerCase().includes(query.toLowerCase())
     );
   };
 

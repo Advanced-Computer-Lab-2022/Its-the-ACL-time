@@ -55,14 +55,16 @@ export default function Courses() {
             );
           })
           .map((course) => {
+            console.log(course);
             return (
               <Course
                 key={course._id}
                 title={course.title}
                 subject={course.subject}
-                description={course.description}
-                instructor={course.instructor}
+                description={course.summary}
+                instructor={course.createdBy.username}
                 price={course.price}
+                courseId={course._id}
               />
             );
           })}

@@ -7,6 +7,7 @@ import { makeStyles } from '@material-ui/core/styles';
 import { useParams } from 'react-router-dom';
 import { useAppContext } from '../../context/App/appContext';
 import { useCourseContext } from '../../context/Course/courseContext';
+import { FormControl, Select } from '@material-ui/core';
 
 const useStyles = makeStyles((theme) => ({
   container: {
@@ -23,6 +24,14 @@ const useStyles = makeStyles((theme) => ({
     textAlign: 'center',
     fontSize: '2rem',
     paddingTop: '2rem',
+  },
+  select: {
+    width: '15rem',
+    height: '2.4rem',
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingBottom: '1rem',
   },
 }));
 
@@ -130,8 +139,44 @@ function CourseForm() {
           </Form.Group>
 
           <Form.Group as={Col} controlId='formGridSubject'>
-            <Form.Label>Subject</Form.Label>
-            <Form.Control type='text' placeholder='Subject' />
+            <FormControl variant='filled' className={classes.formControl}>
+              <Form.Label>Subject</Form.Label>
+
+              <Select
+                native
+                inputProps={{
+                  name: 'age',
+                  id: 'subject',
+                }}
+                className={classes.select}
+              >
+                <option aria-label='None' value='' />
+                <option value='Machine Learning'>Machine Learning</option>
+                <option value='Deep Learning'>Deep Learning</option>
+                <option value='Software Engineering'>
+                  Software Engineering
+                </option>
+                <option value='computer science'>Computer Science</option>
+                <option value='Data Science'>Data Science</option>
+                <option value='Web Development'>Web Development</option>
+                <option value='Artificial Intelligence'>
+                  Artificial Intelligence
+                </option>
+                <option value='Programming'>Programming</option>
+                <option value='Mobile Development'>Mobile Development</option>
+                <option value='Game Development'>Game Development</option>
+                <option value='Cyber Security'>Cyber Security</option>
+                <option value='Cloud Computing'>Cloud Computing</option>
+                <option value='Blockchain'>Blockchain</option>
+                <option value='Internet of Things'>Internet of Things</option>
+                <option value='Data Analysis'>Data Analysis</option>
+                <option value='Data Visualization'>Data Visualization</option>
+                <option value='Data Engineering'>Data Engineering</option>
+                <option value='Database Engineering'>
+                  Database Engineering
+                </option>
+              </Select>
+            </FormControl>
           </Form.Group>
         </Row>
         <Row className='mb-3'>

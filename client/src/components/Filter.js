@@ -42,6 +42,22 @@ export default function Filter({ onFilter }) {
           <option value='Deep Learning'>Deep Learning</option>
           <option value='Software Engineering'>Software Engineering</option>
           <option value='computer science'>Computer Science</option>
+          <option value='Data Science'>Data Science</option>
+          <option value='Web Development'>Web Development</option>
+          <option value='Artificial Intelligence'>
+            Artificial Intelligence
+          </option>
+          <option value='Programming'>Programming</option>
+          <option value='Mobile Development'>Mobile Development</option>
+          <option value='Game Development'>Game Development</option>
+          <option value='Cyber Security'>Cyber Security</option>
+          <option value='Cloud Computing'>Cloud Computing</option>
+          <option value='Blockchain'>Blockchain</option>
+          <option value='Internet of Things'>Internet of Things</option>
+          <option value='Data Analysis'>Data Analysis</option>
+          <option value='Data Visualization'>Data Visualization</option>
+          <option value='Data Engineering'>Data Engineering</option>
+          <option value='Database Engineering'>Database Engineering</option>
         </Select>
       </FormControl>
       <FormControl className={classes.formControl}>

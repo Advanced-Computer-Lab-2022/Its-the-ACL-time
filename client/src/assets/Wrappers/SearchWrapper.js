@@ -1,9 +1,13 @@
 import styled from 'styled-components';
 
 const Wrapper = styled.aside`
+  aside {
+    margin-bottom: 5px;
+  }
+
   .searchInputs {
-    margin-top: 105px;
     display: flex;
+    height: 40px;
   }
 
   .search input {
@@ -14,12 +18,13 @@ const Wrapper = styled.aside`
     border-bottom-right-radius: 0px;
     font-size: 18px;
     padding: 15px;
-    height: 60px;
+    height: 40px;
     width: 300px;
+    margin-bottom: 3rem;
   }
 
   .searchIcon {
-    height: 60px;
+    height: 40px;
     width: 50px;
     background-color: white;
     display: grid;
@@ -41,6 +46,7 @@ const Wrapper = styled.aside`
     box-shadow: rgba(0, 0, 0, 0.35) 0px 5px 15px;
     overflow: hidden;
     overflow-y: auto;
+    position: absolute;
   }
 
   .dataResult::-webkit-scrollbar {
