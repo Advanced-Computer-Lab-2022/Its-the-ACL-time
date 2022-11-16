@@ -5,7 +5,6 @@ import NavDropdown from 'react-bootstrap/NavDropdown';
 import Offcanvas from 'react-bootstrap/Offcanvas';
 import { makeStyles } from '@material-ui/core/styles';
 import { Outlet } from 'react-router-dom';
-import CountrySelector from './CountrySelector';
 import Search from './Search';
 import { Link } from 'react-router-dom';
 
@@ -15,9 +14,11 @@ const useStyles = makeStyles((theme) => ({
     padding: '5px 15px',
   },
   nav: {
-    display: 'flex',
+    display: 'block',
+    height: '10vh',
     justifyContent: 'space-between',
     alignItems: 'center',
+    boxShadow: '0 0 10px rgba(0,0,0,0.5)',
   },
 }));
 
@@ -25,7 +26,7 @@ function NavBar() {
   const classes = useStyles();
   const expand = 'xxl';
   return (
-    <nav className={`${classes.nav}`}>
+    <nav>
       <Navbar
         key={expand}
         bg='light'
