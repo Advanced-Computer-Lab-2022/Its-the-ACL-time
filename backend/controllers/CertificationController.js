@@ -1,4 +1,7 @@
 const CertificationModel = require('../models');
+const { StatusCodes } = require('http-status-codes');
+const sendEmail = require('../utils/mail');
+const generatePDF = require('../utils/pdfGenerator');
 
 // only for admin
 const allCertifications = (req, res) => {
@@ -21,8 +24,29 @@ const deleteCertification = (req, res) => {
 };
 
 // when course is finished
-const createCertification = (req, res) => {
-  res.send('create Certification');
+const createCertification = async (req, res) => {
+  const { email, username, course } = req.body;
+
+  if (!email || !username || !course)
+    throw new BadRequestError('please provide all values');
+
+  const pdf = await generatePDF(username, course);
+  await sendEmail({
+    email,
+    subject: 'Certificate',
+    text: 'Congratulations, you have completed the course',
+    html: '<h1>Congratulations, you have completed the course</h1>',
+    attachments: [
+      {
+        filename: `${username}-certificate.pdf`,
+        content: pdf,
+        contentType: 'application/pdf',
+      },
+    ],
+  });
+  res.status(StatusCodes.OK).json({
+    msg: 'Certificate sent',
+  });
 };
 
 module.exports = {

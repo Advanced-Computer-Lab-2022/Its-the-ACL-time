@@ -6,8 +6,6 @@ import {
   USER_SETUP_ERROR,
   SET_ALERT,
   CLEAR_ALERT,
-  START_ACTION,
-  END_ACTION,
 } from './appActions';
 import axios from 'axios';
 
@@ -52,7 +50,14 @@ const AppProvider = ({ children }) => {
     localStorage.removeItem('token');
   };
 
-  const setup = async ({ email, password, username,country, type, endPoint }) => {
+  const setup = async ({
+    email,
+    password,
+    username,
+    country,
+    type,
+    endPoint,
+  }) => {
     dispatch({ type: USER_SETUP_BEGIN });
     const url = `http://localhost:8080/api/v1/auth/${endPoint}`;
 
@@ -60,7 +65,7 @@ const AppProvider = ({ children }) => {
       let body = {
         email,
         password,
-        country
+        country,
       };
 
       if (endPoint === 'register')
@@ -84,14 +89,16 @@ const AppProvider = ({ children }) => {
       });
 
       addToLocalStorage({ user, token });
+      return true;
     } catch (error) {
       console.log(error.response.data.msg);
       dispatch({
         type: USER_SETUP_ERROR,
         payload: { msg: error.response.data.msg },
       });
+      clearAlert();
+      return false;
     }
-    clearAlert();
   };
 
   return (

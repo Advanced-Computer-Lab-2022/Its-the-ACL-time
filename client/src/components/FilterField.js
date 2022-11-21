@@ -1,6 +1,7 @@
-import { Box, Checkbox, FormControlLabel } from '@material-ui/core';
+import { Box, Checkbox } from '@material-ui/core';
 import React, { useEffect, useState } from 'react';
 import { makeStyles } from '@material-ui/core/styles';
+import { AiOutlineDown } from 'react-icons/ai';
 
 const useStyles = makeStyles((theme) => ({
   Box: {
@@ -38,30 +39,33 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-const FilterField = ({ title, options, onFilter }) => {
+const FilterField = ({
+  title,
+  options,
+  onFilter,
+  optionOnClick,
+  titleStyle,
+  checkedOptions,
+}) => {
   const classes = useStyles();
   const [visible, setVisible] = useState(false);
   const [showMore, setShowMore] = useState(false);
-  const [checked, setChecked] = useState({});
-
-  // useEffect(() => {
-  //   const obj = {};
-  //   options.forEach((item) => (obj[item] = false));
-  //   setChecked(obj);
-  // }, [options]);
+  const [checked, setChecked] = useState(checkedOptions ? checkedOptions : {});
 
   const handleCheck = async (e) => {
-    onFilter(
-      // {
-      // ...checked,
-      //   [e.target.name]: e.target.checked,
-      // },
-      e.target.name,
-      title
-    );
-    console.log(e);
+    onFilter(e.target.name, title, e.target.checked);
     setChecked({ ...checked, [e.target.name]: e.target.checked });
   };
+
+  // useEffect(() => {
+  //   const checkedOptions = JSON.parse(localStorage.getItem('checkedSubtitles'));
+  //   const checkedOptionsObj = checkedOptions?.reduce((obj, item) => {
+  //     obj[item] = true;
+  //     return obj;
+  //   }, {});
+
+  //   setChecked(checkedOptionsObj ? checkedOptionsObj : {});
+  // }, []);
 
   return (
     <>
@@ -70,24 +74,32 @@ const FilterField = ({ title, options, onFilter }) => {
         className={`${classes.Box}`}
         onClick={() => setVisible(!visible)}
       >
-        <h1 className={`${classes.title}`}>{title}</h1>
-        <i className='fa-light fa-arrow-down'></i>
+        <h1 className={`${classes.title}`} style={titleStyle}>
+          {title}
+        </h1>
+        <AiOutlineDown
+          style={{ transform: visible ? 'rotate(180deg)' : 'rotate(0deg)' }}
+        />
       </Box>
       {visible && (
         <div className={`${classes.list}`}>
           {options
             .map((subject, index) => (
-              <FormControlLabel
-                key={index}
-                control={
-                  <Checkbox
-                    name={subject}
-                    onChange={handleCheck}
-                    checked={checked[subject]}
-                  />
-                }
-                label={subject}
-              />
+              <Box key={index}>
+                <Checkbox
+                  name={subject}
+                  onChange={handleCheck}
+                  checked={checked[subject] ? checked[subject] : false}
+                />
+                <label
+                  onClick={optionOnClick}
+                  style={{
+                    cursor: 'pointer',
+                  }}
+                >
+                  {subject}
+                </label>
+              </Box>
             ))
             .slice(0, showMore ? options.length : 5)}
 

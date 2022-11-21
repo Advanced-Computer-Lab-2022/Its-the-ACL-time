@@ -14,12 +14,18 @@ import { CourseProvider } from './context/Course/courseContext';
 import { SearchProvider } from './context/Search/searchContext';
 import CoursePage from './pages/CoursePage';
 import Filter from './components/Filter';
-import CustomButton from './components/CustomButton';
 import SearchResult from './pages/SearchResult';
-import SubTitle from './components/subtitle/SubTitles';
-import Review from './components/Review';
 import { CourseComponent } from './components/course';
 import Certificate from './components/Certificate';
+import SubtitlesPage from './pages/SubtitlesPage';
+import AlertDialog from './components/AlertDialog';
+import ResetPassword from './pages/ResetPassword';
+import ForgetPassword from './pages/ForgetPassword';
+import SuccessResetPassword from './pages/SuccessResetPassword';
+import Test from './components/Test';
+import RatingForm from './components/RatingForm';
+import Question from './components/Question';
+import Exam from './components/Exam';
 
 function App() {
   return (
@@ -28,6 +34,9 @@ function App() {
         <SearchProvider>
           <Routes>
             <Route path='/Admin' element={<Admin />} />
+            <Route path='/resetPassword' element={<SuccessResetPassword />} />
+            <Route path='/forgetPassword' element={<ForgetPassword />} />
+            <Route path='/resetPassword/:token' element={<ResetPassword />} />
             <Route path='/login' element={<Login />} />
             <Route path='/register' element={<Register />} />
             <Route path='/instructor/:id' element={<Instructor />} />
@@ -44,17 +53,25 @@ function App() {
               <Route path='/addCourse' element={<CourseForm />} />
               <Route path='/updateCourse/:courseId' element={<CourseForm />} />
               {/* <Route path='/course/:courseId' element={<CourseForm />} /> */}
-              <Route
+              {/* <Route
                 path='/course/:courseId/subtitle'
                 element={<AddSubtitleForm />}
-              />
+              /> */}
 
               <Route path='/course/:courseId' element={<CoursePage />} />
               <Route path='/results' element={<SearchResult />} />
+              <Route
+                path='/course/:courseId/subtitles'
+                element={<SubtitlesPage />}
+              />
             </Route>
+            <Route path='/rating' element={<RatingForm />} />
             <Route path='/filter' element={<Filter />} />
-            <Route path='/test' element={<CourseComponent />} />
             <Route path='/certificate' element={<Certificate />} />
+            <Route path='/dialog' element={<AlertDialog />} />
+            <Route path='/test' element={<Test />} />
+            <Route path='/question' element={<Question />} />
+            <Route path='/exam' element={<Exam />} />
           </Routes>
         </SearchProvider>
       </CourseProvider>

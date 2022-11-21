@@ -4,9 +4,10 @@ import { useParams } from 'react-router-dom';
 import axios from 'axios';
 import { useCourseContext } from '../context/Course/courseContext';
 import SubTitles from '../components/subtitle/SubTitles';
-import { Box } from '@material-ui/core';
+import { Box, Typography } from '@material-ui/core';
 import Review from '../components/Review';
 import { CourseComponent } from '../components';
+import { AiOutlineCheck } from 'react-icons/ai';
 
 const useStyles = makeStyles((theme) => ({
   main: {
@@ -14,7 +15,7 @@ const useStyles = makeStyles((theme) => ({
     flexDirection: 'column',
     justifyContent: 'center',
     width: '100%',
-    marginTop: '4.2rem',
+    marginTop: '3.9rem',
   },
   background: {
     width: '100%',
@@ -52,7 +53,7 @@ const useStyles = makeStyles((theme) => ({
   content: {
     marginLeft: '5rem',
     marginRight: '5rem',
-    marginTop: '5rem',
+    marginTop: '13rem',
   },
   showMore: {
     border: 'none',
@@ -64,6 +65,117 @@ const useStyles = makeStyles((theme) => ({
   Items: {
     overflow: 'auto',
   },
+  reviewCourse: {
+    width: '25rem',
+    display: 'flex',
+    flexDirection: 'column',
+    justifyContent: 'center',
+    alignItems: 'center',
+    position: 'absolute',
+    top: '55%',
+    left: '80%',
+    transform: 'translate(-50%, -50%)',
+    backgroundColor: '#dcdad7',
+    paddingBottom: '2rem',
+    borderRadius: '1rem',
+    boxShadow: '0 0 10px 0 rgba(0, 0, 0, 0.5)',
+  },
+  reviewVideo: {
+    width: '100%',
+    height: '15rem',
+    borderRadius: '1rem 1rem 0 0',
+    backgroundColor: 'black',
+  },
+
+  finalPrice: {
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  actualPrice: {
+    textDecoration: 'line-through',
+    marginRight: '1rem',
+  },
+  discount: {
+    fontWeight: '100',
+  },
+  discountPrice: {
+    color: 'black',
+    marginRight: '1rem',
+    fontSize: '2rem',
+    fontWeight: 'bold',
+  },
+
+  addToCart: {
+    width: '20rem',
+    marginLeft: '2.5rem',
+    marginRight: '2.5rem',
+    height: '3rem',
+    backgroundColor: '#3f51b5',
+    color: 'white',
+    border: 'none',
+    borderRadius: '0.5rem',
+    fontSize: '1.2rem',
+    fontWeight: 'bold',
+    cursor: 'pointer',
+    marginTop: '1rem',
+    marginBottom: '1rem',
+  },
+  coupon: {
+    width: '20rem',
+    marginLeft: '2.5rem',
+    marginRight: '2.5rem',
+    height: '3rem',
+    border: 'none',
+    borderRadius: '0.5rem',
+    fontSize: '1.2rem',
+    fontWeight: 'bold',
+    marginTop: '1rem',
+    marginBottom: '1rem',
+    // on hover
+    '&:hover': {
+      backgroundColor: '#2D3331',
+      color: 'white',
+    },
+  },
+
+  line: {
+    width: '90%',
+    height: '1px',
+    backgroundColor: 'black',
+    marginTop: '1rem',
+    marginBottom: '1rem',
+  },
+
+  applyCoupon: {
+    width: '20rem',
+    marginLeft: '2.5rem',
+    marginRight: '2.5rem',
+    marginTop: '1rem',
+    height: '3rem',
+    display: 'flex',
+    justifyContent: 'center',
+    backgroundColor: '#3f51b5',
+    alignItems: 'center',
+    color: 'white',
+  },
+
+  applyCouponInput: {
+    border: 'none',
+    borderRadius: '0.5rem 0 0 0.5rem',
+    fontSize: '1.2rem',
+    padding: '0.5rem',
+  },
+
+  applyCouponButton: {
+    border: 'none',
+    borderRadius: '0 0.5rem 0.5rem 0',
+    fontSize: '1.2rem',
+    padding: '0.5rem',
+    backgroundColor: '#2D3331',
+    color: 'white',
+    cursor: 'pointer',
+  },
 }));
 
 const CoursePage = () => {
@@ -73,6 +185,7 @@ const CoursePage = () => {
   const { courses } = useCourseContext();
   const [course, setCourse] = useState({});
   const [showDescription, setShowDescription] = useState(false);
+  const [applyCoupon, setApplyCoupon] = useState(false);
 
   useEffect(() => {
     function getCourse() {
@@ -92,7 +205,9 @@ const CoursePage = () => {
     getSubtitles();
   }, [courseId, courses]);
 
-  console.log(course);
+  const applyCouponHandler = () => {
+    console.log('apply coupon');
+  };
 
   return (
     <main className={`${classes.main}`}>
@@ -101,8 +216,57 @@ const CoursePage = () => {
           <h1>{course?.title}</h1>
           <h2>{course?.subject}</h2>
           <p>{course && course?.summary?.slice(0, 50)}</p>
-          <span>{course?.price}$</span>
         </div>
+        <Box className={`${classes.reviewCourse}`}>
+          <div className={`${classes.reviewVideo}`}></div>
+          <div className={`${classes.finalPrice}`}>
+            <Typography variant='h6' className={`${classes.discountPrice}`}>
+              {course?.price || 'discount price'} $
+            </Typography>
+            <Typography variant='h6' className={`${classes.actualPrice}`}>
+              {course?.price - course?.price * (course?.promotion / 100) ||
+                'actual price'}{' '}
+              $
+            </Typography>
+            <Typography variant='h6' className={`${classes.discount}`}>
+              {course?.promotion || 'promotion'}%
+            </Typography>
+          </div>
+          <button className={`${classes.addToCart}`}>Add To Cart</button>
+          <p>
+            <AiOutlineCheck /> 30-Day Money-Back Guarantee
+          </p>
+          <p>
+            <AiOutlineCheck />
+            Full Lifetime Access
+          </p>
+          {!applyCoupon && (
+            <button
+              className={classes.coupon}
+              onClick={() => setApplyCoupon(true)}
+            >
+              Apply Coupon
+            </button>
+          )}
+          {applyCoupon && (
+            <>
+              <hr className={`${classes.line}`} />
+              <div className={`{${classes.applyCoupon}}`}>
+                <input
+                  type='text'
+                  placeholder='Enter Coupon Code'
+                  className={`${classes.applyCouponInput}`}
+                />
+                <button
+                  className={classes.applyCouponButton}
+                  onClick={applyCouponHandler}
+                >
+                  Apply
+                </button>
+              </div>
+            </>
+          )}
+        </Box>
         {/* frame for youtube video here  */}
         {/* <iframe
           width='560'

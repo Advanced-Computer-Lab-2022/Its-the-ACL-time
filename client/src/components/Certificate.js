@@ -3,72 +3,76 @@ import html2canvas from 'html2canvas';
 import { jsPDF } from 'jspdf';
 import { Box } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core';
+import certificate from '../assets/images/certificate.svg';
+import axios from 'axios';
+import { useSearchParams } from 'react-router-dom';
 
 const useStyles = makeStyles((theme) => ({
   certificate: {
-    width: '696px',
-    height: '520px',
-    borderRadius: '1rem',
+    width: '45rem',
+    height: '30rem',
     display: 'flex',
     flexDirection: 'column',
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundImage: 'url(./certificateBackground.jpg)',
+    backgroundSize: 'cover',
+    backgroundRepeat: 'no-repeat',
+    backgroundPosition: 'center',
+    backgroundColor: '#fff',
+    border: '1px solid #000',
+    backgroundImage: `url(${certificate})`,
   },
   header: {
     display: 'flex',
+    justifyContent: 'center',
     alignItems: 'center',
+    marginTop: '12rem',
     marginRight: '3rem',
   },
-  logo: {
-    width: '5rem',
-    height: '5rem',
-    borderRadius: '50%',
-  },
+
   main: {
-    textAlign: 'center',
-    marginBottom: '2rem',
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'center',
+    '& p': {
+      fontSize: '1rem',
+      fontWeight: '300',
+      color: '#000',
+    },
+    '& strong': {
+      fontSize: '1.2rem',
+      fontWeight: '600',
+      color: '#000',
+    },
   },
+
   footer: {
     textAlign: 'center',
-    marginTop: '2rem',
   },
 }));
 
-const Certificate = ({ name, course }) => {
+const Certificate = () => {
   const inputRef = useRef(null);
   const classes = useStyles();
+  const [searchParams, setSearchParams] = useSearchParams();
+  console.log(searchParams);
 
-  name = name || 'michael';
-  course = course || 'React Course';
-
-  const downloadCertificate = () => {
-    html2canvas(inputRef.current).then((canvas) => {
-      const imgData = canvas.toDataURL('image/png');
-      const pdf = new jsPDF();
-      pdf.addImage(imgData, 'JPEG', 0, 0);
-      pdf.save(`${name}-certificate.pdf`);
-    });
-  };
+  // const downloadCertificate = () => {
+  //   html2canvas(inputRef.current).then((canvas) => {
+  //     const imgData = canvas.toDataURL('image/svg');
+  //     const pdf = new jsPDF();
+  //     pdf.addImage(imgData, 'JPEG', 0, 0);
+  //     pdf.save('certificate.pdf');
+  //   });
+  // };
 
   return (
     <>
-      <h1>Certificate generator</h1>
-      <div>
-        <button onClick={downloadCertificate}>Download</button>
-      </div>
-      <Box ref={inputRef} className={`${classes.certificate}`}>
+      <div ref={inputRef} className={`${classes.certificate}`}>
         <header className={`${classes.header}`}>
-          {/* <img
-            src='https://t4.ftcdn.net/jpg/03/49/04/11/360_F_349041172_7p4d3KBfqpM2fg51vuPq4jhLkkwnnrFk.jpg'
-            alt=''
-            className={`${classes.logo}`}
-          /> */}
-
           <h1
             style={{
-              // marginLeft: '6rem',
-              fontSize: '2rem',
+              fontSize: '1.6rem',
               fontWeight: '600',
               color: '#000',
             }}
@@ -79,11 +83,11 @@ const Certificate = ({ name, course }) => {
         <main className={`${classes.main}`}>
           <p>Awarded to</p>
           <p>
-            <strong>{name}</strong>
+            <strong>{searchParams.get('username')}</strong>
           </p>
           <p>for successfully completing</p>
           <p>
-            <strong>{course}</strong>
+            <strong>{searchParams.get('course')}</strong>
           </p>
         </main>
         <footer className={`${classes.footer}`}>
@@ -92,7 +96,7 @@ const Certificate = ({ name, course }) => {
           </p>
           <p>Nerd academy</p>
         </footer>
-      </Box>
+      </div>
     </>
   );
 };

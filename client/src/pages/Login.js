@@ -17,6 +17,8 @@ import Alert from '@material-ui/lab/Alert';
 import LockOutlinedIcon from '@material-ui/icons/LockOutlined';
 import { makeStyles } from '@material-ui/core/styles';
 import { useAppContext } from '../context/App/appContext';
+import { Navigate, useNavigate } from 'react-router-dom';
+import axios from 'axios';
 
 function Copyright() {
   return (
@@ -66,6 +68,7 @@ export default function Login() {
 
   const email = useRef();
   const password = useRef();
+  const navigate = useNavigate();
 
   const handleLogin = (e) => {
     e.preventDefault();
@@ -79,7 +82,11 @@ export default function Login() {
       setAlert('error', 'Please Provide all values');
       setTimeout(() => clearAlert(), 3000);
     } else {
-      setup(user);
+      const status = setup(user);
+      if (status) {
+        console.log('Login Success' + status);
+        setTimeout(() => navigate('/'), 3000);
+      }
     }
   };
 
@@ -140,7 +147,13 @@ export default function Login() {
           </Button>
           <Grid container>
             <Grid item xs>
-              <Link href='#' variant='body2'>
+              <Link
+                variant='body2'
+                onClick={() => {
+                  navigate('/forgetPassword');
+                }}
+                style={{ cursor: 'pointer' }}
+              >
                 Forgot password?
               </Link>
             </Grid>

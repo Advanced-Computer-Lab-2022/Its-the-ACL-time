@@ -8,6 +8,7 @@ import { Box } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
 import { useNavigate } from 'react-router-dom';
 import { useRef } from 'react';
+import { useEffect } from 'react';
 
 const useStyles = makeStyles((theme) => ({
   item: {
@@ -34,6 +35,19 @@ const Search = () => {
     navigate(`/results?query=${e.target.innerText}`);
     dataResult.current.style.display = 'none';
   };
+
+  useEffect(() => {
+    let mouseDownHandler = (e) => {
+      if (dataResult.current && !dataResult.current.contains(e.target)) {
+        dataResult.current.style.display = 'none';
+      }
+    };
+    document.addEventListener('mousedown', mouseDownHandler);
+
+    return () => {
+      document.removeEventListener('mousedown', mouseDownHandler);
+    };
+  }, []);
 
   const search = (term) => {
     const filteredCourses = courses.filter(
@@ -65,7 +79,11 @@ const Search = () => {
             placeholder='Search for a courses'
             value={state.query}
             onChange={(e) => search(e.target.value)}
-            // onClick={() => (dataResult.current.style.display = 'block')}
+            onFocus={(e) => {
+              if (dataResult.current)
+                dataResult.current.style.display =
+                  state.filteredCourses.length > 0 ? 'block' : 'none';
+            }}
           />
           <div className='searchIcon'>
             {courses.length === 0 ? (
