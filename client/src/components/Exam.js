@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { makeStyles } from '@material-ui/core';
 import { Alert, AlertTitle } from '@material-ui/lab';
 import Question from './Question';
+import { AiOutlineStar } from 'react-icons/ai';
 
 const exam = {
   duration: 60,
@@ -14,34 +15,34 @@ const exam = {
       choices: ['Paris', 'London', 'Berlin', 'Rome'],
       answer: 0,
     },
-    {
-      title: 'What is the capital of Germany?',
-      imageURL:
-        'https://upload.wikimedia.org/wikipedia/commons/thumb/b/ba/Flag_of_Germany.svg/1200px-Flag_of_Germany.svg.png',
-      choices: ['Paris', 'London', 'Berlin', 'Rome'],
-      answer: 2,
-    },
-    {
-      title: 'What is the capital of Italy?',
-      imageURL:
-        'https://upload.wikimedia.org/wikipedia/commons/thumb/0/03/Flag_of_Italy.svg/1200px-Flag_of_Italy.svg.png',
-      choices: ['Paris', 'London', 'Berlin', 'Rome'],
-      answer: 3,
-    },
-    {
-      title: 'What is the capital of Spain?',
-      imageURL:
-        'https://upload.wikimedia.org/wikipedia/commons/thumb/9/9a/Flag_of_Spain.svg/1200px-Flag_of_Spain.svg.png',
-      choices: ['Paris', 'London', 'Berlin', 'Rome'],
-      answer: 0,
-    },
-    {
-      title: 'What is the capital of England?',
-      imageURL:
-        'https://upload.wikimedia.org/wikipedia/commons/thumb/b/be/Flag_of_England.svg/1200px-Flag_of_England.svg.png',
-      choices: ['Paris', 'London', 'Berlin', 'Rome'],
-      answer: 1,
-    },
+    // {
+    //   title: 'What is the capital of Germany?',
+    //   imageURL:
+    //     'https://upload.wikimedia.org/wikipedia/commons/thumb/b/ba/Flag_of_Germany.svg/1200px-Flag_of_Germany.svg.png',
+    //   choices: ['Paris', 'London', 'Berlin', 'Rome'],
+    //   answer: 2,
+    // },
+    // {
+    //   title: 'What is the capital of Italy?',
+    //   imageURL:
+    //     'https://upload.wikimedia.org/wikipedia/commons/thumb/0/03/Flag_of_Italy.svg/1200px-Flag_of_Italy.svg.png',
+    //   choices: ['Paris', 'London', 'Berlin', 'Rome'],
+    //   answer: 3,
+    // },
+    // {
+    //   title: 'What is the capital of Spain?',
+    //   imageURL:
+    //     'https://upload.wikimedia.org/wikipedia/commons/thumb/9/9a/Flag_of_Spain.svg/1200px-Flag_of_Spain.svg.png',
+    //   choices: ['Paris', 'London', 'Berlin', 'Rome'],
+    //   answer: 0,
+    // },
+    // {
+    //   title: 'What is the capital of England?',
+    //   imageURL:
+    //     'https://upload.wikimedia.org/wikipedia/commons/thumb/b/be/Flag_of_England.svg/1200px-Flag_of_England.svg.png',
+    //   choices: ['Paris', 'London', 'Berlin', 'Rome'],
+    //   answer: 1,
+    // },
   ],
 };
 
@@ -63,26 +64,48 @@ const useStyles = makeStyles((theme) => ({
     marginTop: '1rem',
   },
   checkAnswerBtn: {
-    backgroundColor: '#3f51b5',
+    backgroundColor: '#9c9797',
     color: 'white',
     padding: '0.5rem 1rem',
     borderRadius: '0.5rem',
     border: 'none',
     cursor: 'pointer',
     '&:hover': {
-      backgroundColor: '#303f9f',
+      backgroundColor: '#595757',
+    },
+
+    '&:disabled': {
+      backgroundColor: '#9c9797',
+      cursor: 'not-allowed',
     },
   },
+
   nextBtn: {
-    backgroundColor: '#3f51b5',
+    backgroundColor: '#383838',
     color: 'white',
     padding: '0.5rem 1rem',
-    borderRadius: '0.5rem',
     border: 'none',
+    borderRadius: '0.5rem',
     cursor: 'pointer',
     '&:hover': {
-      backgroundColor: '#303f9f',
+      backgroundColor: '#121212',
     },
+  },
+
+  startBtn: {
+    backgroundColor: '#383838',
+    color: 'white',
+    padding: '0.5rem 1rem',
+    border: 'none',
+    borderRadius: '0.5rem',
+    cursor: 'pointer',
+    '&:hover': {
+      backgroundColor: '#121212',
+    },
+  },
+
+  alert: {
+    margin: '1rem 0',
   },
 }));
 
@@ -101,20 +124,16 @@ function Exam() {
   const updateAnswer = (answerText) => {
     const answerNumber =
       exam.questions[questionState.currentQuestion].choices.indexOf(answerText);
-    console.log(answerNumber);
+    // console.log(answerNumber);
     setQuestionState({ ...questionState, answer: answerNumber });
   };
 
   const handleNextQuestion = () => {
-    const currentQuestion = exam.questions[questionState.currentQuestion];
+    setAlert(null);
 
     setQuestionState({
       ...questionState,
       currentQuestion: questionState.currentQuestion + 1,
-      numberOfCorrectAnswers:
-        questionState.answer === currentQuestion.answer
-          ? questionState.numberOfCorrectAnswers + 1
-          : questionState.numberOfCorrectAnswers,
     });
   };
 
@@ -136,9 +155,15 @@ function Exam() {
         type: 'success',
       });
     }
-    setTimeout(() => {
-      setAlert(null);
-    }, 2000);
+
+    setQuestionState({
+      ...questionState,
+      numberOfCorrectAnswers:
+        questionState.answer === currentQuestion.answer
+          ? questionState.numberOfCorrectAnswers + 1
+          : questionState.numberOfCorrectAnswers,
+      answer: null,
+    });
   };
 
   return (
@@ -157,7 +182,7 @@ function Exam() {
         </p>
       </header>
       {alert && (
-        <Alert severity={alert.type}>
+        <Alert severity={alert.type} className={classes.alert}>
           <AlertTitle>{alert.title}</AlertTitle>
           {alert.text}
         </Alert>
@@ -180,6 +205,7 @@ function Exam() {
               <button
                 onClick={handleCheckAnswer}
                 className={`${classes.checkAnswerBtn}`}
+                disabled={questionState.answer === null}
               >
                 Check answer
               </button>
@@ -198,15 +224,26 @@ function Exam() {
           <>
             {questionState.numberOfCorrectAnswers === exam.questions.length && (
               <div className={`${classes.all}`}>
+                <div
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                  }}
+                >
+                  <AiOutlineStar
+                    style={{
+                      fontSize: '5rem',
+                      color: '#f9d71c',
+                      display: 'flex',
+                      justifyContent: 'center',
+                      alignItems: 'center',
+                    }}
+                  />
+                </div>
                 <h1>
                   Great job! You are ready to move on to the next lecture.
                 </h1>
-                {/* happy icon */}
-                <img
-                  src='https://cdn.pixabay.com/photo/2016/11/29/05/45/adult-1867615_960_720.png'
-                  alt='happy'
-                />
-
                 <p>
                   You got {questionState.numberOfCorrectAnswers} out of{' '}
                   {questionState.numberOfCorrectAnswers}
@@ -238,7 +275,7 @@ function Exam() {
             onClick={() => {
               setStart(true);
             }}
-            className={`${classes.btn}`}
+            className={`${classes.startBtn}`}
           >
             Start Exam
           </button>

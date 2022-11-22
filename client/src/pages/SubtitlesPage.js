@@ -9,6 +9,7 @@ import { LinearProgress } from '@material-ui/core';
 import { useParams } from 'react-router-dom';
 import { AiOutlinePlusCircle } from 'react-icons/ai';
 import AlertDialog from '../components/AlertDialog';
+import Exam from '../components/Exam';
 
 const useStyles = makeStyles((theme) => ({
   main: {
@@ -390,7 +391,9 @@ const SubtitlesPage = () => {
         )}
       </section>
       <section className={`${classes.rightSection}`}>
-        <div className={`${classes.video}`}></div>
+        <div className={`${classes.video}`}>
+          <Exam></Exam>
+        </div>
         <div className={`${classes.videoInfo}`}>
           <div className={`${classes.line}`}></div>
           <div className={`${classes.videoInfoHeader}`}>

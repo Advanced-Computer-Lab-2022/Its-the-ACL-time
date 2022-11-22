@@ -1,23 +1,26 @@
-const express=require('express');
-const router=express.Router();
+const express = require('express');
+const router = express.Router();
 const {
-    createQuestion,
-    getAllQuestion,
-    deleteQuestion,
-    updateQuestion,
-}=require ('../controllers/QuestionController');
+  createQuestion,
+  getAllQuestion,
+  deleteQuestion,
+  updateQuestion,
+  getQuestion,
+} = require('../controllers/QuestionController');
 
-// GET All Question
-router.get('/:id',getAllQuestion)
+// GET Question
+router.get('/:id', getQuestion);
+
+// GET All Questions
+router.get('/', getAllQuestion);
 
 // POST a new Question
-router.post('/',createQuestion)
+router.post('/', createQuestion);
 
-// DELETE an Question 
-router.delete('/:id',deleteQuestion)
+// DELETE an Question
+router.delete('/:id', deleteQuestion);
 
 // UPDATE an Question
-router.patch('/:id',updateQuestion)
+router.patch('/:id', updateQuestion);
 
-
-module.exports=router
+module.exports = router;
