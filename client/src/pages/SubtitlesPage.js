@@ -5,11 +5,11 @@ import { Box, TextareaAutosize, Typography } from '@material-ui/core';
 import { AiFillCloseCircle, AiFillEdit, AiFillDelete } from 'react-icons/ai';
 import { useEffect } from 'react';
 import axios from 'axios';
-import { LinearProgress } from '@material-ui/core';
-import { useParams } from 'react-router-dom';
+import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { AiOutlinePlusCircle } from 'react-icons/ai';
 import AlertDialog from '../components/AlertDialog';
 import Exam from '../components/Exam';
+import { useAppContext } from '../context/App/appContext';
 
 const useStyles = makeStyles((theme) => ({
   main: {
@@ -76,6 +76,17 @@ const useStyles = makeStyles((theme) => ({
     border: '1px solid #e0e0e0',
     borderRadius: '0.5rem',
     backgroundColor: 'black',
+  },
+
+  exam: {
+    width: '100%',
+    height: '30rem',
+    border: '1px solid #e0e0e0',
+    borderRadius: '0.5rem',
+    backgroundColor: 'white',
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'center',
   },
 
   videoInfoHeader: {
@@ -261,33 +272,19 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-function LinearProgressWithLabel(props) {
-  return (
-    <Box display='flex' alignItems='center'>
-      <Box width='100%' mr={1}>
-        <LinearProgress variant='determinate' {...props} />
-      </Box>
-      <Box minWidth={35}>
-        <Typography variant='body2' color='textSecondary'>{`${Math.round(
-          props.value
-        )}%`}</Typography>
-      </Box>
-    </Box>
-  );
-}
-
 const initialState = {
   checkedSubtitles: [],
   numOfCheckedSubtitles: 0,
+  checkedExams: [],
 };
-
-let notes = ['note1', 'note2', 'note3'];
 
 const SubtitlesPage = () => {
   const classes = useStyles();
 
   const [showList, setShowList] = useState(true);
   const [subtitles, setSubtitles] = useState([]);
+  const [exams, setExams] = useState([]);
+  const [exam, setExam] = useState(null);
   const [state, setState] = useState(initialState);
   const [showMore, setShowMore] = useState(false);
   const [videoInfo, setVideoInfo] = useState(0);
@@ -296,59 +293,156 @@ const SubtitlesPage = () => {
   const [showMoreDescription, setShowMoreDescription] = useState(false);
   const noteContent = useRef();
   const { courseId } = useParams();
+  const [searchParams, setSearchParams] = useSearchParams();
+  const navigate = useNavigate();
+  const { user } = useAppContext();
+  const [notes, setNotes] = useState([]);
 
-  const addSubtitleToLocalStorage = (item) => {
-    if (!localStorage.getItem('checkedSubtitles'))
-      localStorage.setItem('checkedSubtitles', JSON.stringify([]));
-    let subtitles = JSON.parse(localStorage.getItem('checkedSubtitles'));
-    subtitles.push(item);
-    localStorage.setItem('checkedSubtitles', JSON.stringify(subtitles));
+  const addItemToLocalStorage = (item, type) => {
+    if (!localStorage.getItem(`${type}${courseId}`))
+      localStorage.setItem(`${type}${courseId}`, JSON.stringify([]));
+    let items = JSON.parse(localStorage.getItem(`${type}${courseId}`));
+    items.push(item);
+    localStorage.setItem(`${type}${courseId}`, JSON.stringify(items));
   };
 
-  const removeSubtitleFromLocalStorage = (subtitle) => {
-    let subtitles = JSON.parse(localStorage.getItem('checkedSubtitles'));
-    let filteredSubtitles = subtitles.filter((item) => item !== subtitle);
-    localStorage.setItem('checkedSubtitles', JSON.stringify(filteredSubtitles));
+  const removeItemFromLocalStorage = (item, type) => {
+    let items = JSON.parse(localStorage.getItem(`${type}${courseId}`));
+    let filteredItems = items.filter((i) => i !== item);
+    localStorage.setItem(`${type}${courseId}`, JSON.stringify(filteredItems));
   };
 
-  const getCheckedSubtitles = () => {
-    return JSON.parse(localStorage.getItem('checkedSubtitles'));
+  const getItemFromLocalStorage = (type) => {
+    if (!localStorage.getItem(`${type}${courseId}`))
+      localStorage.setItem(`${type}${courseId}`, JSON.stringify([]));
+    return JSON.parse(localStorage.getItem(`${type}${courseId}`));
   };
 
   useEffect(() => {
+    console.log('courseId ' + courseId);
     async function fetchSubtitles() {
       const response = await axios.get(
         `http://localhost:8080/api/v1/course/${courseId}/subtitle`
       );
-      console.log(response.data.subTitles);
       setSubtitles(response.data.subTitles);
     }
 
+    async function fetchExams() {
+      try {
+        const response = await axios.get(
+          `http://localhost:8080/api/v1/exam?courseId=635f73a23569cc0d7e43d80e`
+        );
+        setExams(response.data);
+      } catch (error) {
+        console.log(error);
+      }
+    }
+
     async function getState() {
-      const checkedSubTitles = getCheckedSubtitles();
+      const checkedSubTitles = getItemFromLocalStorage('checkedSubtitles');
+      const checkedExams = getItemFromLocalStorage('checkedExams');
       setState({
         checkedSubtitles: checkedSubTitles ? checkedSubTitles : [],
         numOfCheckedSubtitles: checkedSubTitles?.length,
+        checkedExams: checkedExams ? checkedExams : [],
       });
     }
 
     fetchSubtitles();
+    fetchExams();
     getState();
   }, [courseId]);
+
+  useEffect(() => {
+    const getExam = async (examId) => {
+      try {
+        const response = await axios.get(
+          'http://localhost:8080/api/v1/exam/' + examId
+        );
+        setExam(response.data);
+      } catch (error) {
+        console.log(error);
+      }
+    };
+
+    async function fetchNotes(subtitleId) {
+      try {
+        const response = await axios.get(
+          `http://localhost:8080/api/v1/note?subtitleId=${subtitleId}&userId=${user._id}`
+        );
+        setNotes(response.data);
+      } catch (error) {
+        console.log(error);
+      }
+    }
+
+    if (searchParams.has('examId')) {
+      getExam(searchParams.get('examId'));
+    }
+
+    if (searchParams.has('subtitleId')) {
+      fetchNotes(searchParams.get('subtitleId'));
+    }
+  }, [searchParams, user._id]);
 
   const handleChecked = async (subtitle, title, checked) => {
     let resultSubtitles = state.checkedSubtitles;
     if (checked) {
-      addSubtitleToLocalStorage(subtitle);
+      addItemToLocalStorage(subtitle, 'checkedSubtitles');
       resultSubtitles.push(subtitle);
     } else {
-      removeSubtitleFromLocalStorage(subtitle);
+      removeItemFromLocalStorage(subtitle, 'checkedSubtitles');
       resultSubtitles.filter((item) => item !== subtitle);
     }
     setState({
+      ...state,
       checkedSubtitles: resultSubtitles,
       numOfCheckedSubtitles: resultSubtitles.length,
     });
+  };
+
+  const handleCheckedExam = (exam, title, checked) => {
+    let resultExams = state.checkedExams;
+    if (checked) {
+      addItemToLocalStorage(exam, 'checkedExams');
+      resultExams.push(exam);
+    } else {
+      removeItemFromLocalStorage(exam, 'checkedExams');
+      resultExams.filter((item) => item !== exam);
+    }
+    setState({
+      ...state,
+      checkedExams: resultExams,
+    });
+  };
+
+  const addNote = async () => {
+    try {
+      const response = await axios.post('http://localhost:8080/api/v1/note', {
+        subtitleId: searchParams.get('subtitleId'),
+        userId: user._id,
+        description: noteContent.current.value,
+      });
+      setNotes([...notes, response.data.response]);
+      setWriteNote(false);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const deleteNote = async (noteId) => {
+    console.log('noteId ' + noteId);
+    try {
+      await axios.delete(
+        `http://localhost:8080/api/v1/note/${noteId}?userId=${user._id}`,
+        {
+          userId: user._id,
+        }
+      );
+      setNotes(notes.filter((note) => note.id !== noteId));
+    } catch (error) {
+      console.log(error);
+    }
   };
 
   return (
@@ -369,7 +463,7 @@ const SubtitlesPage = () => {
                 options={[...Array(subtitle.title)]}
                 key={idx}
                 onFilter={handleChecked}
-                optionOnClick={() => console.log('Get Subtitle')}
+                optionOnClick={() => navigate(`?subtitleId=${subtitle._id}`)}
                 titleStyle={{
                   fontSize: '1rem',
                   fontWeight: '500',
@@ -381,6 +475,23 @@ const SubtitlesPage = () => {
               />
             ))
             .slice(0, showMore ? subtitles.length : 2)}
+        {exams.map((exam, idx) => (
+          <FilterField
+            title={`Exam ${idx + 1}`}
+            options={[...Array(`Let's take the exam ${idx + 1}`)]}
+            key={idx}
+            onFilter={handleCheckedExam}
+            optionOnClick={() => navigate(`?examId=${exam._id}`)}
+            titleStyle={{
+              fontSize: '1rem',
+              fontWeight: '500',
+            }}
+            checkedOptions={state.checkedExams.reduce((acc, item) => {
+              acc[item] = true;
+              return acc;
+            }, {})}
+          />
+        ))}
         {subtitles.length > 2 && (
           <button
             className={`${classes.showMore}`}
@@ -390,9 +501,20 @@ const SubtitlesPage = () => {
           </button>
         )}
       </section>
+
       <section className={`${classes.rightSection}`}>
-        <div className={`${classes.video}`}>
-          <Exam></Exam>
+        <div
+          className={searchParams.get('examId') ? classes.exam : classes.video}
+        >
+          {exam && searchParams.get('examId') ? (
+            <Exam
+              questions={exam?.questions}
+              title={"Let's take the exam"}
+              duration={exam?.duration}
+            ></Exam>
+          ) : (
+            <></>
+          )}
         </div>
         <div className={`${classes.videoInfo}`}>
           <div className={`${classes.line}`}></div>
@@ -457,13 +579,7 @@ const SubtitlesPage = () => {
                   >
                     Cancel
                   </button>
-                  <button
-                    className={`${classes.save}`}
-                    onClick={() => {
-                      notes.push(noteContent.current?.value);
-                      setWriteNote(false);
-                    }}
-                  >
+                  <button className={`${classes.save}`} onClick={addNote}>
                     save
                   </button>
                 </div>
@@ -485,9 +601,9 @@ const SubtitlesPage = () => {
             {videoInfo === 1 && (
               <div className={`${classes.notes}`}>
                 {notes.map((note, idx) => (
-                  <>
+                  <div key={note.id} style={{ width: '100%' }}>
                     <Box className={`${classes.note}`}>
-                      <div className={`${classes.noteHeader}`} key={idx}>
+                      <div className={`${classes.noteHeader}`}>
                         <Typography
                           variant='h6'
                           gutterBottom
@@ -500,17 +616,17 @@ const SubtitlesPage = () => {
                           <AiFillDelete
                             className={`${classes.noteIcons}`}
                             onClick={() => {
-                              setDialog(idx);
+                              setDialog(note.id);
                             }}
                           />
                         </div>
                       </div>
                       <div className={`${classes.noteContent}`}>
-                        <p>{note}</p>
+                        <p>{note?.description}</p>
                       </div>
                     </Box>
                     <div className={`${classes.hr}`}></div>
-                  </>
+                  </div>
                 ))}
               </div>
             )}
@@ -519,7 +635,7 @@ const SubtitlesPage = () => {
               content={'Are you sure you want to delete this note ?'}
               open={dialog !== -1}
               handleAgree={() => {
-                notes = notes.filter((note, idx) => idx !== dialog);
+                deleteNote(dialog);
                 setDialog(-1);
                 console.log('agree');
               }}

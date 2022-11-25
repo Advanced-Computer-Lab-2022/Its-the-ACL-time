@@ -58,7 +58,6 @@ function SearchResult() {
   const [searchParams, setSearchParams] = useSearchParams();
 
   const search = (term) => {
-    console.log(courses);
     const filteredCourses = courses.filter(
       (course) =>
         course.title.toLowerCase().includes(term.toLowerCase()) ||
@@ -82,7 +81,9 @@ function SearchResult() {
   useEffect(() => {
     setState({
       ...state,
-      filteredCourses: search(searchParams.get('query')),
+      filteredCourses: searchParams.get('query')
+        ? search(searchParams.get('query'))
+        : [],
     });
   }, [courses, searchParams]);
 
@@ -249,31 +250,35 @@ function SearchResult() {
           )}
         </div>
       </section>
-      <section className={`${classes.coursesSection}`}>
-        <p className={`${classes.results}`}>
-          {state.filteredCourses.slice(page * 5, (page + 1) * 5).length} results
-        </p>
-        {state.filteredCourses.slice(page * 5, (page + 1) * 5).map((course) => {
-          return (
-            <Course
-              key={course._id}
-              title={course.title}
-              subject={course.subject}
-              description={course.summary}
-              instructor={course.createdBy.username}
-              price={course.price}
-              courseId={course._id}
-              horizontal={true}
+      {state.filteredCourses.length > 0 && (
+        <section className={`${classes.coursesSection}`}>
+          <p className={`${classes.results}`}>
+            {state.filteredCourses.slice(page * 5, (page + 1) * 5).length}{' '}
+            results
+          </p>
+          {state.filteredCourses
+            .slice(page * 5, (page + 1) * 5)
+            .map((course) => {
+              return (
+                <Course
+                  key={course._id}
+                  title={course.title}
+                  subject={course.subject}
+                  description={course.summary}
+                  instructor={course.createdBy.username}
+                  price={course.price}
+                  courseId={course._id}
+                  horizontal={true}
+                />
+              );
+            })}
+          <div className={`${classes.pages}`}>
+            <Pagination
+              count={Math.ceil(state.filteredCourses.length / 5)}
+              color='secondary'
+              onChange={getPage}
             />
-          );
-        })}
-        <div className={`${classes.pages}`}>
-          <Pagination
-            count={Math.ceil(state.filteredCourses.length / 5)}
-            color='secondary'
-            onChange={getPage}
-          />
-          {/* {[...Array(Math.ceil(state.filteredCourses.length / 5))].map(
+            {/* {[...Array(Math.ceil(state.filteredCourses.length / 5))].map(
             (e, i) => {
               return (
                 <p
@@ -289,8 +294,9 @@ function SearchResult() {
               );
             }
           )} */}
-        </div>
-      </section>
+          </div>
+        </section>
+      )}
     </div>
   );
 }

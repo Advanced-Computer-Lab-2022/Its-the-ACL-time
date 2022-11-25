@@ -2,16 +2,16 @@ const mongoose = require('mongoose');
 
 const Schema = mongoose.Schema;
 
-const VideoNotesSchema = new Schema({
-  video: {
+const NotesSchema = new Schema({
+  subtitle: {
     type: Schema.Types.ObjectId,
-    required: [true, 'please provide which video'],
-    ref: 'Video',
+    required: [true, 'please provide which subtitle'],
+    ref: 'SubTitle',
   },
   user: {
     type: Schema.Types.ObjectId,
     ref: 'User',
-    required: [true, 'please provide a user for video'],
+    required: [true, 'please provide a user'],
   },
   description: {
     type: String,
@@ -19,4 +19,4 @@ const VideoNotesSchema = new Schema({
   },
 });
 
-module.exports = mongoose.model('VideoNotesModel', VideoNotesSchema);
+module.exports = mongoose.model('NotesModel', NotesSchema);

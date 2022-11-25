@@ -6,6 +6,7 @@ import {
   USER_SETUP_ERROR,
   SET_ALERT,
   CLEAR_ALERT,
+  USER_RESET,
 } from './appActions';
 import axios from 'axios';
 
@@ -43,11 +44,6 @@ const AppProvider = ({ children }) => {
   const addToLocalStorage = ({ user, token }) => {
     localStorage.setItem('user', JSON.stringify(user));
     localStorage.setItem('token', token);
-  };
-
-  const removeToLocalStorage = () => {
-    localStorage.removeItem('user');
-    localStorage.removeItem('token');
   };
 
   const setup = async ({
@@ -101,6 +97,12 @@ const AppProvider = ({ children }) => {
     }
   };
 
+  const resetUser = () => {
+    localStorage.removeItem('user');
+    localStorage.removeItem('token');
+    dispatch({ type: USER_RESET });
+  };
+
   return (
     <AppContext.Provider
       value={{
@@ -108,6 +110,7 @@ const AppProvider = ({ children }) => {
         setAlert,
         clearAlert,
         setup,
+        resetUser,
       }}
     >
       {children}

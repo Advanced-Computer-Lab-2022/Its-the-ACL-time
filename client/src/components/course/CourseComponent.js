@@ -1,9 +1,14 @@
 import Grid from '@material-ui/core/Grid';
 import Typography from '@material-ui/core/Typography';
-import ButtonBase from '@material-ui/core/ButtonBase';
 import { makeStyles } from '@material-ui/core/styles';
 import { Link } from 'react-router-dom';
-import { Box } from '@material-ui/core';
+import LinearProgressBar from '../LinearProgressBar';
+import { useRef, useState } from 'react';
+import {
+  AiOutlineCheck,
+  AiOutlineHeart,
+  AiOutlineShoppingCart,
+} from 'react-icons/ai';
 
 const useStyles = makeStyles((theme) => ({
   img: {
@@ -15,7 +20,6 @@ const useStyles = makeStyles((theme) => ({
   },
   root: {
     padding: '1rem',
-    // make shadow
     boxShadow: '0 0 10px rgba(.5,.5,.5,0.1)',
     marginBottom: '1rem',
   },
@@ -56,26 +60,170 @@ const useStyles = makeStyles((theme) => ({
     '-webkit-line-clamp': 3,
     '-webkit-box-orient': 'vertical',
   },
+
+  demo: {
+    position: 'absolute',
+    width: '25rem',
+    display: 'flex',
+    flexDirection: 'column',
+    padding: '1rem',
+    backgroundColor: 'rgb(220, 218, 215)',
+    boxShadow: '0 0 10px rgba(.5,.5,.5,0.1)',
+    zIndex: 100,
+  },
+
+  demoHeader: {
+    display: 'flex',
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginRight: '2rem',
+    marginTop: '1rem',
+    fontSize: '0.8rem',
+    fontWeight: '400',
+  },
+
+  willLearn: {
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'flex-start',
+    justifyContent: 'flex-start',
+    margin: '1rem 0',
+  },
+
+  addToCartBtn: {
+    width: '17rem',
+    height: '2.5rem',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: 'rgb(45, 49, 51)',
+    color: '#fff',
+    cursor: 'pointer',
+    transition: 'all 0.3s ease',
+    border: 'none',
+    outline: 'none',
+    '&:hover': {
+      backgroundColor: 'rgb(0, 0, 0)',
+    },
+  },
+
+  likeBtn: {
+    width: '2.5rem',
+    height: '2.5rem',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderRadius: '50%',
+  },
+
+  demoFooter: {
+    display: 'flex',
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginTop: '1rem',
+  },
 }));
+
+function Demo({
+  numOfHours,
+  numOfVideos,
+  numOfStudents,
+  title,
+  description,
+  price,
+  instructor,
+  subject,
+  style,
+}) {
+  const classes = useStyles();
+
+  console.log(title);
+  return (
+    <>
+      <div className={classes.demo}>
+        <Typography variant='h5' component='h2'>
+          {title && title}
+        </Typography>
+        <div className={classes.demoHeader}>
+          <p style={{ marginRight: '1rem' }}>5 Videos</p>
+          <p style={{ marginRight: '1rem' }}>10 Hours</p>
+          <p>1000 Students</p>
+        </div>
+        <Typography>{description && description.slice(0, 100)}</Typography>
+        <div className={classes.willLearn}>
+          <Typography variant='h6'>What you'll learn</Typography>
+          <div
+            style={{
+              padding: '0.5rem',
+            }}
+          >
+            <div>
+              <AiOutlineCheck /> Learn React.js
+            </div>
+            <div>
+              <AiOutlineCheck /> Learn Redux
+            </div>
+            <div>
+              <AiOutlineCheck /> Learn React Hooks
+            </div>
+            <div>
+              <AiOutlineCheck /> Learn React Router
+            </div>
+          </div>
+        </div>
+        <div className={classes.demoFooter}>
+          <button
+            className={classes.addToCartBtn}
+            onClick={() => console.log('add to cart')}
+          >
+            Add to Cart <AiOutlineShoppingCart />
+          </button>
+          <button
+            className={classes.likeBtn}
+            onClick={() => console.log('Like')}
+          >
+            <AiOutlineHeart />
+          </button>
+        </div>
+      </div>
+    </>
+  );
+}
 
 function CourseComponent({
   title,
   description,
-  instructor,
+  image,
   price,
-  subject,
+  rating,
+  instructor,
   courseId,
+  progress,
+  subject,
   horizontal,
+  numOfVideos,
+  numOfHours,
+  numberOfStudents,
 }) {
   const classes = useStyles();
+  const [showDemo, setShowDemo] = useState(false);
+  const courseRef = useRef();
 
   return (
     <>
       {horizontal && (
-        <div className={`${classes.root}`}>
+        <div className={`${classes.root}`} ref={courseRef}>
           <Link
             to={`/course/${courseId}`}
-            style={{ textDecoration: 'none', color: 'black' }}
+            style={{
+              textDecoration: 'none',
+              color: 'black',
+            }}
+            onMouseEnter={() => {
+              setShowDemo(true);
+            }}
+            onMouseLeave={() => setShowDemo(false)}
           >
             <Grid container spacing={2}>
               <Grid item>
@@ -89,22 +237,20 @@ function CourseComponent({
               <Grid item xs={5} sm container>
                 <Grid item xs container direction='column' spacing={2}>
                   <Grid item xs>
-                    <Typography gutterBottom variant='subtitle1'>
-                      {title || 'Course Title'}
+                    <Typography gutterBottom style={{ fontWeight: 'bold' }}>
+                      {title && title}
                     </Typography>
                     <Typography variant='body2' gutterBottom>
-                      {instructor || 'Course Instructor'}
+                      {description && description}
                     </Typography>
                     <Typography gutterBottom variant='body2'>
-                      {subject || 'Subject'}
+                      {instructor && instructor}
                     </Typography>
                     <Typography variant='body2' color='textSecondary'>
-                      {description || 'Course Description'}
+                      {subject && subject}
                     </Typography>
-                  </Grid>
-                  <Grid item>
-                    <Typography variant='body2' style={{ cursor: 'pointer' }}>
-                      Add to Cart
+                    <Typography variant='body2' color='textSecondary'>
+                      {price && price}
                     </Typography>
                   </Grid>
                 </Grid>
@@ -113,15 +259,79 @@ function CourseComponent({
                 </Grid>
               </Grid>
             </Grid>
-            <hr />
+            <div
+              style={{
+                position: 'absolute',
+                top: courseRef.current?.offsetTop,
+                left: Number(
+                  courseRef.current?.offsetLeft +
+                    courseRef.current?.offsetWidth +
+                    400 >=
+                    document.body.clientWidth
+                    ? courseRef.current?.offsetLeft - 400
+                    : courseRef.current?.offsetLeft +
+                        courseRef.current?.offsetWidth
+                )
+                  ? Number(
+                      courseRef.current?.offsetLeft +
+                        courseRef.current?.offsetWidth +
+                        400 >=
+                        document.body.clientWidth
+                        ? courseRef.current?.offsetLeft - 400
+                        : courseRef.current?.offsetLeft +
+                            courseRef.current?.offsetWidth
+                    )
+                  : 0,
+              }}
+            >
+              {showDemo && (
+                <Demo
+                  title={title}
+                  description={description}
+                  image={image}
+                  price={price}
+                  instructor={instructor}
+                  subject={subject}
+                  numOfVideos={numOfVideos}
+                  numOfHours={numOfHours}
+                  numberOfStudents={numberOfStudents}
+                />
+              )}
+            </div>
           </Link>
         </div>
       )}
       {!horizontal && (
-        <Box className={`${classes.course}`}>
+        <div
+          className={`${classes.course}`}
+          // style={{
+          //   position: 'absolute',
+          //   top: courseRef.current?.offsetTop,
+          //   left: Number(
+          //     courseRef.current?.offsetLeft +
+          //       courseRef.current?.offsetWidth +
+          //       400 >=
+          //       document.body.clientWidth
+          //       ? courseRef.current?.offsetLeft - 400
+          //       : courseRef.current?.offsetLeft + courseRef.current?.offsetWidth
+          //   )
+          //     ? Number(
+          //         courseRef.current?.offsetLeft +
+          //           courseRef.current?.offsetWidth +
+          //           400 >=
+          //           document.body.clientWidth
+          //           ? courseRef.current?.offsetLeft - 400
+          //           : courseRef.current?.offsetLeft +
+          //               courseRef.current?.offsetWidth
+          //       )
+          //     : 0,
+          // }}
+        >
           <Link
             to={`/course/${courseId}`}
             style={{ textDecoration: 'none', color: 'black' }}
+            // onMouseEnter={() => setShowDemo(true)}
+            // onMouseLeave={() => setShowDemo(false)}
           >
             <img
               className={classes.imgVertical}
@@ -129,26 +339,58 @@ function CourseComponent({
               src='https://www.patterns.dev/img/reactjs/react-logo@3x.svg'
             />
             <div className={`${classes.core}`}>
-              <Typography gutterBottom variant='subtitle1'>
-                {title || 'Course Title'}
+              <Typography gutterBottom style={{ fontWeight: 'bold' }}>
+                {title && title}
               </Typography>
               <Typography variant='body2' gutterBottom>
-                {instructor || 'Course Instructor'}
+                {instructor && instructor}
               </Typography>
               <Typography gutterBottom variant='body2'>
-                {subject || 'Subject'}
+                {subject && subject}
               </Typography>
               <Typography
                 variant='body2'
                 color='textSecondary'
                 className={`${classes.description}`}
               >
-                {description.slice(0, 50) || 'Course Description'}
+                {description?.slice(0, 50) || 'Course Description'}
               </Typography>
-              <Typography variant='subtitle1'>${price}</Typography>
+              {price && <Typography variant='subtitle1'>${price}</Typography>}
+              {progress && (
+                <div
+                  style={{
+                    width: '100%',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    justifyContent: 'center',
+                  }}
+                >
+                  <LinearProgressBar valueOfProgress={progress} />
+                  <Typography
+                    gutterBottom
+                    style={{ fontWeight: '300' }}
+                    variant='caption'
+                  >
+                    {progress}% Completed
+                  </Typography>
+                </div>
+              )}
             </div>
           </Link>
-        </Box>
+          {showDemo && (
+            <Demo
+              title={title}
+              description={description}
+              image={image}
+              price={price}
+              instructor={instructor}
+              subject={subject}
+              numOfVideos={numOfVideos}
+              numOfHours={numOfHours}
+              numberOfStudents={numberOfStudents}
+            />
+          )}
+        </div>
       )}
     </>
   );

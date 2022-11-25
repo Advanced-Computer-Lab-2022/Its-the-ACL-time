@@ -5,6 +5,8 @@ import { Outlet, useNavigate } from 'react-router-dom';
 import Search from './Search';
 import { Link } from 'react-router-dom';
 import { useEffect, useRef, useState } from 'react';
+import { useAppContext } from '../context/App/appContext';
+import { Box, Button, MenuItem, Select } from '@material-ui/core';
 
 const useStyles = makeStyles((theme) => ({
   name: {
@@ -83,14 +85,52 @@ const useStyles = makeStyles((theme) => ({
       color: 'rgba(0,0,0,0.5)',
     },
   },
+
+  identity: {
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+  },
+
+  btn: {
+    width: '5rem',
+    height: '2rem',
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'center',
+    border: '1px solid grey',
+    backgroundColor: 'rgb(240, 237, 237)',
+    color: 'black',
+    textDecoration: 'none',
+    '&:hover': {
+      backgroundColor: 'rgba(135, 132, 132, 0.5)',
+    },
+    marginRight: '1rem',
+  },
 }));
+
+const languages = [
+  'Arabic',
+  'English',
+  'Spanish',
+  'French',
+  'German',
+  'Italian',
+  'Russian',
+  'Chinese',
+  'Japanese',
+  'Korean',
+  'Other',
+];
 
 function NavBar() {
   const classes = useStyles();
-  const user = JSON.parse(localStorage.getItem('user'));
+  const { user, resetUser } = useAppContext();
   const profileList = useRef();
   const navigate = useNavigate();
   const [showProfileList, setShowProfileList] = useState(false);
+  const [openLanguages, setOpenLanguages] = useState(false);
+  const [language, setLanguage] = useState('');
 
   useEffect(() => {
     let mouseDownHandler = (e) => {
@@ -106,9 +146,9 @@ function NavBar() {
   });
 
   const handleLogout = () => {
-    localStorage.removeItem('user');
-    localStorage.removeItem('token');
-    navigate('/');
+    console.log('logout');
+    resetUser();
+    navigate('/landing');
   };
 
   const expand = 'xxl';
@@ -129,110 +169,153 @@ function NavBar() {
             </Navbar.Brand>
           </Link>
           <Search />
-
-          <div
-            className={`${classes.profileIcon}`}
-            onClick={() => setShowProfileList(!showProfileList)}
-          >
-            {user?.username.slice(0, 2).toUpperCase()}
-          </div>
-          {user && showProfileList && (
-            <div className={`${classes.profileList}`} ref={profileList}>
-              <div className={`${classes.profileListHeader}`}>
-                <div
-                  className={`${classes.profileIcon}`}
-                  style={{ backgroundColor: 'black', color: 'white' }}
-                >
-                  {user?.username.slice(0, 2).toUpperCase()}
-                </div>
-                <div className={`${classes.profileListHeaderInfo}`}>
-                  <p
-                    style={{
-                      fontSize: '1.2rem',
-                      fontWeight: 'bold',
-                      marginBottom: '0',
-                    }}
-                  >
-                    {user?.username}
-                  </p>
-                  <p
-                    style={{
-                      fontSize: '0.8rem',
-                      width: '10rem',
-                      fontWeight: '300',
-                      marginBottom: '0',
-                      overflow: 'hidden',
-                    }}
-                  >
-                    {user?.email.slice(0, 18)}
-                  </p>
-                </div>
-              </div>
+          {user && (
+            <>
               <div
-                style={{
-                  width: '100%',
-                  height: '1px',
-                  backgroundColor: 'rgba(0,0,0,0.2)',
-                  margin: '1rem 0',
-                }}
-              ></div>
-              <div className={`${classes.profileListBody}`}>
-                <Link to='/myCourses'>
-                  {/* learning icon */}
-                  <span className={`${classes.profileListItem}`}>
-                    <i
-                      className='fas fa-book-open'
-                      style={{ marginRight: '0.5rem' }}
-                    ></i>
-                    <p
-                      style={{
-                        fontSize: '1rem',
-                        fontWeight: '350',
-                        marginBottom: '0',
-                        marginLeft: '0.5rem',
-                      }}
-                    >
-                      My Courses
-                    </p>
-                  </span>
-                </Link>
-                <Link to='/cart'>
-                  <span className={`${classes.profileListItem}`}>
-                    <i
-                      className='fas fa-shopping-cart'
-                      style={{ marginRight: '0.5rem' }}
-                    ></i>
-                    <p
-                      style={{
-                        fontSize: '1rem',
-                        fontWeight: '350',
-                        marginBottom: '0',
-                        marginLeft: '0.5rem',
-                      }}
-                    >
-                      Cart
-                    </p>
-                  </span>
-                </Link>
-                <Link onClick={handleLogout}>
-                  <span className={`${classes.profileListItem}`}>
-                    <i
-                      className='fas fa-sign-out-alt'
-                      style={{ marginRight: '0.5rem' }}
-                    ></i>
-                    <p
-                      style={{
-                        fontSize: '1rem',
-                        fontWeight: '350',
-                        marginBottom: '0',
-                        marginLeft: '0.5rem',
-                      }}
-                    >
-                      Logout
-                    </p>
-                  </span>
-                </Link>
+                className={`${classes.profileIcon}`}
+                onClick={() => setShowProfileList(!showProfileList)}
+              >
+                {user?.username.slice(0, 2).toUpperCase()}
               </div>
+              {user && showProfileList && (
+                <div className={`${classes.profileList}`} ref={profileList}>
+                  <div className={`${classes.profileListHeader}`}>
+                    <div
+                      className={`${classes.profileIcon}`}
+                      style={{ backgroundColor: 'black', color: 'white' }}
+                    >
+                      {user?.username.slice(0, 2).toUpperCase()}
+                    </div>
+                    <div className={`${classes.profileListHeaderInfo}`}>
+                      <p
+                        style={{
+                          fontSize: '1.2rem',
+                          fontWeight: 'bold',
+                          marginBottom: '0',
+                        }}
+                      >
+                        {user?.username.slice(0, 10)}
+                      </p>
+                      <p
+                        style={{
+                          fontSize: '0.8rem',
+                          width: '10rem',
+                          fontWeight: '300',
+                          marginBottom: '0',
+                          overflow: 'hidden',
+                        }}
+                      >
+                        {user?.email.slice(0, 18)}
+                      </p>
+                    </div>
+                  </div>
+                  <div
+                    style={{
+                      width: '100%',
+                      height: '1px',
+                      backgroundColor: 'rgba(0,0,0,0.2)',
+                      margin: '1rem 0',
+                    }}
+                  ></div>
+                  <div className={`${classes.profileListBody}`}>
+                    <Link to='/myCourses'>
+                      {/* learning icon */}
+                      <span className={`${classes.profileListItem}`}>
+                        <i
+                          className='fas fa-book-open'
+                          style={{ marginRight: '0.5rem' }}
+                        ></i>
+                        <p
+                          style={{
+                            fontSize: '1rem',
+                            fontWeight: '350',
+                            marginBottom: '0',
+                            marginLeft: '0.5rem',
+                          }}
+                        >
+                          My Courses
+                        </p>
+                      </span>
+                    </Link>
+                    <Link to='/cart'>
+                      <span className={`${classes.profileListItem}`}>
+                        <i
+                          className='fas fa-shopping-cart'
+                          style={{ marginRight: '0.5rem' }}
+                        ></i>
+                        <p
+                          style={{
+                            fontSize: '1rem',
+                            fontWeight: '350',
+                            marginBottom: '0',
+                            marginLeft: '0.5rem',
+                          }}
+                        >
+                          Cart
+                        </p>
+                      </span>
+                    </Link>
+                    <Box
+                      onClick={handleLogout}
+                      style={{
+                        cursor: 'pointer',
+                      }}
+                    >
+                      <span className={`${classes.profileListItem}`}>
+                        <i
+                          className='fas fa-sign-out-alt'
+                          style={{ marginRight: '0.5rem' }}
+                        ></i>
+                        <p
+                          style={{
+                            fontSize: '1rem',
+                            fontWeight: '350',
+                            marginBottom: '0',
+                            marginLeft: '0.5rem',
+                          }}
+                        >
+                          Logout
+                        </p>
+                      </span>
+                    </Box>
+                  </div>
+                </div>
+              )}
+            </>
+          )}
+
+          {!user && (
+            <div className={classes.identity}>
+              <Link to='/login' className={classes.btn}>
+                <Button>Login</Button>
+              </Link>
+              <Link to='/register' className={classes.btn}>
+                <Button>Signup</Button>
+              </Link>
+              <Button
+                className={classes.btn}
+                onClick={() => setOpenLanguages(true)}
+              >
+                <i className='fas fa-globe'></i>
+              </Button>
+              {openLanguages && (
+                <Select
+                  labelId='demo-controlled-open-select-label'
+                  id='demo-controlled-open-select'
+                  open={openLanguages}
+                  onClose={() => setOpenLanguages(false)}
+                  onOpen={() => setOpenLanguages(true)}
+                  value={language}
+                  onChange={(e) => setLanguage(e.target.value)}
+                >
+                  <MenuItem value=''>
+                    <em>None</em>
+                  </MenuItem>
+                  {languages.map((language) => (
+                    <MenuItem value={language}>{language}</MenuItem>
+                  ))}
+                </Select>
+              )}
             </div>
           )}
         </Container>

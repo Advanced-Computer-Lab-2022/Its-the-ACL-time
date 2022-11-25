@@ -55,8 +55,9 @@ const useStyles = makeStyles((theme) => ({
 
 const Review = ({ username, reviewText }) => {
   const classes = useStyles();
-  const name = username;
+  const name = username || 'Anonymous';
   const text =
+    reviewText ||
     'loremRev iewlor emRe viewlorem loremRev iewlor emRe viewlorem loremRev iewlor emRe viewlorem loremRev iewlor emRe viewlorem loremRev iewlor emRe viewlorem loremRev iewlor emRe viewlorem ';
 
   const [showMore, setShowMore] = useState(false);

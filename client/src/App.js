@@ -26,6 +26,9 @@ import Test from './components/Test';
 import RatingForm from './components/RatingForm';
 import Question from './components/Question';
 import Exam from './components/Exam';
+import LinearProgressBar from './components/LinearProgressBar';
+import Footer from './components/Footer';
+import Review from './components/Review';
 
 function App() {
   return (
@@ -40,7 +43,13 @@ function App() {
             <Route path='/login' element={<Login />} />
             <Route path='/register' element={<Register />} />
             <Route path='/instructor/:id' element={<Instructor />} />
-            <Route element={<NavBar />}>
+            <Route
+              element={
+                <>
+                  <NavBar />
+                </>
+              }
+            >
               <Route path='/landing' element={<Landing />} />
               <Route
                 index
@@ -61,7 +70,7 @@ function App() {
               <Route path='/course/:courseId' element={<CoursePage />} />
               <Route path='/results' element={<SearchResult />} />
               <Route
-                path='/course/:courseId/subtitles'
+                path='/course/:courseId/content'
                 element={<SubtitlesPage />}
               />
             </Route>
@@ -72,6 +81,10 @@ function App() {
             <Route path='/test' element={<Test />} />
             <Route path='/question' element={<Question />} />
             <Route path='/exam' element={<Exam />} />
+            <Route path='/courseComponent' element={<CourseComponent />} />
+            <Route path='/progress' element={<LinearProgressBar />} />
+            <Route path='/footer' element={<Footer />} />
+            <Route path='/review' element={<Review />} />
           </Routes>
         </SearchProvider>
       </CourseProvider>

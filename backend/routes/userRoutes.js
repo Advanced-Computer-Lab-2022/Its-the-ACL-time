@@ -16,14 +16,6 @@ const {
   deleteCertification,
 } = require('../controllers/CertificationController');
 
-const {
-  findVideoNotes,
-  addVideoNotes,
-  updateVideoNotes,
-  allVideoNotes,
-  deleteVideoNotes,
-} = require('../controllers/VideoNotesController');
-
 const { authOwner, authAdmin, authMiddleware } = require('../middlewares');
 
 // wallet router
@@ -45,13 +37,4 @@ router.patch('/certification/:id', authAdmin, updateCertification);
 router.delete('/certification/:id', authAdmin, deleteCertification);
 // end certification router
 
-// video notes router
-
-router.get('/videoNotesAll', allVideoNotes);
-router.get('/videoNote/', findVideoNotes);
-router.post('/videoNote/', addVideoNotes);
-router.patch('/videoNote/:id', updateVideoNotes);
-router.delete('/videoNote/:id', deleteVideoNotes);
-
-// end video notes router
 module.exports = router;

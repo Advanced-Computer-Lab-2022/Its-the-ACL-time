@@ -9,9 +9,14 @@ import { makeStyles } from '@material-ui/core/styles';
 import { useNavigate } from 'react-router-dom';
 import { useRef } from 'react';
 import { useEffect } from 'react';
+import { AiOutlineSearch } from 'react-icons/ai';
 
 const useStyles = makeStyles((theme) => ({
   item: {
+    display: 'flex',
+    alignItems: 'center',
+    padding: '.5rem 1rem',
+    justifyContent: 'flex-start',
     cursor: 'pointer',
     '&:hover': {
       backgroundColor: '#f2f2f2',
@@ -50,12 +55,37 @@ const Search = () => {
   }, []);
 
   const search = (term) => {
-    const filteredCourses = courses.filter(
-      (course) =>
-        course.title.toLowerCase().includes(term.toLowerCase()) ||
-        course.subject.toLowerCase().includes(term.toLowerCase()) ||
-        course.createdBy?.username.toLowerCase().includes(term.toLowerCase())
-    );
+    const searchResults = {};
+
+    // const filteredCourses = courses.filter((course) => {
+    //   const title = course.title.toLowerCase().includes(term.toLowerCase());
+    //   const subject = course.subject.toLowerCase().includes(term.toLowerCase());
+    //   const createdBy = course.createdBy?.username
+    //     .toLowerCase()
+    //     .includes(term.toLowerCase());
+    //   return title || subject || createdBy;
+    // });
+
+    const filteredCourses = [];
+    courses.forEach((course) => {
+      const title = course.title.toLowerCase().includes(term.toLowerCase());
+      const subject = course.subject.toLowerCase().includes(term.toLowerCase());
+      const createdBy = course.createdBy?.username;
+
+      if (title && !searchResults[title]) {
+        searchResults[title] = true;
+        filteredCourses.push(course.title);
+      }
+      if (subject && !searchResults[subject]) {
+        searchResults[subject] = true;
+        filteredCourses.push(course.subject);
+      }
+      if (createdBy && !searchResults[createdBy]) {
+        searchResults[createdBy] = true;
+        filteredCourses.push(course.createdBy.username);
+      }
+    });
+
     setState({
       query: term,
       filteredCourses,
@@ -102,7 +132,21 @@ const Search = () => {
                   onClick={handleClick}
                   key={value._id}
                 >
-                  <p>{value.title} </p>
+                  <AiOutlineSearch
+                    style={{
+                      marginRight: '.7rem',
+                      fontSize: '1.5rem',
+                    }}
+                  />
+                  <p
+                    style={{
+                      marginTop: '1rem',
+                      fontSize: '1.2rem',
+                      fontWeight: '300',
+                    }}
+                  >
+                    {value}
+                  </p>
                 </Box>
               );
             })}

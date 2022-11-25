@@ -72,7 +72,7 @@ export default function Register() {
   const [country, setCountry] = useState('Country');
   const navigate = useNavigate();
 
-  const handleRegister = (e) => {
+  const handleRegister = async (e) => {
     e.preventDefault();
     // get the values from the form
     const user = {
@@ -95,7 +95,7 @@ export default function Register() {
       setAlert('error', 'Please Provide all values');
       setTimeout(() => clearAlert(), 3000);
     } else {
-      const status = setup(user);
+      const status = await setup(user);
       if (status) {
         setTimeout(() => navigate('/'), 3000);
       }

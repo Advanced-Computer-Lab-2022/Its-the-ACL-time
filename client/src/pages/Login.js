@@ -25,7 +25,7 @@ function Copyright() {
     <Typography variant='body2' color='textSecondary' align='center'>
       {'Copyright © '}
       <Link color='inherit' href='https://mui.com/'>
-        Your Website
+        Nerd academy
       </Link>{' '}
       {new Date().getFullYear()}
       {'.'}
@@ -45,7 +45,7 @@ const useStyles = makeStyles((theme) => ({
     backgroundColor: theme.palette.secondary.main,
   },
   form: {
-    width: '100%', // Fix IE 11 issue.
+    width: '100%',
     marginTop: theme.spacing(1),
   },
   submit: {
@@ -70,7 +70,7 @@ export default function Login() {
   const password = useRef();
   const navigate = useNavigate();
 
-  const handleLogin = (e) => {
+  const handleLogin = async (e) => {
     e.preventDefault();
 
     const user = {
@@ -82,7 +82,7 @@ export default function Login() {
       setAlert('error', 'Please Provide all values');
       setTimeout(() => clearAlert(), 3000);
     } else {
-      const status = setup(user);
+      const status = await setup(user);
       if (status) {
         console.log('Login Success' + status);
         setTimeout(() => navigate('/'), 3000);

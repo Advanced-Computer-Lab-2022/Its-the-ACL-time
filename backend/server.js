@@ -21,6 +21,7 @@ const { authRouter, courseRouter, userRouter } = require('./routes');
 const examRouter = require('./routes/examRoutes');
 const adminroutes = require('./routes/AdminRoutes');
 const questionRouter = require('./routes/questionRoutes');
+const notesRouter = require('./routes/NotesRoutes');
 
 const corsOptions = {
   origin: 'http://localhost:3000',
@@ -37,8 +38,7 @@ app.use('/api/v1/user', userRouter);
 // app.use('/api/v1/course', authMiddleware, courseRouter);
 app.use('/api/v1/course', courseRouter);
 app.use('/api/v1/admin', adminroutes);
-
-//Michael
+app.use('/api/v1/note', notesRouter);
 app.use('/api/v1/exam', examRouter);
 app.use('/api/v1/question', questionRouter);
 
