@@ -1,23 +1,26 @@
-const express=require('express');
-const router=express.Router();
+const express = require('express');
+const router = express.Router();
 const {
-    createExam,
-    getExam,
-    deleteExam,
-    updateExam,
-}=require ('../controllers/ExamController');
+  createExam,
+  getExam,
+  deleteExam,
+  updateExam,
+  getAllExams,
+} = require('../controllers/ExamController');
 
 // GET a single exercise
-router.get('/:id',getExam)
+router.get('/:id', getExam);
 
-// POST a new Exam 
-router.post('/',createExam)
+// GET all exams
+router.get('/', getAllExams);
 
-// DELETE an Exam 
-router.delete('/:id',deleteExam)
+// POST a new Exam
+router.post('/', createExam);
 
-// UPDATE an Exam 
-router.patch('/:id',updateExam)
+// DELETE an Exam
+router.delete('/:id', deleteExam);
 
+// UPDATE an Exam
+router.patch('/:id', updateExam);
 
-module.exports=router
+module.exports = router;

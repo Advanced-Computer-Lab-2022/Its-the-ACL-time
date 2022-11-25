@@ -11,7 +11,7 @@ const questionSchema = new Schema({
     contentType: String,
   },
 
-  choices: [{ String, required: true }],
+  choices: [String],
 
   answer: {
     type: Number,

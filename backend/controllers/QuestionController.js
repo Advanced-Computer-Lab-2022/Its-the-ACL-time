@@ -22,7 +22,6 @@ const createQuestion = async (req, res) => {
   if (choices?.length != 4) {
     res.status(400).json({ error: 'Add 4' });
   }
-
   try {
     const question = await Question.create({ title, image, choices, answer });
     res.status(200).json(question);
@@ -57,7 +56,6 @@ const updateQuestion = async (req, res) => {
       ...req.body,
     }
   );
-
   if (!Question) {
     return res.status(400).json({ error: 'No such Question' });
   }
