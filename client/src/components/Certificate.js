@@ -57,14 +57,14 @@ const Certificate = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   console.log(searchParams);
 
-  // const downloadCertificate = () => {
-  //   html2canvas(inputRef.current).then((canvas) => {
-  //     const imgData = canvas.toDataURL('image/svg');
-  //     const pdf = new jsPDF();
-  //     pdf.addImage(imgData, 'JPEG', 0, 0);
-  //     pdf.save('certificate.pdf');
-  //   });
-  // };
+  const downloadCertificate = () => {
+    html2canvas(inputRef.current).then((canvas) => {
+      const imgData = canvas.toDataURL('image/svg');
+      const pdf = new jsPDF();
+      pdf.addImage(imgData, 'JPEG', 0, 0);
+      pdf.save('certificate.pdf');
+    });
+  };
 
   return (
     <>

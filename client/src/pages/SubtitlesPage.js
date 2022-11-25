@@ -10,6 +10,7 @@ import { AiOutlinePlusCircle } from 'react-icons/ai';
 import AlertDialog from '../components/AlertDialog';
 import Exam from '../components/Exam';
 import { useAppContext } from '../context/App/appContext';
+import { jsPDF } from 'jspdf';
 
 const useStyles = makeStyles((theme) => ({
   main: {
@@ -191,6 +192,19 @@ const useStyles = makeStyles((theme) => ({
       backgroundColor: '#006db3',
     },
   },
+  downloadNotes: {
+    width: '6rem',
+    height: '3rem',
+    border: 'none',
+    backgroundColor: '#666f73',
+    color: 'white',
+    fontWeight: '600',
+    cursor: 'pointer',
+    '&:hover': {
+      backgroundColor: '#4d5559',
+    },
+    marginTop: '1rem',
+  },
 
   cancel: {
     width: '100%',
@@ -297,6 +311,20 @@ const SubtitlesPage = () => {
   const navigate = useNavigate();
   const { user } = useAppContext();
   const [notes, setNotes] = useState([]);
+
+  const downloadNotes = () => {
+    const doc = new jsPDF();
+    doc.text('Notes', 100, 10);
+    let height = 0;
+    notes.forEach((note, index) => {
+      doc.text(`note ${index + 1}: `, 10, 20 + height);
+      for (let line = 0; line <= note.description.length; line += 68) {
+        doc.text(`${note.description.slice(line, line + 68)}`, 30, 20 + height);
+        height += 10;
+      }
+    });
+    doc.save('notes.pdf');
+  };
 
   const addItemToLocalStorage = (item, type) => {
     if (!localStorage.getItem(`${type}${courseId}`))
@@ -628,6 +656,23 @@ const SubtitlesPage = () => {
                     <div className={`${classes.hr}`}></div>
                   </div>
                 ))}
+                <div
+                  style={{
+                    width: '100%',
+                    display: 'flex',
+                    justifyContent: 'flex-end',
+                    alignItems: 'center',
+                  }}
+                >
+                  {notes.length !== 0 && (
+                    <button
+                      onClick={() => downloadNotes()}
+                      className={`${classes.downloadNotes}`}
+                    >
+                      Download notes
+                    </button>
+                  )}
+                </div>
               </div>
             )}
             <AlertDialog
