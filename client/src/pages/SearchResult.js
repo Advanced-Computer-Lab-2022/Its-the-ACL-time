@@ -219,10 +219,10 @@ function SearchResult() {
       ratingFlag = ratingFlag || candidateCourse.rating === parseInt(rating);
     });
 
-    console.log('Topic: ' + topicFlag);
-    console.log('Price: ' + priceFlag);
-    console.log('Rating: ' + ratingFlag);
-    console.log('-------------------');
+    // console.log('Topic: ' + topicFlag);
+    // console.log('Price: ' + priceFlag);
+    // console.log('Rating: ' + ratingFlag);
+    // console.log('-------------------');
 
     return topicFlag && priceFlag && ratingFlag;
   };

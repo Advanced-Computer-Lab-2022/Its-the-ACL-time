@@ -1,5 +1,5 @@
 import { Box, Checkbox } from '@material-ui/core';
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { makeStyles } from '@material-ui/core/styles';
 import { AiOutlineDown } from 'react-icons/ai';
 
@@ -54,6 +54,7 @@ const FilterField = ({
 
   const handleCheck = async (e) => {
     onFilter(e.target.name, title, e.target.checked);
+
     setChecked({ ...checked, [e.target.name]: e.target.checked });
   };
 
@@ -89,7 +90,15 @@ const FilterField = ({
                 <Checkbox
                   name={typeof subject === 'object' ? `${index + 1}` : subject}
                   onChange={handleCheck}
-                  checked={checked[subject] ? checked[subject] : false}
+                  checked={
+                    typeof subject === 'object'
+                      ? checked[index + 1]
+                        ? checked[index + 1]
+                        : false
+                      : checked[subject]
+                      ? checked[subject]
+                      : false
+                  }
                 />
                 <label
                   onClick={optionOnClick}

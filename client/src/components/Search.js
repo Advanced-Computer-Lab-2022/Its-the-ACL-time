@@ -85,7 +85,7 @@ const Search = () => {
         filteredCourses.push(course.createdBy.username);
       }
     });
-
+    console.log(filteredCourses);
     setState({
       query: term,
       filteredCourses,
@@ -125,12 +125,12 @@ const Search = () => {
         </div>
         {state.query !== '' && state.filteredCourses.length !== 0 && (
           <div className='dataResult' ref={dataResult}>
-            {state.filteredCourses.slice(0, 15).map((value) => {
+            {state.filteredCourses.slice(0, 15).map((value, idx) => {
               return (
                 <Box
                   className={`${classes.item} dataItem`}
                   onClick={handleClick}
-                  key={value._id}
+                  key={idx}
                 >
                   <AiOutlineSearch
                     style={{
