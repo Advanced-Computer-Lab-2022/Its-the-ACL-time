@@ -1,7 +1,7 @@
 import React, { useRef, useState } from 'react';
 import { makeStyles } from '@material-ui/core/styles';
 import FilterField from '../components/FilterField';
-import { Box, Grid, TextareaAutosize, Typography } from '@material-ui/core';
+import { Box, TextareaAutosize, Typography } from '@material-ui/core';
 import { AiFillCloseCircle, AiFillEdit, AiFillDelete } from 'react-icons/ai';
 import { useEffect } from 'react';
 import axios from 'axios';
@@ -13,6 +13,7 @@ import { useAppContext } from '../context/App/appContext';
 import { jsPDF } from 'jspdf';
 import Review from '../components/Review';
 import RatingForm from '../components/RatingForm';
+import { useCourseContext } from '../context/Course/courseContext';
 
 const useStyles = makeStyles((theme) => ({
   main: {
@@ -311,7 +312,8 @@ const SubtitlesPage = () => {
   const { courseId } = useParams();
   const [searchParams, setSearchParams] = useSearchParams();
   const navigate = useNavigate();
-  const { user, token, setAlert, clearAlert } = useAppContext();
+  const { user, token } = useAppContext();
+  const { courses, updateCourse } = useCourseContext();
   const [notes, setNotes] = useState([]);
   const [reviews, setReviews] = useState([]);
 
@@ -515,6 +517,30 @@ const SubtitlesPage = () => {
     } catch (error) {
       console.log(error);
     }
+  };
+
+  const postReview = async (rating, review) => {
+    const course = courses.find((item) => item._id === courseId);
+    updateCourse(courseId, {
+      ...course,
+      reviews: [
+        ...course.reviews,
+        {
+          username: user.username,
+          review: review,
+          rate: rating,
+        },
+      ],
+    });
+    console.log([...reviews]);
+    setReviews([
+      ...reviews,
+      {
+        username: user.username,
+        review,
+        rate: rating,
+      },
+    ]);
   };
 
   return (
@@ -743,16 +769,16 @@ const SubtitlesPage = () => {
                   }}
                 >
                   {reviews
-                    ?.map((review) => (
+                    ?.map((review, idx) => (
                       <div
-                        key={review?._id}
+                        key={idx}
                         style={{
                           marginBottom: '1rem',
                         }}
                       >
                         <Review
                           username={review?.username}
-                          reviewText={review?.reviewText}
+                          reviewText={review?.review}
                           rate={review?.rate}
                         />
                       </div>
@@ -776,6 +802,7 @@ const SubtitlesPage = () => {
                         backgroundColor: 'black',
                       },
                     }}
+                    onSubmit={postReview}
                   />
                 </div>
               </>

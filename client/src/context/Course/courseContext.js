@@ -100,7 +100,8 @@ const CourseProvider = ({ children }) => {
         type: UPDATE_COURSE,
         payload: { course: response.data.updatedCourse },
       });
-      console.log(response.data);
+      console.log(response.data.updatedCourse);
+      return response.data.updatedCourse;
     } catch (error) {
       console.log(error);
     }
