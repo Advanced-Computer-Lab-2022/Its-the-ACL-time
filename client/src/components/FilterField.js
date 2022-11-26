@@ -87,7 +87,7 @@ const FilterField = ({
             .map((subject, index) => (
               <Box key={index}>
                 <Checkbox
-                  name={subject}
+                  name={typeof subject === 'object' ? `${index + 1}` : subject}
                   onChange={handleCheck}
                   checked={checked[subject] ? checked[subject] : false}
                 />

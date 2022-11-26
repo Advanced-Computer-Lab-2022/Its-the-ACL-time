@@ -8,6 +8,26 @@ import { useEffect } from 'react';
 import Pagination from '@material-ui/lab/Pagination';
 import { useCourseContext } from '../context/Course/courseContext';
 import { useSearchParams } from 'react-router-dom';
+import { FaStar } from 'react-icons/fa';
+
+// function to return the number of stars to be displayed
+const getStars = (rating) => {
+  const stars = [];
+  for (let i = 0; i < 5; i++) {
+    stars.push(
+      <FaStar key={i} style={{ color: i < rating ? '#ffc107' : 'grey' }} />
+    );
+  }
+  return stars;
+};
+
+const ratingOptions = [
+  <>{getStars(5)}</>,
+  <>{getStars(4)}</>,
+  <>{getStars(3)}</>,
+  <>{getStars(2)}</>,
+  <>{getStars(1)}</>,
+];
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -231,7 +251,7 @@ function SearchResult() {
               <hr className={`${classes.hr}`} />
               <FilterField
                 title='Rating'
-                options={['1', '2', '3', '4', '5']}
+                options={ratingOptions}
                 onFilter={handleFilter}
               />
               <hr />

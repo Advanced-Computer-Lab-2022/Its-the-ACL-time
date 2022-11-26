@@ -92,4 +92,18 @@ function App() {
   );
 }
 
+/*
+          Finished Components
+          1- NavBar
+          2- footer
+          3- courseComponent
+          4- review
+          5- exam      -> /dialog
+          6- question  -> /question
+          7- rating     -> /rating
+          8- certificate  -> /certificate
+          9- /test -> to send a certificate to your email
+          10- CourseForm (to add course) -> /addCourse
+*/
+
 export default App;
