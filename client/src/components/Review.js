@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Box, makeStyles } from '@material-ui/core';
+import RatingStars from './RatingStars';
 
 const useStyles = makeStyles((theme) => ({
   review: {
@@ -46,6 +47,7 @@ const useStyles = makeStyles((theme) => ({
   name: {
     fontSize: '1.5rem',
     fontWeight: 'bold',
+    marginRight: '.5rem',
   },
   upper: {
     display: 'flex',
@@ -53,7 +55,7 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-const Review = ({ username, reviewText }) => {
+const Review = ({ username, reviewText, rate }) => {
   const classes = useStyles();
   const name = username || 'Anonymous';
   const text =
@@ -67,6 +69,7 @@ const Review = ({ username, reviewText }) => {
       <span className={`${classes.upper}`}>
         <span className={`${classes.pic}`}>{name.charAt(0).toUpperCase()}</span>
         <span className={`${classes.name}`}>{name}</span>
+        <RatingStars rate={rate} />
       </span>
       <p>
         {text.slice(0, showMore ? text.length : 100)}

@@ -1,11 +1,17 @@
 import React, { useContext, useReducer, useEffect } from 'react';
 import courseReducer from './courseReducer';
-import { CREATE_COURSE, GET_COURSES, UPDATE_COURSE } from './courseActions';
+import {
+  CREATE_COURSE,
+  GET_COURSES,
+  UPDATE_COURSE,
+  GET_MY_COURSES,
+} from './courseActions';
 import axios from 'axios';
 import { useAppContext } from '../App/appContext';
 
 const initialState = {
   courses: [],
+  myCourses: [],
 };
 
 const CourseContext = React.createContext();
@@ -15,22 +21,47 @@ const CourseProvider = ({ children }) => {
   const { token } = useAppContext();
 
   useEffect(() => {
-    axios
-      .get('http://localhost:8080/api/v1/course', {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      })
-      .then(({ data }) => {
+    const getAllCourses = async () =>
+      axios
+        .get('http://localhost:8080/api/v1/course', {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        })
+        .then(({ data }) => {
+          dispatch({
+            type: GET_COURSES,
+            payload: {
+              courses: data.courses,
+            },
+          });
+        })
+        .catch((error) => console.log(error));
+
+    const getMyCourses = async () => {
+      try {
+        const response = await axios.get(
+          'http://localhost:8080/api/v1/course?myCourses=true',
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
         dispatch({
-          type: GET_COURSES,
+          type: GET_MY_COURSES,
           payload: {
-            courses: data.courses,
+            courses: response.data.courses,
           },
         });
-      })
-      .catch((error) => console.log(error));
-  }, []);
+      } catch (error) {
+        console.log(error);
+      }
+    };
+
+    getAllCourses();
+    getMyCourses();
+  }, [token]);
 
   const createCourse = async (course) => {
     console.log(course);

@@ -8,6 +8,10 @@ import { Box, Typography } from '@material-ui/core';
 import Review from '../components/Review';
 import { CourseComponent } from '../components';
 import { AiOutlineCheck } from 'react-icons/ai';
+import { useAppContext } from '../context/App/appContext';
+import { AiFillVideoCamera } from 'react-icons/ai';
+import { MdOutlineArticle } from 'react-icons/md';
+import { TbCertificate } from 'react-icons/tb';
 
 const useStyles = makeStyles((theme) => ({
   main: {
@@ -176,6 +180,47 @@ const useStyles = makeStyles((theme) => ({
     color: 'white',
     cursor: 'pointer',
   },
+
+  courseInclude: {
+    display: 'flex',
+    flexDirection: 'column',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginTop: '2rem',
+  },
+
+  included: {
+    display: 'flex',
+    width: '100%',
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginTop: '1rem',
+  },
+
+  cart: {
+    width: '15rem',
+    height: '10rem',
+    display: 'flex',
+    flexDirection: 'column',
+    justifyContent: 'center',
+    alignItems: 'center',
+    border: 'none',
+    borderRadius: '0.5rem',
+    boxShadow: '0 0 10px 0 rgba(0, 0, 0, 0.5)',
+    '&:hover': {
+      backgroundColor: '#dcdad7',
+    },
+    marginRight: '1rem',
+  },
+
+  icon: {
+    width: '5rem',
+    height: '5rem',
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
 }));
 
 const CoursePage = () => {
@@ -184,19 +229,24 @@ const CoursePage = () => {
   const [subtitles, setSubtitles] = useState([]);
   const { courses } = useCourseContext();
   const [course, setCourse] = useState({});
+  const { token } = useAppContext();
   const [showDescription, setShowDescription] = useState(false);
   const [applyCoupon, setApplyCoupon] = useState(false);
 
   useEffect(() => {
     function getCourse() {
       const course = courses.find((course) => course._id === courseId);
-      console.log(courses);
       setCourse(course);
     }
 
     async function getSubtitles() {
       const response = await axios.get(
-        `http://localhost:8080/api/v1/course/${courseId}/subtitle`
+        `http://localhost:8080/api/v1/course/${courseId}/subtitle`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
       );
       console.log(response.data.subTitles);
       setSubtitles(response.data.subTitles);
@@ -301,6 +351,24 @@ const CoursePage = () => {
           )}
         </section>
 
+        <section className={classes.courseInclude}>
+          <h2 className={`${classes.title}`}>This course includes</h2>
+          <div className={`${classes.included}`}>
+            <Box className={classes.cart}>
+              <AiFillVideoCamera className={classes.icon} />
+              <p className={classes.comment}> 10 hours on-demand video</p>
+            </Box>
+            <Box className={classes.cart}>
+              <MdOutlineArticle className={classes.icon} />
+              <p className={classes.comment}> 10 articles</p>
+            </Box>
+            <Box className={classes.cart}>
+              <TbCertificate className={classes.icon} />
+              <p className={classes.comment}> Certificate of Completion</p>
+            </Box>
+          </div>
+        </section>
+
         <section>
           <h2 className={`${classes.title}`}>Content</h2>
           <div className={`${classes.subtitle}`}>
@@ -318,11 +386,12 @@ const CoursePage = () => {
               flexDirection='row'
               className={`${classes.Items}`}
             >
-              {course.reviews.map((review) => (
+              {course?.reviews.map((review) => (
                 <Review
                   key={review._id}
                   username={review.username}
                   reviewText={review.review}
+                  rate={review?.rate}
                 />
               ))}
             </Box>
