@@ -38,9 +38,10 @@ const createCourse = async (req, res) => {
 
 const getCourse = async (req, res) => {
   const { courseId } = req.params;
-  const query = Object.keys(req.query)
-    .map((key) => (req.query[key] === 'false' ? `-${key}` : ''))
+  let query = Object.keys(req.query)
+    .map((key) => (req.query[key] === 'false' ? `-${key}` : key))
     .join(' ');
+  console.log('query: ' + query);
   const course = await Course.findOne({ _id: courseId }).select(`${query}`);
   res.status(StatusCodes.OK).json({ course });
 };

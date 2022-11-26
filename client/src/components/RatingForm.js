@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import Button from '@material-ui/core/Button';
 import Dialog from '@material-ui/core/Dialog';
 import DialogActions from '@material-ui/core/DialogActions';
@@ -55,33 +55,33 @@ const Transition = React.forwardRef(function Transition(props, ref) {
   return <Slide direction='up' ref={ref} {...props} />;
 });
 
-export default function RatingForm() {
-  const [open, setOpen] = React.useState(false);
+export default function RatingForm({
+  onSubmit,
+  buttonText,
+  buttonStyle,
+  title,
+  textArea,
+}) {
   const classes = useStyles();
-
+  const [open, setOpen] = useState(false);
   const [clicked, setClicked] = useState(null);
   const [hover, setHover] = useState(null);
 
-  const handleClickOpen = () => {
-    setOpen(true);
+  const handleSubmitRating = () => {
+    console.log('clicked');
+    onSubmit();
   };
-
-  const handleClose = () => {
-    setOpen(false);
-  };
-
-  const handleSubmitRating = () => {};
 
   return (
-    <div>
-      <Button variant='outlined' color='primary' onClick={handleClickOpen}>
-        Slide in alert dialog
-      </Button>
+    <>
+      <button onClick={() => setOpen(true)} style={buttonStyle}>
+        {buttonText}
+      </button>
+
       <Dialog
         open={open}
         TransitionComponent={Transition}
-        keepMounted
-        onClose={handleClose}
+        onClose={() => setOpen(false)}
         aria-labelledby='alert-dialog-slide-title'
         aria-describedby='alert-dialog-slide-description'
       >
@@ -89,7 +89,7 @@ export default function RatingForm() {
           id='alert-dialog-slide-title'
           style={{ textAlign: 'center', display: 'inline' }}
         >
-          How would you rate this course?
+          How would you rate this {title}?
         </DialogTitle>
 
         <p
@@ -102,31 +102,30 @@ export default function RatingForm() {
           Select Rating
         </p>
         <DialogContent>
-          <DialogContentText id='alert-dialog-slide-description'>
-            <div className={`${classes.stars}`}>
-              {[...Array(5)].map((_, idx) => {
-                return (
-                  <div
-                    className={`${classes.star}`}
-                    onClick={() => setClicked(idx + 1)}
-                    onMouseLeave={() => setHover(null)}
-                    onMouseEnter={() => setHover(idx + 1)}
-                  >
-                    <FaStar
-                      size={40}
-                      color={(hover || clicked) > idx ? '#ffc107' : '#e4e5e9'}
-                    />
-                  </div>
-                );
-              })}
-            </div>
-            <div className={`${classes.review}`}>
-              <textarea
-                className={`${classes.textarea}`}
-                placeholder='Tell us about your own personal experience taking this course. Was it a good match for you?'
-              />
-            </div>
-          </DialogContentText>
+          <div className={`${classes.stars}`}>
+            {[...Array(5)].map((_, idx) => {
+              return (
+                <div
+                  className={`${classes.star}`}
+                  onClick={() => setClicked(idx + 1)}
+                  onMouseLeave={() => setHover(null)}
+                  onMouseEnter={() => setHover(idx + 1)}
+                  key={idx}
+                >
+                  <FaStar
+                    size={40}
+                    color={(hover || clicked) > idx ? '#ffc107' : '#e4e5e9'}
+                  />
+                </div>
+              );
+            })}
+          </div>
+          <div className={`${classes.review}`}>
+            <textarea
+              className={`${classes.textarea}`}
+              placeholder={textArea}
+            />
+          </div>
         </DialogContent>
         <DialogActions>
           <Button onClick={handleSubmitRating} className={`${classes.btn}`}>
@@ -134,6 +133,6 @@ export default function RatingForm() {
           </Button>
         </DialogActions>
       </Dialog>
-    </div>
+    </>
   );
 }

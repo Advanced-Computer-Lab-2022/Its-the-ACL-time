@@ -1,7 +1,7 @@
 import React, { useRef, useState } from 'react';
 import { makeStyles } from '@material-ui/core/styles';
 import FilterField from '../components/FilterField';
-import { Box, TextareaAutosize, Typography } from '@material-ui/core';
+import { Box, Grid, TextareaAutosize, Typography } from '@material-ui/core';
 import { AiFillCloseCircle, AiFillEdit, AiFillDelete } from 'react-icons/ai';
 import { useEffect } from 'react';
 import axios from 'axios';
@@ -11,6 +11,8 @@ import AlertDialog from '../components/AlertDialog';
 import Exam from '../components/Exam';
 import { useAppContext } from '../context/App/appContext';
 import { jsPDF } from 'jspdf';
+import Review from '../components/Review';
+import RatingForm from '../components/RatingForm';
 
 const useStyles = makeStyles((theme) => ({
   main: {
@@ -309,8 +311,9 @@ const SubtitlesPage = () => {
   const { courseId } = useParams();
   const [searchParams, setSearchParams] = useSearchParams();
   const navigate = useNavigate();
-  const { user } = useAppContext();
+  const { user, token, setAlert, clearAlert } = useAppContext();
   const [notes, setNotes] = useState([]);
+  const [reviews, setReviews] = useState([]);
 
   const downloadNotes = () => {
     const doc = new jsPDF();
@@ -350,7 +353,12 @@ const SubtitlesPage = () => {
     console.log('courseId ' + courseId);
     async function fetchSubtitles() {
       const response = await axios.get(
-        `http://localhost:8080/api/v1/course/${courseId}/subtitle`
+        `http://localhost:8080/api/v1/course/${courseId}/subtitle`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
       );
       setSubtitles(response.data.subTitles);
     }
@@ -358,7 +366,12 @@ const SubtitlesPage = () => {
     async function fetchExams() {
       try {
         const response = await axios.get(
-          `http://localhost:8080/api/v1/exam?courseId=635f73a23569cc0d7e43d80e`
+          `http://localhost:8080/api/v1/exam?courseId=635f73a23569cc0d7e43d80e`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
         );
         setExams(response.data);
       } catch (error) {
@@ -379,13 +392,18 @@ const SubtitlesPage = () => {
     fetchSubtitles();
     fetchExams();
     getState();
-  }, [courseId]);
+  }, [courseId, token]);
 
   useEffect(() => {
     const getExam = async (examId) => {
       try {
         const response = await axios.get(
-          'http://localhost:8080/api/v1/exam/' + examId
+          'http://localhost:8080/api/v1/exam/' + examId,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
         );
         setExam(response.data);
       } catch (error) {
@@ -396,9 +414,30 @@ const SubtitlesPage = () => {
     async function fetchNotes(subtitleId) {
       try {
         const response = await axios.get(
-          `http://localhost:8080/api/v1/note?subtitleId=${subtitleId}&userId=${user._id}`
+          `http://localhost:8080/api/v1/note?subtitleId=${subtitleId}&userId=${user._id}`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
         );
         setNotes(response.data);
+      } catch (error) {
+        console.log(error);
+      }
+    }
+
+    async function fetchReviews() {
+      try {
+        const response = await axios.get(
+          `http://localhost:8080/api/v1/course/${courseId}?reviews=true`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+        setReviews(response.data.course.reviews);
       } catch (error) {
         console.log(error);
       }
@@ -411,7 +450,12 @@ const SubtitlesPage = () => {
     if (searchParams.has('subtitleId')) {
       fetchNotes(searchParams.get('subtitleId'));
     }
-  }, [searchParams, user._id]);
+
+    if (videoInfo === 2) {
+      console.log('fetch reviews');
+      fetchReviews();
+    }
+  }, [searchParams, user._id, token, videoInfo, courseId]);
 
   const handleChecked = async (subtitle, title, checked) => {
     let resultSubtitles = state.checkedSubtitles;
@@ -689,7 +733,53 @@ const SubtitlesPage = () => {
                 console.log('disagree');
               }}
             />
-            {videoInfo === 2 && 'Reviews'}
+            {videoInfo === 2 && (
+              <>
+                <div
+                  style={{
+                    width: '100%',
+                    alignItems: 'center',
+                    marginTop: '1rem',
+                  }}
+                >
+                  {reviews
+                    ?.map((review) => (
+                      <div
+                        key={review?._id}
+                        style={{
+                          marginBottom: '1rem',
+                        }}
+                      >
+                        <Review
+                          username={review?.username}
+                          reviewText={review?.reviewText}
+                          rate={review?.rate}
+                        />
+                      </div>
+                    ))
+                    .slice(0, 3)}
+                </div>
+                <div>
+                  <RatingForm
+                    buttonText={'Rate this course'}
+                    title={'Course'}
+                    textArea={'Tell us, what do you think about this course ?'}
+                    buttonStyle={{
+                      height: '3rem',
+                      borderRadius: '0.5rem',
+                      backgroundColor: 'rgb(74, 73, 73)',
+                      color: 'white',
+                      border: 'none',
+                      fontSize: '1.2rem',
+                      cursor: 'pointer',
+                      '&:hover': {
+                        backgroundColor: 'black',
+                      },
+                    }}
+                  />
+                </div>
+              </>
+            )}
           </div>
         </div>
       </section>
