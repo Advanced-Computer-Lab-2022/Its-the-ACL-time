@@ -26,13 +26,14 @@ const CourseSchema = mongoose.Schema(
       type: Number,
       required: [true, 'Please provide number of hours'],
     },
-    ratings: {
+    rating: {
       type: Number,
     },
     reviews: [
       {
         username: { type: String },
         review: { type: String },
+        rate: { type: Number },
       },
     ],
     numberOfStudents: {

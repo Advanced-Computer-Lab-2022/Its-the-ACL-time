@@ -9,6 +9,8 @@ import {
   AiOutlineHeart,
   AiOutlineShoppingCart,
 } from 'react-icons/ai';
+import { FaStar } from 'react-icons/fa';
+import RatingStars from '../RatingStars';
 
 const useStyles = makeStyles((theme) => ({
   img: {
@@ -209,7 +211,6 @@ function CourseComponent({
   const classes = useStyles();
   const [showDemo, setShowDemo] = useState(false);
   const courseRef = useRef();
-
   return (
     <>
       {horizontal && (
@@ -249,13 +250,16 @@ function CourseComponent({
                     <Typography variant='body2' color='textSecondary'>
                       {subject && subject}
                     </Typography>
-                    <Typography variant='body2' color='textSecondary'>
-                      {price && price}
-                    </Typography>
+
+                    <div>
+                      <RatingStars rate={rating} />
+                    </div>
                   </Grid>
                 </Grid>
-                <Grid item>
-                  <Typography variant='subtitle1'>${price}</Typography>
+                <Grid>
+                  <Typography variant='body2' color='textSecondary'>
+                    ${price && price}
+                  </Typography>
                 </Grid>
               </Grid>
             </Grid>

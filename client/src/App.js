@@ -29,6 +29,7 @@ import Exam from './components/Exam';
 import LinearProgressBar from './components/LinearProgressBar';
 import Footer from './components/Footer';
 import Review from './components/Review';
+import RatingStars from './components/RatingStars';
 
 function App() {
   return (
@@ -85,6 +86,7 @@ function App() {
             <Route path='/progress' element={<LinearProgressBar />} />
             <Route path='/footer' element={<Footer />} />
             <Route path='/review' element={<Review />} />
+            <Route path='/rate' element={<RatingStars />} />
           </Routes>
         </SearchProvider>
       </CourseProvider>
@@ -102,8 +104,9 @@ function App() {
           6- question  -> /question
           7- rating     -> /rating
           8- certificate  -> /certificate
-          9- /test -> to send a certificate to your email
+          9- /test -> to send a certificate to your email, and download it as pdf
           10- CourseForm (to add course) -> /addCourse
+          11- RatingStars -> /rate
 */
 
 export default App;

@@ -44,6 +44,7 @@ export default function SearchResult() {
               price={course.price}
               courseId={course._id}
               horizontal={true}
+              rating={course.rating}
             />
           );
         })}

@@ -8,29 +8,34 @@ import { useEffect } from 'react';
 import Pagination from '@material-ui/lab/Pagination';
 import { useCourseContext } from '../context/Course/courseContext';
 import { useSearchParams } from 'react-router-dom';
-import { FaStar } from 'react-icons/fa';
+import RatingStars from '../components/RatingStars';
 
-// function to return the number of stars to be displayed
-const getStars = (rating) => {
-  const stars = [];
-  for (let i = 0; i < 5; i++) {
-    stars.push(
-      <FaStar key={i} style={{ color: i < rating ? '#ffc107' : 'grey' }} />
-    );
-  }
-  return stars;
-};
-
-const ratingOptions = [
-  <>{getStars(5)}</>,
-  <>{getStars(4)}</>,
-  <>{getStars(3)}</>,
-  <>{getStars(2)}</>,
-  <>{getStars(1)}</>,
-];
+const ratingOptions = [1, 2, 3, 4, 5].map((rate) => {
+  return (
+    <span
+      style={{
+        display: 'flex',
+        alignItems: 'center',
+      }}
+    >
+      <RatingStars rate={rate} />
+      <p
+        style={{
+          marginLeft: '0.5rem',
+          fontSize: '.8rem',
+          fontWeight: '600',
+          color: '#A9A9A9',
+          marginTop: '1rem',
+        }}
+      >
+        star{rate > 1 ? 's' : ''}
+      </p>
+    </span>
+  );
+});
 
 const useStyles = makeStyles((theme) => ({
-  root: {
+  body: {
     display: 'flex',
     flexWrap: 'wrap',
     justifyContent: 'space-between',
@@ -167,6 +172,7 @@ function SearchResult() {
       case 'Rating': {
         setState(() => {
           let ratings = state.filterRatings;
+          console.log(ratings);
           if (state.filterRatings.includes(filter)) {
             ratings = state.filterRatings.filter((rating) => rating !== filter);
           } else {
@@ -232,73 +238,92 @@ function SearchResult() {
   };
 
   return (
-    <div className={classes.root}>
-      <section className={`${classes.filterSection}`}>
-        <CustomButton
-          text='Filter'
-          onClick={() => setShowFilters(!showFilters)}
-          icon={<FaFilter />}
-          className={classes.filterButton}
-        ></CustomButton>
-        <div className={`${classes.filters}`}>
-          {showFilters && (
-            <div>
-              <FilterField
-                title='Topic'
-                options={courses.map((course) => course.subject)}
-                onFilter={handleFilter}
-              />
-              <hr className={`${classes.hr}`} />
-              <FilterField
-                title='Rating'
-                options={ratingOptions}
-                onFilter={handleFilter}
-              />
-              <hr />
-              <FilterField
-                title='Price'
-                options={[
-                  '0 - 10',
-                  '10 - 100',
-                  '100 - 1000',
-                  '1000 - 10000',
-                  '10000+',
-                ]}
-                onFilter={handleFilter}
-              />
-            </div>
-          )}
-        </div>
-      </section>
-      {state.filteredCourses.length > 0 && (
-        <section className={`${classes.coursesSection}`}>
-          <p className={`${classes.results}`}>
-            {state.filteredCourses.slice(page * 5, (page + 1) * 5).length}{' '}
-            results
-          </p>
-          {state.filteredCourses
-            .slice(page * 5, (page + 1) * 5)
-            .map((course) => {
-              return (
-                <Course
-                  key={course._id}
-                  title={course.title}
-                  subject={course.subject}
-                  description={course.summary}
-                  instructor={course.createdBy.username}
-                  price={course.price}
-                  courseId={course._id}
-                  horizontal={true}
+    <div
+      style={{
+        display: 'flex',
+        flexDirection: 'column',
+        width: '100%',
+        marginTop: '12vh',
+      }}
+    >
+      <h1
+        style={{
+          fontSize: '2.5rem',
+          fontWeight: '600',
+          marginTop: '2rem',
+          marginLeft: '1rem',
+        }}
+      >
+        {state.filteredCourses.length} results for “{searchParams.get('query')}”
+      </h1>
+      <div className={classes.body}>
+        <section className={`${classes.filterSection}`}>
+          <CustomButton
+            text='Filter'
+            onClick={() => setShowFilters(!showFilters)}
+            icon={<FaFilter />}
+            className={classes.filterButton}
+          ></CustomButton>
+          <div className={`${classes.filters}`}>
+            {showFilters && (
+              <div>
+                <FilterField
+                  title='Topic'
+                  options={courses.map((course) => course.subject)}
+                  onFilter={handleFilter}
                 />
-              );
-            })}
-          <div className={`${classes.pages}`}>
-            <Pagination
-              count={Math.ceil(state.filteredCourses.length / 5)}
-              color='secondary'
-              onChange={getPage}
-            />
-            {/* {[...Array(Math.ceil(state.filteredCourses.length / 5))].map(
+                <hr className={`${classes.hr}`} />
+                <FilterField
+                  title='Rating'
+                  options={ratingOptions}
+                  onFilter={handleFilter}
+                />
+                <hr />
+                <FilterField
+                  title='Price'
+                  options={[
+                    '0 - 10',
+                    '10 - 100',
+                    '100 - 1000',
+                    '1000 - 10000',
+                    '10000+',
+                  ]}
+                  onFilter={handleFilter}
+                />
+              </div>
+            )}
+          </div>
+        </section>
+        {state.filteredCourses.length > 0 && (
+          <section className={`${classes.coursesSection}`}>
+            <p className={`${classes.results}`}>
+              {state.filteredCourses.slice(page * 5, (page + 1) * 5).length}{' '}
+              results
+            </p>
+            {state.filteredCourses
+              .slice(page * 5, (page + 1) * 5)
+              .map((course) => {
+                return (
+                  <Course
+                    key={course._id}
+                    title={course.title}
+                    subject={course.subject}
+                    description={course.summary}
+                    instructor={course.createdBy.username}
+                    price={course.price}
+                    courseId={course._id}
+                    horizontal={true}
+                    rating={course.rating}
+                  />
+                );
+              })}
+            <div className={`${classes.pages}`}>
+              <Pagination
+                count={Math.ceil(state.filteredCourses.length / 5)}
+                color='secondary'
+                onChange={getPage}
+              />
+              {/* {[...Array(Math.ceil(state.filteredCourses.length / 5))].map(
             (e, i) => {
               return (
                 <p
@@ -314,9 +339,10 @@ function SearchResult() {
               );
             }
           )} */}
-          </div>
-        </section>
-      )}
+            </div>
+          </section>
+        )}
+      </div>
     </div>
   );
 }
