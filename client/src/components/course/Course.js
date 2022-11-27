@@ -20,7 +20,7 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-function Course({ title, description, instructor, price, subject, courseId }) {
+function Course({ title, description, instructor, price, subject, courseId, numberOfHours, ratings }) {
   const classes = useStyles();
   console.log({ title, description, instructor, price });
   return (
@@ -54,6 +54,12 @@ function Course({ title, description, instructor, price, subject, courseId }) {
                 </Typography>
                 <Typography variant='body2' color='textSecondary'>
                   {description || 'Course Description'}
+                </Typography>
+                <Typography variant='body2' color='textSecondary'>
+                  {ratings || 'Course rating'}
+                </Typography>
+                <Typography variant='body2' color='textSecondary'>
+                  {numberOfHours || 'Course hours'}
                 </Typography>
               </Grid>
               <Grid item>

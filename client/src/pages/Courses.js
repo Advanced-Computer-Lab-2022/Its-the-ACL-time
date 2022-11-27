@@ -65,6 +65,8 @@ export default function Courses() {
                 instructor={course.createdBy.username}
                 price={course.price}
                 courseId={course._id}
+                numberOfHours={course?.numberOfHours}
+                ratings = {course?.ratings}
               />
             );
           })}

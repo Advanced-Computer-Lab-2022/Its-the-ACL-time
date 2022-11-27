@@ -23,8 +23,6 @@ const CorporateSchema = mongoose.Schema({
     type:Number,
     require:true,
   }
-
-
 });
 
 module.exports = mongoose.model('Corporate', CorporateSchema);

@@ -5,4 +5,8 @@ import Home from './Home';
 import ProtectedRoute from './ProtectedRoute';
 import Instructor from './Instructor'
 import Admin from './Admin';
-export { Landing, Login, Register, Home, ProtectedRoute ,Instructor,Admin};
+import Payment from './Payment';
+import Course from './Course';
+import SuccessPayment from './SuccessPayment';
+import FailedPayment from './FailedPayment';
+export { Landing, Login, Register, Home, ProtectedRoute ,Instructor,Admin,Payment,Course,SuccessPayment,FailedPayment};
