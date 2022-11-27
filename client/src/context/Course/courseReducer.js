@@ -1,4 +1,9 @@
-import { CREATE_COURSE, GET_COURSES, UPDATE_COURSE } from './courseActions';
+import {
+  CREATE_COURSE,
+  GET_COURSES,
+  UPDATE_COURSE,
+  GET_MY_COURSES,
+} from './courseActions';
 
 const courseReducer = (state, action) => {
   switch (action.type) {
@@ -25,6 +30,13 @@ const courseReducer = (state, action) => {
           }
           return course;
         }),
+      };
+    }
+
+    case GET_MY_COURSES: {
+      return {
+        ...state,
+        myCourses: action.payload.courses,
       };
     }
 

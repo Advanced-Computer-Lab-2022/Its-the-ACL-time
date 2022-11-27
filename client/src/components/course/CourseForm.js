@@ -8,11 +8,13 @@ import { useParams } from 'react-router-dom';
 import { useAppContext } from '../../context/App/appContext';
 import { useCourseContext } from '../../context/Course/courseContext';
 import { FormControl, Select } from '@material-ui/core';
+import { useState } from 'react';
+import { useRef } from 'react';
 
 const useStyles = makeStyles((theme) => ({
   container: {
     width: '60vw',
-    margin: '7vh 20vw',
+    margin: '7rem 20rem',
     backgroundColor: '#cccccc',
     boxShadow: '0 0 10px 0 rgba(0, 0, 0, 0.5)',
     borderRadius: '10px',
@@ -33,7 +35,74 @@ const useStyles = makeStyles((theme) => ({
     alignItems: 'center',
     paddingBottom: '1rem',
   },
+  buttons: {
+    display: 'flex',
+    justifyContent: 'flex-end',
+    alignItems: 'center',
+  },
+  line: {
+    width: '100%',
+    height: '1px',
+    backgroundColor: 'black',
+    margin: '1rem 0',
+  },
+  subtitleTitle: {
+    textAlign: 'center',
+  },
+
+  alert: {
+    display: 'absolute',
+    marginTop: '1rem',
+  },
+  addCourseButton: {
+    width: '20rem',
+    margin: '.5rem auto',
+    display: 'block',
+  },
+  addSubtitleButton: {
+    width: '20rem',
+    margin: '.5rem auto',
+    display: 'block',
+    backgroundColor: '#3f51b5',
+  },
+  removeSubtitleButton: {
+    width: '20rem',
+    margin: '.5rem auto',
+    display: 'block',
+    backgroundColor: '#f44336',
+  },
 }));
+
+const subjects = [
+  'Machine Learning',
+  'Deep Learning',
+  'Computer Vision',
+  'Software Engineering',
+  'Computer Science',
+  'Data Science',
+  'Web Development',
+  'Algorithms',
+  'Mathematics',
+  'Programming',
+  'Data Structures',
+  'Artificial Intelligence',
+  'Operating Systems',
+  'Computer Architecture',
+  'Databases',
+  'Computer Networks',
+  'Computer Graphics',
+  'Computer Security',
+  'Cyber Security',
+  'Cloud Computing',
+  'Blockchain',
+  'Game Development',
+  'Mobile Development',
+  'Software Testing',
+  'Software Design',
+  'Internet of Things',
+  'Robotics',
+  'Computer Hardware',
+];
 
 function CourseForm() {
   const classes = useStyles();
@@ -41,6 +110,18 @@ function CourseForm() {
   const { courseId } = useParams();
   const { alert, setAlert, clearAlert, alertText, alertType } = useAppContext();
   const { createCourse, updateCourse } = useCourseContext();
+  const [subtitles, setSubtitles] = useState(0);
+  const addCourseButtonRef = useRef();
+
+  const addSubtitle = () => {
+    addCourseButtonRef.current.disabled = false;
+    setSubtitles(subtitles + 1);
+  };
+
+  const removeSubtitle = () => {
+    if (subtitles === 1) addCourseButtonRef.current.disabled = true;
+    setSubtitles(subtitles - 1);
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -124,7 +205,6 @@ function CourseForm() {
       <h1 className={`${classes.title}`}>
         {courseId ? 'Update' : 'Add'} Course
       </h1>
-      {/* make the alert small */}
 
       {alert && (
         <Alert variant='filled' severity={alertType} sx={{ width: 20 }}>
@@ -151,30 +231,11 @@ function CourseForm() {
                 className={classes.select}
               >
                 <option aria-label='None' value='' />
-                <option value='Machine Learning'>Machine Learning</option>
-                <option value='Deep Learning'>Deep Learning</option>
-                <option value='Software Engineering'>
-                  Software Engineering
-                </option>
-                <option value='computer science'>Computer Science</option>
-                <option value='Data Science'>Data Science</option>
-                <option value='Web Development'>Web Development</option>
-                <option value='Artificial Intelligence'>
-                  Artificial Intelligence
-                </option>
-                <option value='Programming'>Programming</option>
-                <option value='Mobile Development'>Mobile Development</option>
-                <option value='Game Development'>Game Development</option>
-                <option value='Cyber Security'>Cyber Security</option>
-                <option value='Cloud Computing'>Cloud Computing</option>
-                <option value='Blockchain'>Blockchain</option>
-                <option value='Internet of Things'>Internet of Things</option>
-                <option value='Data Analysis'>Data Analysis</option>
-                <option value='Data Visualization'>Data Visualization</option>
-                <option value='Data Engineering'>Data Engineering</option>
-                <option value='Database Engineering'>
-                  Database Engineering
-                </option>
+                {subjects.map((subject, i) => (
+                  <option value={subject} key={i}>
+                    {subject}
+                  </option>
+                ))}
               </Select>
             </FormControl>
           </Form.Group>
@@ -205,7 +266,67 @@ function CourseForm() {
           <Form.Control as='textarea' placeholder='Summary' />
         </Form.Group>
 
-        <Button variant='primary' type='submit'>
+        {subtitles > 0 && (
+          <div className={`${classes.subtitles}`}>
+            <div className={`${classes.line}`}></div>
+            <h3 className={`${classes.subtitleTitle}`}>Subtitles</h3>
+            {[...Array(subtitles)].map((e, i) => {
+              return (
+                <div className={`${classes.subtitle}`} key={i}>
+                  <h4>Subtitle {i + 1}</h4>
+                  <Form.Group className='mb-3' controlId='formGridTitle'>
+                    <Form.Label>Title</Form.Label>
+                    <Form.Control placeholder='Title' />
+                  </Form.Group>
+
+                  <Row className='mb-3'>
+                    <Form.Group as={Col} controlId='formGridLink'>
+                      <Form.Label>Link</Form.Label>
+                      <Form.Control type='text' placeholder='Link' />
+                    </Form.Group>
+
+                    <Form.Group as={Col} controlId='formGridDuration'>
+                      <Form.Label>Duration</Form.Label>
+                      <Form.Control type='number' placeholder='Duration' />
+                    </Form.Group>
+                  </Row>
+
+                  <Form.Group className='mb-3' controlId='formGridDescription'>
+                    <Form.Label>Description</Form.Label>
+                    <Form.Control as='textarea' placeholder='Description' />
+                  </Form.Group>
+                </div>
+              );
+            })}
+          </div>
+        )}
+
+        <div className={`${classes.buttons}`}>
+          <Button
+            variant='secondary'
+            onClick={addSubtitle}
+            className={`${classes.addSubtitleButton}`}
+          >
+            Add Subtitle
+          </Button>
+          {subtitles > 0 && (
+            <Button
+              variant='secondary'
+              className={`${classes.removeSubtitleButton}`}
+              onClick={removeSubtitle}
+            >
+              Remove Subtitle
+            </Button>
+          )}
+        </div>
+        <Button
+          variant='primary'
+          type='submit'
+          className={`${classes.addCourseButton}`}
+          ref={addCourseButtonRef}
+          id='addCourseButton'
+          disabled={!courseId}
+        >
           {courseId ? 'Update' : 'Add'} Course
         </Button>
       </Form>

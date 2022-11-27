@@ -38,9 +38,10 @@ const createCourse = async (req, res) => {
 
 const getCourse = async (req, res) => {
   const { courseId } = req.params;
-  const query = Object.keys(req.query)
-    .map((key) => (req.query[key] === 'false' ? `-${key}` : ''))
+  let query = Object.keys(req.query)
+    .map((key) => (req.query[key] === 'false' ? `-${key}` : key))
     .join(' ');
+  console.log('query: ' + query);
   const course = await Course.findOne({ _id: courseId }).select(`${query}`);
   res.status(StatusCodes.OK).json({ course });
 };
@@ -77,14 +78,16 @@ const updateCourse = async (req, res) => {
   console.log(req.body);
   if (!courseId) throw new BadRequestError('Please provide course id');
 
-  if (type !== 'Instructor')
-    throw new UnauthorizedError('you are not allowed to update course');
-
   const course = await Course.findOne({ _id: courseId });
   if (!course)
     throw new BadRequestError(`There is no course with this id ${courseId}`);
 
-  if (userId !== course.createdBy.toString())
+  const user = await User.findOne({
+    _id: userId,
+    courses: { $in: [courseId] },
+  });
+
+  if (userId !== course.createdBy.toString() && !user)
     throw new UnauthorizedError('You are not the owner of that course');
 
   const updatedCourse = await Course.findOneAndUpdate(
@@ -92,6 +95,9 @@ const updateCourse = async (req, res) => {
     { ...req.body },
     { new: true }
   );
+
+  console.log(updatedCourse);
+
   res.status(StatusCodes.OK).json({ updatedCourse });
 };
 

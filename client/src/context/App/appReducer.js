@@ -6,6 +6,7 @@ import {
   USER_SETUP_ERROR,
   START_ACTION,
   END_ACTION,
+  USER_RESET,
 } from './appActions';
 
 const appReducer = (state, action) => {
@@ -67,6 +68,14 @@ const appReducer = (state, action) => {
       return {
         ...state,
         isLoading: false,
+      };
+    }
+
+    case USER_RESET: {
+      return {
+        ...state,
+        user: null,
+        token: null,
       };
     }
 

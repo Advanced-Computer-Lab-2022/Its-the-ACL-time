@@ -22,7 +22,8 @@ const { authRouter, courseRouter, userRouter, paymentRouter } = require('./route
 //Michael
 const examRouter = require('./routes/examRoutes');
 const adminroutes = require('./routes/AdminRoutes');
-//const questionRouter = require('./routes/questionRoutes');
+const questionRouter = require('./routes/questionRoutes');
+const notesRouter = require('./routes/NotesRoutes');
 
 const corsOptions = {
   origin: 'http://localhost:3000',
@@ -37,15 +38,16 @@ app.use(express.json());
 app.use('/api/v1/auth', authRouter);
 // app.use('/api/v1/user', authMiddleware, userRouter);
 app.use('/api/v1/user', userRouter);
-// app.use('/api/v1/course', authMiddleware, courseRouter);
-app.use('/api/v1/course', courseRouter);
+app.use('/api/v1/course', authMiddleware, courseRouter);
+// app.use('/api/v1/course', courseRouter);
 app.use('/api/v1/admin', adminroutes);
 app.use('/api/v1/payment',paymentRouter);
 
 
 //Michael
+app.use('/api/v1/note', notesRouter);
 app.use('/api/v1/exam', examRouter);
-//app.use('/api/v1/exam',questionRouter);
+app.use('/api/v1/question', questionRouter);
 
 
 app.use(notFoundMiddleware);

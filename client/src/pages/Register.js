@@ -1,4 +1,4 @@
-import React, { useRef ,useState} from 'react';
+import React, { useRef, useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import {
   Avatar,
@@ -69,9 +69,10 @@ export default function Register() {
   const username = useRef(null);
   const email = useRef(null);
   const category = useRef(null);
-  const [country,setCountry] = useState('Country');
+  const [country, setCountry] = useState('Country');
+  const navigate = useNavigate();
 
-  const handleRegister = (e) => {
+  const handleRegister = async (e) => {
     e.preventDefault();
     // get the values from the form
     const user = {
@@ -79,16 +80,25 @@ export default function Register() {
       password: password.current.value,
       email: email.current.value,
       type: category.current.value,
-      country:country.label,
+      country: country.label,
       endPoint: 'register',
     };
 
-    if (!user.username || !user.password || !user.email || !user.type || !user.country) {
+    if (
+      !user.username ||
+      !user.password ||
+      !user.email ||
+      !user.type ||
+      !user.country
+    ) {
       console.log('error');
       setAlert('error', 'Please Provide all values');
       setTimeout(() => clearAlert(), 3000);
     } else {
-      setup(user);
+      const status = await setup(user);
+      if (status) {
+        setTimeout(() => navigate('/'), 3000);
+      }
     }
   };
 

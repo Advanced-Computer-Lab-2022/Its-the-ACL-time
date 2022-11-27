@@ -17,13 +17,15 @@ import Alert from '@material-ui/lab/Alert';
 import LockOutlinedIcon from '@material-ui/icons/LockOutlined';
 import { makeStyles } from '@material-ui/core/styles';
 import { useAppContext } from '../context/App/appContext';
+import { Navigate, useNavigate } from 'react-router-dom';
+import axios from 'axios';
 
 function Copyright() {
   return (
     <Typography variant='body2' color='textSecondary' align='center'>
       {'Copyright © '}
       <Link color='inherit' href='https://mui.com/'>
-        Your Website
+        Nerd academy
       </Link>{' '}
       {new Date().getFullYear()}
       {'.'}
@@ -43,7 +45,7 @@ const useStyles = makeStyles((theme) => ({
     backgroundColor: theme.palette.secondary.main,
   },
   form: {
-    width: '100%', // Fix IE 11 issue.
+    width: '100%',
     marginTop: theme.spacing(1),
   },
   submit: {
@@ -66,8 +68,9 @@ export default function Login() {
 
   const email = useRef();
   const password = useRef();
+  const navigate = useNavigate();
 
-  const handleLogin = (e) => {
+  const handleLogin = async (e) => {
     e.preventDefault();
 
     const user = {
@@ -79,7 +82,11 @@ export default function Login() {
       setAlert('error', 'Please Provide all values');
       setTimeout(() => clearAlert(), 3000);
     } else {
-      setup(user);
+      const status = await setup(user);
+      if (status) {
+        console.log('Login Success' + status);
+        setTimeout(() => navigate('/'), 3000);
+      }
     }
   };
 
@@ -140,7 +147,13 @@ export default function Login() {
           </Button>
           <Grid container>
             <Grid item xs>
-              <Link href='#' variant='body2'>
+              <Link
+                variant='body2'
+                onClick={() => {
+                  navigate('/forgetPassword');
+                }}
+                style={{ cursor: 'pointer' }}
+              >
                 Forgot password?
               </Link>
             </Grid>
