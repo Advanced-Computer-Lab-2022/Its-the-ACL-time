@@ -13,3 +13,7 @@ const changePassword = async (req, res) => {
   await user.save();
   res.status(200).json(user);
 };
+
+module.exports = {
+  changePassword,
+};

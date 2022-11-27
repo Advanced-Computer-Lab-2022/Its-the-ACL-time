@@ -112,10 +112,31 @@ const getCoursesInstructor = async (req, res) => {
   });
 };
 
+const courseEnroll = async (req, res) => {
+  const { userId, type } = req.user;
+  const { courseId } = req.params;
+  const user = await User.findOne({
+    _id: userId,
+    courses: { $ne: courseId },
+  });
+
+  if (type === 'Instructor') {
+    throw new UnauthorizedError("Instructor can't enroll in courses");
+  }
+
+  if (!user)
+    throw new BadRequestError('You are already enrolled in this course');
+
+  user.courses.push(courseId);
+  await user.save();
+  res.status(200).json({ msg: 'You are enrolled in this course' });
+};
+
 module.exports = {
   createCourse,
   getCourse,
   getAllCourses,
   updateCourse,
   getCoursesInstructor,
+  courseEnroll,
 };
