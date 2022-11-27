@@ -1,32 +1,14 @@
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
-import {
-  Landing,
-  Register,
-  Login,
-  Home,
-  ProtectedRoute,
-  Instructor,
-  Admin,
-  Course,
-  CoursePage,
-  Payment,
-  SuccessPayment,
-  FailedPayment
-} from './pages';
-import { NavBar, CourseForm, Courses } from './components';
+import { SubtitlesPage, SuccessResetPassword, SearchResult, ResetPassword, Landing, ForgetPassword, Login, Register, CoursePage, Home, ProtectedRoute, Instructor, Admin, Payment, SuccessPayment, FailedPayment, } from './pages';
+import { NavBar, CourseForm } from './components';
 import AddSubtitleForm from './components/subtitle/AddSubtitleForm';
 import { CourseProvider } from './context/Course/courseContext';
 import { SearchProvider } from './context/Search/searchContext';
-import { PaymentProvider } from './context/Payment/paymePage';
+import { PaymentProvider } from './context/Payment/payment';
 import Filter from './components/Filter';
-import SearchResult from './pages/SearchResult';
 import { CourseComponent } from './components/course';
 import Certificate from './components/Certificate';
-import SubtitlesPage from './pages/SubtitlesPage';
 import AlertDialog from './components/AlertDialog';
-import ResetPassword from './pages/ResetPassword';
-import ForgetPassword from './pages/ForgetPassword';
-import SuccessResetPassword from './pages/SuccessResetPassword';
 import Test from './components/Test';
 import RatingForm from './components/RatingForm';
 import Question from './components/Question';
@@ -34,7 +16,7 @@ import Exam from './components/Exam';
 import LinearProgressBar from './components/LinearProgressBar';
 import Footer from './components/Footer';
 import Review from './components/Review';
-import RatingStars from './components/RatingStarsnt';
+import RatingStars from './components/RatingStars';
 function App() {
   return (
     <BrowserRouter>
@@ -49,7 +31,9 @@ function App() {
               <Route path='/login' element={<Login />} />
               <Route path='/register' element={<Register />} />
               <Route path='/instructor/:id' element={<Instructor />} />
-              <Route path='/payment' element={<Payment/>}/>
+              <Route path='/payment' element={<Payment />} />
+              <Route path='/SuccessPayment' element={<SuccessPayment/>} />
+              <Route path='/FailedPayment' element={<SuccessPayment/>} />
               <Route
                 element={
                   <>

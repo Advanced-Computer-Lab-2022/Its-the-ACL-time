@@ -60,7 +60,9 @@ const CourseProvider = ({ children }) => {
     };
 
     getAllCourses();
-    getMyCourses();
+    if(token){
+      getMyCourses();
+    }
   }, [token]);
 
   const createCourse = async (course) => {
