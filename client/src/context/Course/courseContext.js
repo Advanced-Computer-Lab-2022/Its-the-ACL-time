@@ -25,7 +25,7 @@ const CourseProvider = ({ children }) => {
       axios
         .get('http://localhost:8080/api/v1/course', {
           headers: {
-            Authorization: `Bearer ${token}`,
+            authorization: `Bearer ${token}`,
           },
         })
         .then(({ data }) => {
@@ -44,7 +44,7 @@ const CourseProvider = ({ children }) => {
           'http://localhost:8080/api/v1/course?myCourses=true',
           {
             headers: {
-              Authorization: `Bearer ${token}`,
+              authorization: `Bearer ${token}`,
             },
           }
         );
@@ -73,7 +73,7 @@ const CourseProvider = ({ children }) => {
         course,
         {
           headers: {
-            Authorization: `Bearer ${token}`,
+            authorization: `Bearer ${token}`,
           },
         }
       );
@@ -94,7 +94,7 @@ const CourseProvider = ({ children }) => {
         course,
         {
           headers: {
-            Authorization: `Bearer ${token}`,
+            authorization: `Bearer ${token}`,
           },
         }
       );

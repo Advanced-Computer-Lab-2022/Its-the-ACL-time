@@ -1,6 +1,6 @@
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import { SubtitlesPage, SuccessResetPassword, SearchResult, ResetPassword, Landing, ForgetPassword, Login, Register, CoursePage, Home, ProtectedRoute, Instructor, Admin, Payment, SuccessPayment, FailedPayment, } from './pages';
-import { NavBar, CourseForm } from './components';
+import { NavBar, CourseForm, Courses } from './components';
 import AddSubtitleForm from './components/subtitle/AddSubtitleForm';
 import { CourseProvider } from './context/Course/courseContext';
 import { SearchProvider } from './context/Search/searchContext';
@@ -17,6 +17,10 @@ import LinearProgressBar from './components/LinearProgressBar';
 import Footer from './components/Footer';
 import Review from './components/Review';
 import RatingStars from './components/RatingStars';
+import Instructorprofile from './components/instructor/Instructorprofile';
+import BioGraphy from './components/instructor/BioGraphy';
+import Setting from './components/instructor/Setting';
+
 function App() {
   return (
     <BrowserRouter>
@@ -34,6 +38,22 @@ function App() {
               <Route path='/payment' element={<Payment />} />
               <Route path='/SuccessPayment' element={<SuccessPayment/>} />
               <Route path='/FailedPayment' element={<SuccessPayment/>} />
+              
+              <Route path='/Instructorprofile' element={<Instructorprofile/>}>
+               
+              <Route path='BioGraphy' element={<BioGraphy></BioGraphy>}/>
+              <Route path='mm' element={<Courses></Courses>}/>
+              <Route path='gg' element={<Setting></Setting>}/>
+
+              
+
+
+
+              </Route>
+              
+             
+            
+
               <Route
                 element={
                   <>

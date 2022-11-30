@@ -35,6 +35,7 @@ const UserSchema = mongoose.Schema({
   },
   biography: {
     type: String,
+    default:""
   },
   courses: [
     {

@@ -96,21 +96,23 @@ const AppProvider = ({ children }) => {
       return false;
     }
   };
-
   const resetUser = () => {
     localStorage.removeItem('user');
     localStorage.removeItem('token');
     dispatch({ type: USER_RESET });
   };
 
+
   return (
     <AppContext.Provider
       value={{
         ...state,
+        dispatch,
         setAlert,
         clearAlert,
         setup,
         resetUser,
+        addToLocalStorage,
       }}
     >
       {children}
