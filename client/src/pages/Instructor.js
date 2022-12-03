@@ -215,11 +215,19 @@ export default function Instructor() {
           margin: '1rem 40vw 5rem 5vw'
         }}>
           <h1>Your Courses</h1>
-          <div className='d-flex flex-wrap'>
-
+          <div id="carousel" className='d-flex flex-row position-relative'>
+            <div className='position-absolute my-auto' style={{ top: "40%", zIndex: 2 }}>
+              <button className='rounded rounded-circle bg-dark p-1'>
+                <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+              </button>
+            </div>
+            <div className='position-absolute my-auto' style={{ top: "40%", right: "2px", zIndex: 2 }}>
+              <button className='rounded rounded-circle bg-dark p-1'>
+                <span class="carousel-control-next-icon" aria-hidden="true"></span>
+              </button>
+            </div>
             {filteredCourses && filteredCourses.map((course) => {
               return (
-
                 <CourseCard
                   courseTitle={course.title}
                   courseDescription={course.description}
@@ -232,7 +240,6 @@ export default function Instructor() {
             }
           </div>
         </section>
-
         {error && <div className='text-danger'>{error}</div>}
       </div>
     </>

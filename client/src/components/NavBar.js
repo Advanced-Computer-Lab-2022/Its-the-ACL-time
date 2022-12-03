@@ -153,12 +153,12 @@ function NavBar() {
 
   const expand = 'xxl';
   return (
-    <nav>
+    <>
       <Navbar
         key={expand}
         bg='light'
         expand={expand}
-        className={`mb-3 bg-dark ${classes.nav}`}
+        className={`mb-5 bg-dark ${classes.nav}`}
         fixed='top'
         size='lg'
       >
@@ -321,7 +321,7 @@ function NavBar() {
         </Container>
       </Navbar>
       <Outlet />
-    </nav>
+      </>
   );
 }
 

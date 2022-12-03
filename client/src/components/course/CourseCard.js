@@ -23,7 +23,7 @@ function CourseCard({
           <ListGroup.Item>{courseInstructor}</ListGroup.Item>
           {coursePrice && <span>price : {coursePrice}</span>}
           {courseSubject && <span>subject : {courseSubject}</span>}
-          {courseSummary && <span>summary : {courseSummary}</span>}
+          {courseSummary && <span>summary : {courseSummary.substring(0,30)}</span>}
           <ListGroup.Item></ListGroup.Item>
         </ListGroup>
         <Card.Body>

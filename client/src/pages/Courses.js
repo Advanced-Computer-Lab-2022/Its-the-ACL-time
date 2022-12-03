@@ -31,8 +31,8 @@ export default function SearchResult() {
   const { courses } = useCourseContext();
 
   return (
-    <div className={classes.root}>
-      <section className={`${classes.coursesSection}`}>
+    <div className="container">
+      <section className='d-flex flex-wrap'>
         {courses.map((course) => {
           return (
             <Course
