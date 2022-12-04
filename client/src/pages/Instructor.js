@@ -1,9 +1,10 @@
-import React, { useEffect, useState } from 'react';
-import { useParams, useSearchParams } from 'react-router-dom';
+import React, { useEffect, useRef, useState } from 'react';
+import { Navigate, useParams, useSearchParams } from 'react-router-dom';
 import { CourseFormInst, CourseCard } from '../components/course';
 import CardGroup from 'react-bootstrap/CardGroup';
-
-
+import { useAppContext } from '../context/App/appContext';
+import { PageHeader } from '../components';
+import Footer from '../components/Footer';
 
 export default function Instructor() {
   const [instCourses, setInstCourses] = useState([]);
@@ -21,10 +22,15 @@ export default function Instructor() {
   const [priceTo, setPriceTo] = useState(
     Number(searchQuery.get('priceTo')) || 100000
   );
-  console.log(priceFrom);
-  console.log(priceTo);
+  const { token, user } = useAppContext();
+  const courseCartRef = useRef();
+  const coursesRef = useRef();
 
-  let instId = useParams().instId;
+  if (!user) {
+    Navigate('/');
+  }
+
+  let instId = user._id;
   instId = '635e894524fe8f2ac3fc4919';
 
   function handleUnique(data) {
@@ -38,11 +44,31 @@ export default function Instructor() {
     });
     setUniqueSubject(unique);
   }
-
+  let courseScroll = 0;
+  async function leftScroll() {
+    let courseCartWidth = courseCartRef.current.clientWidth;
+    if (courseScroll - courseCartWidth >= 0) {
+      courseScroll -= courseCartWidth;
+    }
+    coursesRef.current.scroll({ left: courseScroll, behavior: 'smooth' });
+    console.log("left",coursesRef.current.scrollLeft);
+    console.log(courseScroll);
+  }
+  async function rightScroll() {
+    let coursesWidth = coursesRef.current.scrollWidth;
+    let courseCartWidth = courseCartRef.current.clientWidth;
+    if (courseScroll + courseCartWidth <= coursesWidth) {
+      courseScroll += courseCartWidth;
+    }
+    coursesRef.current.scroll({ left: courseScroll, behavior: 'smooth' });
+    console.log("left",coursesRef.current.scrollLeft);
+    console.log(courseScroll);
+  }
   useEffect(() => {
     // fetch courses add them to the filterCourses and Courses
     // runs only once while first rendering
-    fetch(`http://localhost:8080/api/v1/course/instructor/${instId}`)
+
+    fetch(`http://localhost:8080/api/v1/course/instructor/${instId}`, { headers: { 'authorization': `Bearer ${token}` } })
       .then((res) => res.json())
       .then((res) => {
         setInstCourses((old) => res.data);
@@ -104,13 +130,17 @@ export default function Instructor() {
     setSearch('');
     filter('all', true);
   }
+  console.log("user", user);
   return (
     <>
-      <nav className='m-0 m-md-3 navbar navbar-light bg-light row'>
-        <div className='container-fluid col'>
-          <span className='navbar-brand mb-0 h1'>Instructor Page</span>
+      <nav className='m-0  navbar navbar-light bg-light row p-0'>
+        <div className='container-fluid col ms-5 ps-5'>
+          {(user.type === "Instructor") && <span className='navbar-brand mb-0 h1'>Instructor profile Page</span>}
+          {(user.type === 'Individual trainee') && <span className='navbar-brand mb-0 h1'>Individual trainee profile Page</span>}
+          {(user.type === 'Admin') && <span className='navbar-brand mb-0 h1'>Admin profile Page</span>}
+          {(user.type === 'Corporate trainee') && <span className='navbar-brand mb-0 h1'>Corporate trainee profile Page</span>}
         </div>
-        <div className='container-fluid col'>
+        <div className='container-fluid col me-2'>
           <form className='d-flex' onSubmit={handleSubmit}>
             <input
               className='form-control me-2'
@@ -152,7 +182,8 @@ export default function Instructor() {
           instId={instId}
         ></CourseFormInst>
       )}
-      <div className='container w-100'>
+      <PageHeader></PageHeader>
+      <div className='container w-100 mb-5'>
         {isLoading && <div>is loading .......</div>}
         <div className='d-block'>
           {!showFilterPrice && (
@@ -206,35 +237,38 @@ export default function Instructor() {
         </div>
         {uniqueSubject &&
           uniqueSubject.map((sub) => (
-            <button onClick={() => filter(sub, true)} className='btn btn-link'>
+            <button key={sub} onClick={() => filter(sub, true)} className='btn btn-link'>
               {sub}
             </button>
           ))}
-        <section className='container m-2 w-100' style={{
-          width: '80vw',
-          margin: '1rem 40vw 5rem 5vw'
-        }}>
-          <h1>Your Courses</h1>
-          <div id="carousel" className='d-flex flex-row position-relative'>
-            <div className='position-absolute my-auto' style={{ top: "40%", zIndex: 2 }}>
-              <button className='rounded rounded-circle bg-dark p-1'>
-                <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-              </button>
-            </div>
-            <div className='position-absolute my-auto' style={{ top: "40%", right: "2px", zIndex: 2 }}>
-              <button className='rounded rounded-circle bg-dark p-1'>
-                <span class="carousel-control-next-icon" aria-hidden="true"></span>
-              </button>
-            </div>
-            {filteredCourses && filteredCourses.map((course) => {
+        <section className='container m-2 p-2 w-100  border border-4 position-relative' >
+          <h2 className="btn btn-primary btn-small">Your Courses</h2>
+          {(['Individual trainee','Corporate trainee'].includes(user.type)) &&<h2 className='btn btn-primary btn-small'>Completed Courses</h2>}
+          <div className='position-absolute my-auto' style={{ top: "40%", left: "2px", zIndex: 1 }}>
+            <button className='rounded rounded-circle bg-dark p-1' onClick={leftScroll}>
+              <span className="carousel-control-prev-icon" aria-hidden="true"></span>
+            </button>
+          </div>
+          <div className='position-absolute my-auto' style={{ top: "40%", right: "2px", zIndex: 1 }}>
+            <button className='rounded rounded-circle bg-dark p-1' onClick={rightScroll}>
+              <span className="carousel-control-next-icon" aria-hidden="true"></span>
+            </button>
+          </div>
+          {filteredCourses && (filteredCourses.length === 0 ) && <h3 className="text-center text-info">You have no courses</h3>}
+          <div id="carousel"  className='container d-flex flex-start w-100 overflow-hidden' ref={coursesRef}>
+            {filteredCourses && (filteredCourses.length >1) && filteredCourses.map((course, index) => {
               return (
-                <CourseCard
-                  courseTitle={course.title}
-                  courseDescription={course.description}
-                  coursePrice={course.price}
-                  courseSubject={course.subject}
-                  courseSummary={course.summary}
-                />
+                <div ref={courseCartRef} >
+                  <CourseCard
+                    courseTitle={course.title}
+                    courseDescription={course.description}
+                    coursePrice={course.price}
+                    courseSubject={course.subject}
+                    courseSummary={course.summary}
+                    key={course.title + index} 
+                    ref={courseCartRef}
+                  />
+                </div>
               );
             })
             }
@@ -242,6 +276,7 @@ export default function Instructor() {
         </section>
         {error && <div className='text-danger'>{error}</div>}
       </div>
+      <Footer />
     </>
   );
 }

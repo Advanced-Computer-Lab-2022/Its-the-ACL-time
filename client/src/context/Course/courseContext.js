@@ -55,7 +55,7 @@ const CourseProvider = ({ children }) => {
           },
         });
       } catch (error) {
-        console.log(error);
+        console.warn(error);
       }
     };
 

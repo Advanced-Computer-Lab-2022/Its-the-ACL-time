@@ -10,7 +10,6 @@ const useStyles = makeStyles((theme) => ({
     [theme.breakpoints.down('sm')]: {
       flexDirection: 'column',
     },
-    position: 'absolute',
     bottom: 0,
     left: 0,
     right: 0,

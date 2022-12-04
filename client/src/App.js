@@ -34,25 +34,17 @@ function App() {
               <Route path='/resetPassword/:token' element={<ResetPassword />} />
               <Route path='/login' element={<Login />} />
               <Route path='/register' element={<Register />} />
-              <Route path='/instructor/:id' element={<Instructor />} />
               <Route path='/payment' element={<Payment />} />
               <Route path='/SuccessPayment' element={<SuccessPayment/>} />
               <Route path='/FailedPayment' element={<SuccessPayment/>} />
               
               <Route path='/Instructorprofile' element={<Instructorprofile/>}>
-               
               <Route path='BioGraphy' element={<BioGraphy></BioGraphy>}/>
-              <Route path='mm' element={<Courses></Courses>}/>
+              <Route path='mm' element={<Instructor></Instructor>}/>
               <Route path='gg' element={<Setting></Setting>}/>
-
-              
-
-
-
+            
               </Route>
               
-             
-            
 
               <Route
                 element={

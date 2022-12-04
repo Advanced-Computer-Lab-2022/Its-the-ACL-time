@@ -7,19 +7,19 @@ import './Instructorprofile.css';
 import { IconContext } from 'react-icons';
 
 function Instructorprofile() {
-  const [sidebar, setSidebar] = useState(false);
+  const [sidebar, setSidebar] = useState(true);
 
   const showSidebar = () => setSidebar(!sidebar);
 
   return (
     <>
       <IconContext.Provider value={{ color: '#fff' }}>
-        <div className='navbar'>
+        <div className='navbar position-absolute bg-transparent' style={{zIndex:2,top:"10px"}}>
           <Link to='#' className=' menu-bars'> 
             <FaIcons.FaBars className='text-dark' onClick={showSidebar} />
           </Link>
         </div>
-        <div className={sidebar ? 'nav-menu active' : 'nav-menu'}>
+        <div className={sidebar ? 'nav-menu active' : 'nav-menu'} style={{zIndex:"2"}}>
           <ul className='nav-menu-items' onClick={showSidebar}>
             <li className='navbar-toggle'>
               <Link to='#' className='menu-bars'>

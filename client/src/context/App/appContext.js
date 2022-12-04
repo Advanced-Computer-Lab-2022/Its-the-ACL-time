@@ -1,4 +1,4 @@
-import React, { useContext, useReducer } from 'react';
+import React, { useContext, useEffect, useReducer } from 'react';
 import appReducer from './appReducer';
 import {
   USER_SETUP_BEGIN,
@@ -9,6 +9,7 @@ import {
   USER_RESET,
 } from './appActions';
 import axios from 'axios';
+import { backendApi } from '../../projectConfig';
 
 const userFromLocalStorage = localStorage.getItem('user');
 const tokenFromLocalStorage = localStorage.getItem('token');

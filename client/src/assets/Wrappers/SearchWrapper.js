@@ -4,7 +4,6 @@ const Wrapper = styled.aside`
   aside {
     margin-bottom: 5px;
   }
-
   .searchInputs {
     display: flex;
     height: 40px;
@@ -17,9 +16,7 @@ const Wrapper = styled.aside`
     border-top-right-radius: 0px;
     border-bottom-right-radius: 0px;
     font-size: 18px;
-    padding: 15px;
     height: 40px;
-    width: 300px;
     margin-bottom: 3rem;
   }
 
