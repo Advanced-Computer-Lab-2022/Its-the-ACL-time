@@ -7,6 +7,8 @@ import {
   ProtectedRoute,
   Instructor,
 } from "./pages";
+import {GetAdmin,GetCourse,GetIntstructor,Report,Getcorporttrainee,CourseRequest} from'./components/admin'
+
 import Admin from "./pages/Admin";
 import { NavBar, CourseForm } from "./components";
 import AddSubtitleForm from "./components/subtitle/AddSubtitleForm";
@@ -30,12 +32,7 @@ import LinearProgressBar from "./components/LinearProgressBar";
 import Footer from "./components/Footer";
 import Review from "./components/Review";
 import RatingStars from "./components/RatingStars";
-import Getcorportrainee from "./components/admin/Getcorportrainee";
-import CourseRequest from "./components/admin/CourseRequest";
-import Reports from "./components/admin/report";
-import GetAdmin from "./components/admin/getadmin";
-import GetIntstructor from "./components/admin/GetIntstructor";
-import GetCourse from "./components/admin/GetCourse";
+
 
 // or
 
@@ -48,11 +45,11 @@ function App() {
             <Route path="/admin" element={<Admin />}>
             <Route path="instructor" element={<GetIntstructor></GetIntstructor>}/>
             <Route path="admin" element={<GetAdmin></GetAdmin>}/>
-            <Route path="Report" element={<Reports></Reports>}/>
+            <Route path="Report" element={<Report></Report>}/>
             <Route path="courserequest" element={<CourseRequest></CourseRequest>}/>
             <Route path="course" element={<GetCourse></GetCourse>}/>
 
-            <Route path="corporatetrinee" element={<Getcorportrainee></Getcorportrainee>}></Route>
+            <Route path="corporatetrinee" element={<Getcorporttrainee></Getcorporttrainee>}></Route>
 
 
 

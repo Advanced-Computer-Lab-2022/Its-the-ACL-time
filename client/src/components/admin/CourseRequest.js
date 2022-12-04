@@ -1,9 +1,8 @@
 import React from 'react'
-import {Button} from '@mui/material';
 function CourseRequest() {
   return (
     <div>
-      <Button>open</Button>
+      <h1>coursesRequests</h1>
     </div>
   )
 }
