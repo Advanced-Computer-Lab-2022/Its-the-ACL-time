@@ -11,7 +11,7 @@ const GetAdmin = () => {
   const[type,settype]=useState("");
   const addhandler =  (e) => {
      e.preventDefault();
-    const res = axios.post("http://localhost:8080/api/v1/admin", { username:username,
+    const res = axios.post("http://localhost:8080/api/v1/admin/", { username:username,
                                                 email:email,password,password,type:type });
     console.log(res)
   }

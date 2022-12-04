@@ -1,5 +1,5 @@
 const { StatusCodes } = require('http-status-codes');
-const { Course, User,Report,CourseRequest} = require('../models');
+const { Course, User,Report,CourseRequest,Question} = require('../models');
 const { UnauthorizedError, BadRequestError } = require('../Errors');
 
 module.exports.createUser = async (req, res) => {
@@ -19,6 +19,17 @@ module.exports.createUser = async (req, res) => {
     const admin = await User.create(req.body);
     res.status(StatusCodes.CREATED).json({ admin });
   };
+  module.exports.getuser = async (req, res) => {
+    const type=req.body.type;
+    console.log(type);
+    console.log(req.body);
+
+      const admin = await User.find({type});
+      res.status(200).json(admin);
+    
+  };
+  
+  
  module.exports.getAllreport = async (req, res) => {
     const Questions = await Report.find({});
     res.status(200).json(Questions);

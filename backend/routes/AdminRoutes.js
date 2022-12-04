@@ -6,6 +6,8 @@ const AdminController=require ('../controllers/AdminController');
 
 // POST a new create new user 
 router.post('/',AdminController.createUser);
+router.get('/',AdminController.getuser);
+
 //get all report
 router.get('/report',AdminController.getAllreport );
 
