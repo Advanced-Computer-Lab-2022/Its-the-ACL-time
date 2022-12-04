@@ -3,8 +3,10 @@ const { Course, User,Report,CourseRequest,Question} = require('../models');
 const { UnauthorizedError, BadRequestError } = require('../Errors');
 
 module.exports.createUser = async (req, res) => {
-    console.log('req.body ' + req.body);
+   // console.log('req.body ' + req.body);
+  
     const { username, email, password, type} = req.body;
+    console.log('req.body ' + username,email,password,type);
     if (
       !username ||
       !email ||
@@ -20,7 +22,7 @@ module.exports.createUser = async (req, res) => {
     res.status(StatusCodes.CREATED).json({ admin });
   };
   module.exports.getuser = async (req, res) => {
-    const type=req.body.type;
+    const type=req.query.type;
     console.log(type);
     console.log(req.body);
 

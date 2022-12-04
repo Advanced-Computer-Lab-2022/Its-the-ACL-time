@@ -9,7 +9,7 @@ function GetIntstructor() {
   
  useEffect(()=>{
     
-    axios.get("http://localhost:8080/api/v1/admin/",{type:'Admin'}).then(res=>{
+    axios.get("http://localhost:8080/api/v1/admin/?type=Instructor").then(res=>{
     console.log(res.data);
     setinst(res.data);
    })

@@ -11,8 +11,8 @@ const GetAdmin = () => {
   const[type,settype]=useState("");
   const addhandler =  (e) => {
      e.preventDefault();
-    const res = axios.post("http://localhost:8080/api/v1/admin/", { username:username,
-                                                email:email,password,password,type:type });
+    const res = axios.post("http://localhost:8080/api/v1/admin", { username:username,
+                                                email:email,password:password,type:type });
     console.log(res)
   }
 
@@ -41,11 +41,9 @@ const GetAdmin = () => {
     
       <select calssName='container text-bg-light'  onChange={(e)=>settype(e.target.value)}>
 
-         <option value="Instructor">Instructor</option>
-
+         <option value="">""</option>
          <option value="Admin">Admin</option>
-
-         <option value="Individual trainee">Individual trainee</option>
+         <option value="Instructor">Instructor</option>
          <option value="Corporate trainee">Corporate trainee</option>
 
 
