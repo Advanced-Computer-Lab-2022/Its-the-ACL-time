@@ -15,7 +15,7 @@ const useStyles = makeStyles((theme) => ({
   },
   nav: {
     display: 'block',
-    height: '10vh',
+    height: 'auto',
     justifyContent: 'space-between',
     alignItems: 'center',
     boxShadow: '0 0 10px rgba(0,0,0,0.5)',
@@ -153,12 +153,12 @@ function NavBar() {
 
   const expand = 'xxl';
   return (
-    <nav>
+    <>
       <Navbar
         key={expand}
         bg='light'
         expand={expand}
-        className={`mb-3 bg-dark ${classes.nav}`}
+        className={`py-2 bg-dark ${classes.nav}`}
         fixed='top'
         size='lg'
       >
@@ -321,7 +321,7 @@ function NavBar() {
         </Container>
       </Navbar>
       <Outlet />
-    </nav>
+      </>
   );
 }
 

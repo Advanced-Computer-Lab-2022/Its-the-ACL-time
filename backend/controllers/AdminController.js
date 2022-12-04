@@ -6,7 +6,7 @@ module.exports.createUser = async (req, res) => {
    // console.log('req.body ' + req.body);
   
     const { username, email, password, type} = req.body;
-    console.log('req.body ' + username,email,password,type);
+   // console.log('req.body ' + username,email,password,type);
     if (
       !username ||
       !email ||

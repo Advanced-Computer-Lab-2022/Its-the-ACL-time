@@ -29,10 +29,10 @@ const useStyles = makeStyles((theme) => ({
 export default function SearchResult() {
   const classes = useStyles();
   const { courses } = useCourseContext();
-
+  console.log("courses",courses);
   return (
-    <div className={classes.root}>
-      <section className={`${classes.coursesSection}`}>
+    <div className="container">
+      <section className='d-flex flex-wrap'>
         {courses.map((course) => {
           return (
             <Course

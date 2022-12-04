@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import Button from '@material-ui/core/Button';
 import Dialog from '@material-ui/core/Dialog';
 import DialogActions from '@material-ui/core/DialogActions';
@@ -66,10 +66,12 @@ export default function RatingForm({
   const [open, setOpen] = useState(false);
   const [clicked, setClicked] = useState(null);
   const [hover, setHover] = useState(null);
+  const textAreaRef = useRef();
 
   const handleSubmitRating = () => {
-    console.log('clicked');
-    onSubmit();
+    console.log(clicked, textAreaRef.current.value);
+    onSubmit(clicked, textAreaRef.current.value);
+    setOpen(false);
   };
 
   return (
@@ -124,6 +126,7 @@ export default function RatingForm({
             <textarea
               className={`${classes.textarea}`}
               placeholder={textArea}
+              ref={textAreaRef}
             />
           </div>
         </DialogContent>

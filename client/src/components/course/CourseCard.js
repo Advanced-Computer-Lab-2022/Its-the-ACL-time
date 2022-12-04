@@ -15,17 +15,17 @@ function CourseCard({
     <span>
       <Card style={{ width: '20rem', margin: '8px' }}>
         <Card.Img variant='top' src='../Images/course1.png' />
-        <Card.Body>
+        <Card.Body className="p-2">
           <Card.Title>{courseTitle}</Card.Title>
           <Card.Text>{courseDescription}</Card.Text>
+          <ListGroup className='list-group-flush'>
+            <ListGroup.Item>{courseInstructor}</ListGroup.Item>
+            {coursePrice && <span>price : {coursePrice}</span>}
+            {courseSubject && <span>subject : {courseSubject}</span>}
+            {courseSummary && <span>summary : {courseSummary.substring(0, 20)}</span>}
+            <ListGroup.Item></ListGroup.Item>
+          </ListGroup>
         </Card.Body>
-        <ListGroup className='list-group-flush'>
-          <ListGroup.Item>{courseInstructor}</ListGroup.Item>
-          {coursePrice && <span>price : {coursePrice}</span>}
-          {courseSubject && <span>subject : {courseSubject}</span>}
-          {courseSummary && <span>summary : {courseSummary}</span>}
-          <ListGroup.Item></ListGroup.Item>
-        </ListGroup>
         <Card.Body>
           <Card.Link href='#'>Card Link</Card.Link>
           <Card.Link href='#'>Another Link</Card.Link>

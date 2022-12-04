@@ -78,14 +78,16 @@ const updateCourse = async (req, res) => {
   console.log(req.body);
   if (!courseId) throw new BadRequestError('Please provide course id');
 
-  if (type !== 'Instructor')
-    throw new UnauthorizedError('you are not allowed to update course');
-
   const course = await Course.findOne({ _id: courseId });
   if (!course)
     throw new BadRequestError(`There is no course with this id ${courseId}`);
 
-  if (userId !== course.createdBy.toString())
+  const user = await User.findOne({
+    _id: userId,
+    courses: { $in: [courseId] },
+  });
+
+  if (userId !== course.createdBy.toString() && !user)
     throw new UnauthorizedError('You are not the owner of that course');
 
   const updatedCourse = await Course.findOneAndUpdate(
@@ -93,6 +95,9 @@ const updateCourse = async (req, res) => {
     { ...req.body },
     { new: true }
   );
+
+  console.log(updatedCourse);
+
   res.status(StatusCodes.OK).json({ updatedCourse });
 };
 
@@ -107,10 +112,31 @@ const getCoursesInstructor = async (req, res) => {
   });
 };
 
+const courseEnroll = async (req, res) => {
+  const { userId, type } = req.user;
+  const { courseId } = req.params;
+  const user = await User.findOne({
+    _id: userId,
+    courses: { $ne: courseId },
+  });
+
+  if (type === 'Instructor') {
+    throw new UnauthorizedError("Instructor can't enroll in courses");
+  }
+
+  if (!user)
+    throw new BadRequestError('You are already enrolled in this course');
+
+  user.courses.push(courseId);
+  await user.save();
+  res.status(200).json({ msg: 'You are enrolled in this course' });
+};
+
 module.exports = {
   createCourse,
   getCourse,
   getAllCourses,
   updateCourse,
   getCoursesInstructor,
+  courseEnroll,
 };

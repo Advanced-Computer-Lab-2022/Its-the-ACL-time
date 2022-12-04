@@ -7,7 +7,7 @@ const {
   updateWallet,
   deleteWallet,
 } = require('../controllers/walletController');
-
+const{changePassword,GetBio,updateBio}=require('../controllers/userController');
 const {
   findCertification,
   allCertifications,
@@ -36,5 +36,11 @@ router.post('/certification', authAdmin, createCertification);
 router.patch('/certification/:id', authAdmin, updateCertification);
 router.delete('/certification/:id', authAdmin, deleteCertification);
 // end certification router
+// bltagy edit
+router.patch('/restestpassword',changePassword)
+router.patch('/updateBio',updateBio)
+router.get('/GetBio',GetBio)
+
+
 
 module.exports = router;

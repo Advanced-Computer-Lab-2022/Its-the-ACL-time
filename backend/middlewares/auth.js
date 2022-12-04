@@ -2,7 +2,9 @@ const { UnauthorizedError } = require('../Errors');
 const { verifyToken } = require('../utils');
 
 const authMiddleware = (req, res, next) => {
+  console.log("header auth");
   const authHeader = req.headers.authorization;
+  
   if (!authHeader || !authHeader.startsWith('Bearer')) {
     throw new UnauthorizedError('Authentication failed');
   } else {
@@ -10,6 +12,7 @@ const authMiddleware = (req, res, next) => {
     try {
       const payload = verifyToken(token);
       req.user = { userId: payload.userId, type: payload.type };
+      console.log("authHeader",req.user);
       next();
     } catch (error) {
       console.log(error);

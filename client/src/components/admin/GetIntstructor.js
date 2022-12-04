@@ -29,7 +29,7 @@ function GetIntstructor() {
 <button type="submit" class=" btn btn-success float-end" >add</button>
 <div class="container mt-3">
   <h2>Instractor</h2>
-  <table class="table table-striped table-hover">
+  <table class="table table-striped table-hover bg-light border border-success ">
     <thead>
       <tr>
         <th>Username</th>

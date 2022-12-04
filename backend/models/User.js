@@ -10,7 +10,7 @@ const UserSchema = mongoose.Schema({
   },
   email: {
     type: String,
-    required: [true, 'please provide email'],
+    // required: [true, 'please provide email'],
     unique: [true, 'this email is already exists'],
     validate: {
       validator: function (v) {
@@ -35,6 +35,7 @@ const UserSchema = mongoose.Schema({
   },
   biography: {
     type: String,
+    default:""
   },
   courses: [
     {

@@ -43,7 +43,7 @@ const GetAdmin = () => {
 
          <option value="">""</option>
          <option value="Admin">Admin</option>
-         <option value="Instructor">Instructor</option>
+         <option value="Instructor">Individual trainee</option>
          <option value="Corporate trainee">Corporate trainee</option>
 
 

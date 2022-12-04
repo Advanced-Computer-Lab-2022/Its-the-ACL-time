@@ -25,7 +25,7 @@ const CourseProvider = ({ children }) => {
       axios
         .get('http://localhost:8080/api/v1/course', {
           headers: {
-            Authorization: `Bearer ${token}`,
+            authorization: `Bearer ${token}`,
           },
         })
         .then(({ data }) => {
@@ -44,7 +44,7 @@ const CourseProvider = ({ children }) => {
           'http://localhost:8080/api/v1/course?myCourses=true',
           {
             headers: {
-              Authorization: `Bearer ${token}`,
+              authorization: `Bearer ${token}`,
             },
           }
         );
@@ -55,12 +55,14 @@ const CourseProvider = ({ children }) => {
           },
         });
       } catch (error) {
-        console.log(error);
+        console.warn(error);
       }
     };
 
     getAllCourses();
-    getMyCourses();
+    if(token){
+      getMyCourses();
+    }
   }, [token]);
 
   const createCourse = async (course) => {
@@ -71,7 +73,7 @@ const CourseProvider = ({ children }) => {
         course,
         {
           headers: {
-            Authorization: `Bearer ${token}`,
+            authorization: `Bearer ${token}`,
           },
         }
       );
@@ -92,7 +94,7 @@ const CourseProvider = ({ children }) => {
         course,
         {
           headers: {
-            Authorization: `Bearer ${token}`,
+            authorization: `Bearer ${token}`,
           },
         }
       );
@@ -100,7 +102,8 @@ const CourseProvider = ({ children }) => {
         type: UPDATE_COURSE,
         payload: { course: response.data.updatedCourse },
       });
-      console.log(response.data);
+      console.log(response.data.updatedCourse);
+      return response.data.updatedCourse;
     } catch (error) {
       console.log(error);
     }

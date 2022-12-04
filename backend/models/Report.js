@@ -14,7 +14,7 @@ const ReportSchema = mongoose.Schema(
     },
     status: {
         type: String,
-        enum: ['resolved','pending'],
+        enum: ['resolved','pending','unseen'],
         required: [true, 'Please provide a report status'],
       },
     createdBy: {

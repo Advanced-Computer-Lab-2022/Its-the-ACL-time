@@ -4,6 +4,7 @@ const { generateToken } = require('../utils');
 const { BadRequestError, UnauthorizedError } = require('../Errors');
 const jwt = require('jsonwebtoken');
 const { sendEmail } = require('../utils');
+const { JsonWebTokenError } = require('jsonwebtoken');
 
 const register = async (req, res) => {
   const { username, password, email, type } = req.body;
