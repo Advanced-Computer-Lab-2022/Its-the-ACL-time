@@ -4,15 +4,29 @@ const AdminController=require ('../controllers/AdminController');
 
 // GET a single exercise
 
-// POST a new Exam 
+// POST a new create new user 
 router.post('/',AdminController.createUser);
-// get user 
-router.get('/:id',AdminController.getuser)
-// DELETE an user 
-router.delete('/:id',AdminController.deleteuser)
+router.get('/',AdminController.getuser);
 
-// UPDATE an user 
-router.patch('/:id',AdminController.updateuser)
+//get all report
+router.get('/report',AdminController.getAllreport );
+
+//mark report as resovle or pending
+router.patch('reportstate',AdminController.updatereport)
+//refund an amoute to trainee
+router.patch('trineerefund',)
+//get all course request
+router.get('/coursereqeut',AdminController.getAllcourserequest)
+// grant the course request
+router.patch('grantcourse',AdminController.updatecourserequest)
+//set promotion for course
+router.patch('setpromotion',)
+
+
+
+
+
+
 
 
 

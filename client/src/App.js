@@ -1,6 +1,9 @@
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import { SubtitlesPage, SuccessResetPassword, SearchResult, ResetPassword, Landing, ForgetPassword, Login, Register, CoursePage, Home, ProtectedRoute, Instructor, Admin, Payment, SuccessPayment, FailedPayment, } from './pages';
 import { NavBar, CourseForm, Courses } from './components';
+import {GetAdmin,GetCourse,GetIntstructor,Report,Getcorporttrainee,CourseRequest} from'./components/admin'
+
+
 import AddSubtitleForm from './components/subtitle/AddSubtitleForm';
 import { CourseProvider } from './context/Course/courseContext';
 import { SearchProvider } from './context/Search/searchContext';
@@ -28,7 +31,15 @@ function App() {
         <CourseProvider>
           <SearchProvider>
             <Routes>
-              <Route path='/Admin' element={<Admin />} />
+            
+            <Route path="admin" element={<Admin />}>
+            <Route path="instructor" element={<GetIntstructor></GetIntstructor>}/>
+            <Route path="admin" element={<GetAdmin></GetAdmin>}/>
+            <Route path="Report" element={<Report></Report>}/>
+            <Route path="courserequest" element={<CourseRequest></CourseRequest>}/>
+            <Route path="course" element={<GetCourse></GetCourse>}/>
+              </Route>
+            <Route path="corporatetrinee" element={<Getcorporttrainee></Getcorporttrainee>}></Route>
               <Route path='/resetPassword' element={<SuccessResetPassword />} />
               <Route path='/forgetPassword' element={<ForgetPassword />} />
               <Route path='/resetPassword/:token' element={<ResetPassword />} />
