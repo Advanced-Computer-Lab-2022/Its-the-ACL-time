@@ -38,10 +38,15 @@ const UserSchema = mongoose.Schema({
     default:""
   },
   courses: [
-    {
+    {courseId:{
       type: mongoose.Types.ObjectId,
       ref: 'Course',
     },
+    isCompleted:{
+      type: Boolean,
+      default:false,
+    }
+  }
   ],
 });
 

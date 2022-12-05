@@ -24,13 +24,15 @@ const authMiddleware = (req, res, next) => {
 
 const authOwner = (req, res, next) => {
   //TODO check signed in user authorization
-  console.log('check user is owner');
+  console.log("check if same user");
   next();
 };
 
 const authAdmin = (req, res, next) => {
   //TODO check singed in user is admin
-  console.log('check user is admin');
+  if(req.user.type!=="Admin"){
+    res.status(401).send({msg:"you are not authorized"});
+  }
   next();
 };
 

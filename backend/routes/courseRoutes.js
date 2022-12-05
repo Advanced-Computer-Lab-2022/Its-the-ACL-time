@@ -7,6 +7,7 @@ const {
   updateCourse,
   getCoursesInstructor,
   courseEnroll,
+  getEnrolledCourses,
 } = require('../controllers/courseController');
 
 const {
@@ -19,6 +20,8 @@ const {
 router.route('/').post(createCourse).get(getAllCourses);
 router.route('/:courseId').get(getCourse).patch(updateCourse);
 router.get('/instructor/:id', getCoursesInstructor);
+router.get('/usersCourses', getCoursesInstructor);
+router.get('/enrolledCourses',getEnrolledCourses);
 
 // SubTitle Routes
 

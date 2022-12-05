@@ -7,10 +7,8 @@ import './Instructorprofile.css';
 import { IconContext } from 'react-icons';
 
 function Instructorprofile() {
-  const [sidebar, setSidebar] = useState(true);
-
+  const [sidebar, setSidebar] = useState(false);
   const showSidebar = () => setSidebar(!sidebar);
-
   return (
     <>
       <IconContext.Provider value={{ color: '#fff' }}>

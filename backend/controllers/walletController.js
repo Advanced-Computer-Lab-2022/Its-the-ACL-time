@@ -4,11 +4,14 @@ const { StatusCodes } = require('http-status-codes');
 // allowed for the wallet owner
 const findWallet = async (req, res) => {
   const id = req.params.id;
-  Wallet.findById(id, (err, wallet) => {
+  if(req.user.userId != id){
+    res.status(401).json({msg:"you are not authorized to access this data"});
+  }
+  Wallet.findOne({owner:id}, (err, wallet) => {
     if (err) {
       res.status(StatusCodes.NOT_FOUND).send(err);
     } else {
-      res.status(StatusCodes.OK).json({ wallet });
+      res.status(StatusCodes.OK).json(wallet);
     }
   });
 };

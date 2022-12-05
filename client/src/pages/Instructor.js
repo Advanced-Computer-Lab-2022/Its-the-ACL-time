@@ -1,12 +1,18 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { Navigate, useParams, useSearchParams } from 'react-router-dom';
-import { CourseFormInst, CourseCard } from '../components/course';
-import CardGroup from 'react-bootstrap/CardGroup';
+import { Navigate, useSearchParams } from 'react-router-dom';
+import { CourseCard } from '../components/course';
 import { useAppContext } from '../context/App/appContext';
 import { PageHeader } from '../components';
 import Footer from '../components/Footer';
+import { useCourseContext } from '../context/Course/courseContext';
+import {CourseForm} from '../components';
 
 export default function Instructor() {
+  const { token, user } = useAppContext();
+  if (!user) {
+    Navigate('/');
+  }
+  const { myCourses } = useCourseContext();
   const [instCourses, setInstCourses] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -14,7 +20,7 @@ export default function Instructor() {
   const [showFilterPrice, setShowFilterPrice] = useState(false);
   const [filteredCourses, setFilterCourses] = useState([]);
   const [searchQuery, setSearchQuery] = useSearchParams({ search: '' });
-  const [search, setSearch] = useState(searchQuery.get('search'));
+  const [search, setSearch] = useState(searchQuery.get('search') || "");
   const [uniqueSubject, setUniqueSubject] = useState([]);
   const [priceFrom, setPriceFrom] = useState(
     Number(searchQuery.get('priceFrom')) || 0
@@ -22,17 +28,27 @@ export default function Instructor() {
   const [priceTo, setPriceTo] = useState(
     Number(searchQuery.get('priceTo')) || 100000
   );
-  const { token, user } = useAppContext();
   const courseCartRef = useRef();
   const coursesRef = useRef();
+  console.log("search", search);
+  useEffect(() => {
+    let filtCourses = myCourses.filter(
+      (course) => {
+        return course.title.toLowerCase().startsWith(search) ||
+          course.subject.toLowerCase().startsWith(search)
+      }
+    );
+    filtCourses = filtCourses.filter(
+      (course) => course.price >= priceFrom && course.price <= priceTo
+    );
+    setFilterCourses(filtCourses);
+    setInstCourses(myCourses);
+    handleUnique(myCourses);
+    setIsLoading(false);
+  }, [myCourses,priceFrom,priceTo,search]);
 
-  if (!user) {
-    Navigate('/');
-  }
-
+  console.log("courses", instCourses);
   let instId = user._id;
-  instId = '635e894524fe8f2ac3fc4919';
-
   function handleUnique(data) {
     let unique = ['all'];
     let lookUp = {};
@@ -51,7 +67,7 @@ export default function Instructor() {
       courseScroll -= courseCartWidth;
     }
     coursesRef.current.scroll({ left: courseScroll, behavior: 'smooth' });
-    console.log("left",coursesRef.current.scrollLeft);
+    console.log("left", coursesRef.current.scrollLeft);
     console.log(courseScroll);
   }
   async function rightScroll() {
@@ -61,34 +77,10 @@ export default function Instructor() {
       courseScroll += courseCartWidth;
     }
     coursesRef.current.scroll({ left: courseScroll, behavior: 'smooth' });
-    console.log("left",coursesRef.current.scrollLeft);
+    console.log("left", coursesRef.current.scrollLeft);
     console.log(courseScroll);
   }
-  useEffect(() => {
-    // fetch courses add them to the filterCourses and Courses
-    // runs only once while first rendering
 
-    fetch(`http://localhost:8080/api/v1/course/instructor/${instId}`, { headers: { 'authorization': `Bearer ${token}` } })
-      .then((res) => res.json())
-      .then((res) => {
-        setInstCourses((old) => res.data);
-        let filteredCourses = res.data.filter(
-          (course) =>
-            course.title.toLowerCase().startsWith(search) ||
-            course.subject.toLowerCase().startsWith(search)
-        );
-        filteredCourses = filteredCourses.filter(
-          (course) => course.price >= priceFrom && course.price <= priceTo
-        );
-        setFilterCourses(filteredCourses);
-        setIsLoading(false);
-        handleUnique(res.data);
-      })
-      .catch((err) => {
-        setError('failed to load courses');
-        setIsLoading(false);
-      });
-  }, []);
   function addCourseFront(courseData) {
     instCourses.unshift(courseData);
     setInstCourses([...instCourses]);
@@ -129,6 +121,14 @@ export default function Instructor() {
     setSearchQuery({ priceFrom: priceFrom, priceTo: priceTo });
     setSearch('');
     filter('all', true);
+  }
+  function enrolledCourses() {
+    let filter = instCourses.filter((course)=>course.isEnrolled);
+    setFilterCourses(filter);
+  }
+  function completedCourses() {
+    let filter = instCourses.filter((course)=>course.isCompleted);
+    setFilterCourses(filter);
   }
   console.log("user", user);
   return (
@@ -177,10 +177,10 @@ export default function Instructor() {
         )}
       </nav>
       {showCreateCourse && (
-        <CourseFormInst
+        <CourseForm
           addCourseFront={addCourseFront}
           instId={instId}
-        ></CourseFormInst>
+        ></CourseForm>
       )}
       <PageHeader></PageHeader>
       <div className='container w-100 mb-5'>
@@ -242,8 +242,9 @@ export default function Instructor() {
             </button>
           ))}
         <section className='container m-2 p-2 w-100  border border-4 position-relative' >
-          <h2 className="btn btn-primary btn-small">Your Courses</h2>
-          {(['Individual trainee','Corporate trainee'].includes(user.type)) &&<h2 className='btn btn-primary btn-small'>Completed Courses</h2>}
+          {user.type === "Instructor" && <h2 className="btn btn-primary btn-small">Your Courses</h2>}
+          <h2 className='btn btn-primary btn-small ms-4' onClick={enrolledCourses}>Courses enrolled in</h2>
+          <h2 className='btn btn-primary btn-small ms-4' onClick={completedCourses}>Completed Courses</h2>
           <div className='position-absolute my-auto' style={{ top: "40%", left: "2px", zIndex: 1 }}>
             <button className='rounded rounded-circle bg-dark p-1' onClick={leftScroll}>
               <span className="carousel-control-prev-icon" aria-hidden="true"></span>
@@ -254,19 +255,20 @@ export default function Instructor() {
               <span className="carousel-control-next-icon" aria-hidden="true"></span>
             </button>
           </div>
-          {filteredCourses && (filteredCourses.length === 0 ) && <h3 className="text-center text-info">You have no courses</h3>}
-          <div id="carousel"  className='container d-flex flex-start w-100 overflow-hidden' ref={coursesRef}>
-            {filteredCourses && (filteredCourses.length >1) && filteredCourses.map((course, index) => {
+          {filteredCourses && (filteredCourses.length === 0) && <h3 className="text-center text-info">You have no courses</h3>}
+          <div id="carousel" className='container d-flex flex-start w-100 overflow-hidden' ref={coursesRef}>
+            {filteredCourses && (filteredCourses.length > 1) && filteredCourses.map((course, index) => {
               return (
                 <div ref={courseCartRef} >
                   <CourseCard
+                    isInstructorCourses={true}
+                    courseId={course._id}
                     courseTitle={course.title}
                     courseDescription={course.description}
                     coursePrice={course.price}
                     courseSubject={course.subject}
                     courseSummary={course.summary}
-                    key={course.title + index} 
-                    ref={courseCartRef}
+                    key={course.title + index}
                   />
                 </div>
               );

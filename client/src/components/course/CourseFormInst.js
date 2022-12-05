@@ -76,9 +76,6 @@ function CourseFormInst({ addCourseFront, instId }) {
       setTimeout(() =>
         clearAlert()
       ,3000);
-  if (addCourseFront) {
-    addCourseFront(response.data.course)
-  }
 } catch (error) {
   const { msg } = error.response.data;
 
