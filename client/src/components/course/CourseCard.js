@@ -1,18 +1,21 @@
 import Card from 'react-bootstrap/Card';
 import ListGroup from 'react-bootstrap/ListGroup';
+import {Link} from 'react-router-dom'
 
 function CourseCard({
+  courseId,
   courseTitle,
   courseDescription,
   courseInstructor,
   coursePrice,
   courseSubject,
   courseSummary,
+  isInstructorCourses,
 }) {
   // console.log({ courseTitle, courseDescription, courseInstructor ,coursePrice});
 
   return (
-    <span>
+    <Link to={`/course/${courseId}`} className="text-black text-decoration-none">
       <Card style={{ width: '20rem', margin: '8px' }}>
         <Card.Img variant='top' src='../Images/course1.png' />
         <Card.Body className="p-2">
@@ -27,11 +30,11 @@ function CourseCard({
           </ListGroup>
         </Card.Body>
         <Card.Body>
-          <Card.Link href='#'>Card Link</Card.Link>
-          <Card.Link href='#'>Another Link</Card.Link>
+          {isInstructorCourses && <Link className='btn btn-link' to={`/course/${courseId}/subtitle`} >Add Subtitles</Link> }
+          {isInstructorCourses && <Link className='btn btn-link ms-2' to={`/updateCourse/${courseId}`}>Update Course</Link> }
         </Card.Body>
       </Card>
-    </span>
+    </Link>
   );
 }
 

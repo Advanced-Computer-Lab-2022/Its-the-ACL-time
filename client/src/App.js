@@ -35,17 +35,14 @@ function App() {
               <Route path='/login' element={<Login />} />
               <Route path='/register' element={<Register />} />
               <Route path='/payment' element={<Payment />} />
-              <Route path='/SuccessPayment' element={<SuccessPayment/>} />
-              <Route path='/FailedPayment' element={<SuccessPayment/>} />
-              
-              <Route path='/Instructorprofile' element={<Instructorprofile/>}>
-              <Route path='BioGraphy' element={<BioGraphy></BioGraphy>}/>
-              <Route path='mm' element={<Instructor></Instructor>}/>
-              <Route path='gg' element={<Setting></Setting>}/>
-            
+              <Route path='/SuccessPayment' element={<SuccessPayment />} />
+              <Route path='/FailedPayment' element={<SuccessPayment />} />
+              <Route path='/profile' element={<Instructorprofile />}>
+                <Route path='' element={<Instructor></Instructor>}></Route>
+                <Route path='BioGraphy' element={<BioGraphy></BioGraphy>} />
+                <Route path='me' element={<Instructor></Instructor>} />
+                <Route path='gg' element={<Setting></Setting>} />
               </Route>
-              
-
               <Route
                 element={
                   <>
@@ -64,17 +61,17 @@ function App() {
                 />
                 <Route path='/addCourse' element={<CourseForm />} />
                 <Route path='/updateCourse/:courseId' element={<CourseForm />} />
-                {/* <Route path='/course/:courseId' element={<CourseForm />} /> */}
-                {/* <Route
-                path='/course/:courseId/subtitle'
-                element={<AddSubtitleForm />}
-              /> */}
-                <Route path='/course/:courseId' element={<CoursePage />} />
-                <Route path='/results' element={<SearchResult />} />
+                <Route
+                  path='/course/:courseId/subtitle'
+                  element={<AddSubtitleForm />} />
                 <Route
                   path='/course/:courseId/content'
                   element={<SubtitlesPage />}
                 />
+                <Route path='/course/:courseId' element={<CoursePage />} />
+                {/* <Route path='/course/:courseId' element={<CourseForm />} /> */}
+                <Route path='/results' element={<SearchResult />} />
+                
               </Route>
               <Route path='/rating' element={<RatingForm />} />
               <Route path='/filter' element={<Filter />} />
