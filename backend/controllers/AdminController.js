@@ -30,31 +30,48 @@ module.exports.createUser = async (req, res) => {
       res.status(200).json(admin);
     
   };
+  module.exports.createreport = async (req, res) => {
+    const { title, status, type} = req.body;
+    // console.log('req.body ' + username,email,password,type);
+     if (
+       !status ||
+       !title ||
+       
+       !type 
+       
+     ) {
+       throw new BadRequestError('Please provide all report values');
+     }
+     //req.body.createdBy = userId;
+   
+     const report = await Report.create(req.body);
+     res.status(StatusCodes.CREATED).json({ report });
+    
+  };
   
   
  module.exports.getAllreport = async (req, res) => {
-    const Questions = await Report.find({});
+    const status=req.query.status;
+    const Questions = await Report.find({status});
     res.status(200).json(Questions);
   };
+  
   module.exports.getAllcourserequest = async (req, res) => {
-    const Questions = await CourseRequest.find({});
-    res.status(200).json(Questions);
+   const courses= await CourseRequest.find({});
+    //const courses = await CoursesRequest.find({});
+    res.status(200).json(courses);
   };
  module.exports.updatereport = async (req, res) => {
-    const { id } = req.params;
-    const{state}=req.body;
-    if (!mongoose.Types.ObjectId.isValid(id)) {
-      return req.status(404).json({ error: 'No such report' });
-    }
-    const report = await Report.findOneAndUpdate(
-      { _id: id },
+
+  //  console.log("id"+id ,state);
+    console.log("req.body"+req.body);
+    const report = await Report.findByIdAndUpdate(
+      {_id:req.body.id},
       {
-        state: state
+        status: req.body.state
       }
     );
-    if (!report) {
-      return res.status(400).json({ error: 'No such report' });
-    }
+    
     res.status(200).json(report);
   };
   module.exports.updatecourserequest = async (req, res) => {

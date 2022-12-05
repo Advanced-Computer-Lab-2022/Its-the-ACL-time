@@ -9,14 +9,15 @@ router.post('/',AdminController.createUser);
 router.get('/',AdminController.getuser);
 
 //get all report
-router.get('/report',AdminController.getAllreport );
+router.get('/report',AdminController.getAllreport);
 
 //mark report as resovle or pending
-router.patch('reportstate',AdminController.updatereport)
+router.patch('/reportstate',AdminController.updatereport)
 //refund an amoute to trainee
 router.patch('trineerefund',)
 //get all course request
 router.get('/coursereqeut',AdminController.getAllcourserequest)
+
 // grant the course request
 router.patch('grantcourse',AdminController.updatecourserequest)
 //set promotion for course

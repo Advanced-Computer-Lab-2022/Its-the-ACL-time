@@ -13,7 +13,7 @@ const CourseRequestSchema = mongoose.Schema(
       ref: 'User',
     },
     state :{
-        type: Boolean,
+        type: String,
     },
   },
   { timestamps: true }

@@ -17,7 +17,7 @@ const ReportSchema = mongoose.Schema(
         enum: ['resolved','pending','unseen'],
         required: [true, 'Please provide a report status'],
       },
-    createdBy: {
+   createdBy : {
       type: mongoose.Types.ObjectId,
       required: [true, 'Please provide the creator'],
       ref: 'User',

@@ -5,6 +5,8 @@ const CertificationModel = require('./CertificationModel');
 const PaymentModel = require('./Payment');
 const NotesModel = require('./NotesModel');
 const SubTitle = require('./SubTitle');
+const Report=require('./Report');
+const CourseRequest=require('./CourseRequest');
 
 module.exports = {
   User,
@@ -14,4 +16,6 @@ module.exports = {
   PaymentModel,
   NotesModel,
   SubTitle,
+  Report,
+  CourseRequest
 };
