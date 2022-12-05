@@ -17,6 +17,8 @@ router.patch('/reportstate',AdminController.updatereport)
 router.patch('trineerefund',)
 //get all course request
 router.get('/coursereqeut',AdminController.getAllcourserequest)
+router.get('/courses',AdminController.getallcourses)
+
 
 // grant the course request
 router.patch('grantcourse',AdminController.updatecourserequest)

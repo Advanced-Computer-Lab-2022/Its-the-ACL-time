@@ -91,6 +91,12 @@ module.exports.createUser = async (req, res) => {
     }
     res.status(200).json(report);
   };
+  module.exports.getallcourses = async (req, res) => {
+    const courses= await Course.find({});
+     //const courses = await CoursesRequest.find({});
+     res.status(200).json(courses);
+   };
+
   /*
   module.exports.udaterefund = async (req, res) => {
     const { id } = req.params.id;
