@@ -80,9 +80,10 @@ export default function Register() {
       password: password.current.value,
       email: email.current.value,
       type: category.current.value,
-      country: country.label,
+      country: country.value,
       endPoint: 'register',
     };
+
 
     if (
       !user.username ||

@@ -3,6 +3,8 @@ import Typography from '@material-ui/core/Typography';
 import ButtonBase from '@material-ui/core/ButtonBase';
 import { makeStyles } from '@material-ui/core/styles';
 import { Link } from 'react-router-dom';
+import {useState,useEffect} from 'react'
+import currencyConverter from '../../services/CurrencyConverter';
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -20,9 +22,18 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-function Course({ title, description, instructor, price, subject, courseId, numberOfHours, ratings }) {
+function Course({ title, description, instructor, coursePrice, subject, courseId, numberOfHours, ratings, userCountry }) {
   const classes = useStyles();
-  console.log({ title, description, instructor, price });
+  const [price,setPrice] = useState(coursePrice);
+  const [currency,setCurrency] = useState("USD") 
+  useEffect(()=>{
+    const getPrice = async()=>{
+      let {price,currency} =await currencyConverter(userCountry,coursePrice)
+      setPrice(price);
+      setCurrency(currency);
+    }
+    getPrice();
+  },[])
   return (
     <div className={`${classes.root}`}>
       <Link
@@ -39,7 +50,6 @@ function Course({ title, description, instructor, price, subject, courseId, numb
               />
             </ButtonBase>
           </Grid>
-
           <Grid item xs={12} sm container>
             <Grid item xs container direction='column' spacing={2}>
               <Grid item xs>
@@ -69,7 +79,7 @@ function Course({ title, description, instructor, price, subject, courseId, numb
               </Grid>
             </Grid>
             <Grid item>
-              <Typography variant='subtitle1'>${price}</Typography>
+              <Typography variant='subtitle1'>${price} {currency}</Typography>
             </Grid>
           </Grid>
         </Grid>
