@@ -179,14 +179,19 @@ function NavBar() {
               </div>
               {user && showProfileList && (
                 <div className={`${classes.profileList}`} ref={profileList}>
+                
                   <div className={`${classes.profileListHeader}`}>
+                 
                     <div
                       className={`${classes.profileIcon}`}
                       style={{ backgroundColor: 'black', color: 'white' }}
                     >
+                     <Link to='/profile'>
                       {user?.username.slice(0, 2).toUpperCase()}
+                      </Link>
                     </div>
                     <div className={`${classes.profileListHeaderInfo}`}>
+                    
                       <p
                         style={{
                           fontSize: '1.2rem',
@@ -207,6 +212,7 @@ function NavBar() {
                       >
                         {user?.email.slice(0, 18)}
                       </p>
+                      
                     </div>
                   </div>
                   <div
@@ -216,9 +222,10 @@ function NavBar() {
                       backgroundColor: 'rgba(0,0,0,0.2)',
                       margin: '1rem 0',
                     }}
+                    
                   ></div>
                   <div className={`${classes.profileListBody}`}>
-                    <Link to='/myCourses'>
+                    <Link to='/profile/myCourses'>
                       {/* learning icon */}
                       <span className={`${classes.profileListItem}`}>
                         <i

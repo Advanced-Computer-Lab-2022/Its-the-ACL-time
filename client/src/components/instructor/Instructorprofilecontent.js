@@ -7,16 +7,11 @@ import * as IconName from "react-icons/fc";
 export const SideBarcontent = [
 
 
-  {
-    title: 'BioGraphy',
-    path: '/profile/BioGraphy',
-    icon: <FaIcons.FaRegAddressBook />,
-    cName: 'nav-text'
-  },
+  
 
   {
     title: 'My Courses',
-    path: '/profile/me',
+    path: '/profile/myCourses',
     icon: <FaIcons.FaBookOpen />,
     cName: 'nav-text'
   },
@@ -34,18 +29,7 @@ export const SideBarcontent = [
     icon: <FaIcons.FaRegSun />,
     cName: 'nav-text'
   },
-  {
-    title: 'CourseReqest',
-    path: '/profile/courserequest',
-    icon: <IconName.FcAbout />,
-    cName: 'nav-text'
-  },
-  {
-    title: 'Corport trainee',
-    path: '/profile/corporatetrinee',
-    icon: <IconName.FcGraduationCap />,
-    cName: 'nav-text'
-  }
+ 
 
 
 ];

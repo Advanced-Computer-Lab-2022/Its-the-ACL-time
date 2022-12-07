@@ -51,7 +51,7 @@ function App() {
               <Route path='/profile' element={<Instructorprofile />}>
                 <Route path='' element={<Instructor></Instructor>}></Route>
                 <Route path='BioGraphy' element={<BioGraphy></BioGraphy>} />
-                <Route path='me' element={<Instructor></Instructor>} />
+                <Route path='myCourses' element={<Instructor></Instructor>} />
                 <Route path='gg' element={<Setting></Setting>} />
               </Route>
               <Route
