@@ -1,6 +1,7 @@
 const { StatusCodes } = require('http-status-codes');
 const { Course, User,Report,CourseRequest,Question} = require('../models');
 const { UnauthorizedError, BadRequestError } = require('../Errors');
+const { json } = require('express');
 
 module.exports.createUser = async (req, res) => {
    // console.log('req.body ' + req.body);
@@ -22,12 +23,8 @@ module.exports.createUser = async (req, res) => {
     res.status(StatusCodes.CREATED).json({ admin });
   };
   module.exports.getuser = async (req, res) => {
-    const type=req.query.type;
-    console.log(type);
-    console.log(req.body);
-
-      const admin = await User.find({type});
-      res.status(200).json(admin);
+      const user = await User.find({});
+      res.status(200).json(user);
     
   };
   module.exports.createreport = async (req, res) => {

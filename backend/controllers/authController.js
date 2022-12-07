@@ -1,4 +1,4 @@
-const { User } = require('../models');
+const { User,Wallet } = require('../models');
 const { StatusCodes } = require('http-status-codes');
 const { generateToken } = require('../utils');
 const { BadRequestError, UnauthorizedError } = require('../Errors');
@@ -6,13 +6,18 @@ const jwt = require('jsonwebtoken');
 const { sendEmail } = require('../utils');
 const { JsonWebTokenError } = require('jsonwebtoken');
 
+
 const register = async (req, res) => {
   const { username, password, email, type } = req.body;
   console.log(type);
   if (!username || !password || !email || !type)
     throw new BadRequestError('please provide all values');
   console.log(req.body);
+  
   const user = await User.create(req.body);
+  console.log(user);
+  const wallet=await Wallet.create({owner:user._id});
+
   const token = generateToken({
     userId: user._id,
     type,
