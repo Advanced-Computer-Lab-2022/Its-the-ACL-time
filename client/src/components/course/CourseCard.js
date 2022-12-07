@@ -1,6 +1,9 @@
 import Card from 'react-bootstrap/Card';
 import ListGroup from 'react-bootstrap/ListGroup';
 import {Link} from 'react-router-dom'
+import currencyConverter from '../../services/CurrencyConverter';
+import {useState,useEffect} from 'react'
+import { useAppContext } from '../../context/App/appContext';
 
 function CourseCard({
   courseId,
@@ -13,7 +16,18 @@ function CourseCard({
   isInstructorCourses,
 }) {
   // console.log({ courseTitle, courseDescription, courseInstructor ,coursePrice});
-
+  const {user} = useAppContext()
+  let userCountry = user.country
+  const [price,setPrice] = useState(coursePrice);
+  const [currency,setCurrency] = useState("USD") 
+  useEffect(()=>{
+    const getPrice = async()=>{
+      let {price,currency} = await currencyConverter(userCountry,coursePrice);
+      setPrice(price);
+      setCurrency(currency);
+    }
+    getPrice();
+  },[])
   return (
     <Link to={`/course/${courseId}`} className="text-black text-decoration-none">
       <Card style={{ width: '20rem', margin: '8px' }}>
@@ -23,7 +37,7 @@ function CourseCard({
           <Card.Text>{courseDescription}</Card.Text>
           <ListGroup className='list-group-flush'>
             <ListGroup.Item>{courseInstructor}</ListGroup.Item>
-            {coursePrice && <span>price : {coursePrice}</span>}
+            {coursePrice && <span>price : {price} {currency}</span>}
             {courseSubject && <span>subject : {courseSubject}</span>}
             {courseSummary && <span>summary : {courseSummary.substring(0, 20)}</span>}
             <ListGroup.Item></ListGroup.Item>

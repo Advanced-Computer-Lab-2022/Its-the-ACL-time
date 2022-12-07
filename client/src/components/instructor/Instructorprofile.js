@@ -12,12 +12,12 @@ function Instructorprofile() {
   return (
     <>
       <IconContext.Provider value={{ color: '#fff' }}>
-        <div className='navbar position-absolute bg-transparent' style={{zIndex:2,top:"10px"}}>
-          <Link to='#' className=' menu-bars'> 
+        <div className='navbar position-absolute bg-transparent' style={{ zIndex: 2, top: "10px" }}>
+          <Link to='#' className=' menu-bars'>
             <FaIcons.FaBars className='text-dark' onClick={showSidebar} />
           </Link>
         </div>
-        <div className={sidebar ? 'nav-menu active' : 'nav-menu'} style={{zIndex:"2"}}>
+        <div className={sidebar ? 'nav-menu active' : 'nav-menu'} style={{ zIndex: "2" }}>
           <ul className='nav-menu-items' onClick={showSidebar}>
             <li className='navbar-toggle'>
               <Link to='#' className='menu-bars'>
@@ -38,10 +38,8 @@ function Instructorprofile() {
         </div>
       </IconContext.Provider>
       <div>      <Outlet></Outlet>
-</div>
-
+      </div>
     </>
-    
   );
 }
 

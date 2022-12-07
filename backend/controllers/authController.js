@@ -7,7 +7,7 @@ const { sendEmail } = require('../utils');
 const { JsonWebTokenError } = require('jsonwebtoken');
 
 const register = async (req, res) => {
-  const { username, password, email, type } = req.body;
+  const { username, password, email, type} = req.body;
   console.log(type);
   if (!username || !password || !email || !type)
     throw new BadRequestError('please provide all values');
