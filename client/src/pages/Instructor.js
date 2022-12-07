@@ -6,6 +6,9 @@ import { PageHeader } from '../components';
 import Footer from '../components/Footer';
 import { useCourseContext } from '../context/Course/courseContext';
 import {CourseForm} from '../components';
+import { Link } from 'react-router-dom';
+import BioGraphy from '../components/instructor/BioGraphy';
+
 
 export default function Instructor() {
   const { token, user } = useAppContext();
@@ -135,7 +138,7 @@ export default function Instructor() {
     <>
       <nav className='m-0  navbar navbar-light bg-light row p-0'>
         <div className='container-fluid col ms-5 ps-5'>
-          {(user.type === "Instructor") && <span className='navbar-brand mb-0 h1'>Instructor profile Page</span>}
+          {(user.type === "Instructor") &&   <Link to='/'><span className='navbar-brand mb-0 h1'>Home Page</span></Link>}
           {(user.type === 'Individual trainee') && <span className='navbar-brand mb-0 h1'>Individual trainee profile Page</span>}
           {(user.type === 'Admin') && <span className='navbar-brand mb-0 h1'>Admin profile Page</span>}
           {(user.type === 'Corporate trainee') && <span className='navbar-brand mb-0 h1'>Corporate trainee profile Page</span>}
@@ -182,7 +185,8 @@ export default function Instructor() {
           instId={instId}
         ></CourseForm>
       )}
-      <PageHeader></PageHeader>
+      <div className="container m-5"> <BioGraphy></BioGraphy></div>
+     
       <div className='container w-100 mb-5'>
         {isLoading && <div>is loading .......</div>}
         <div className='d-block'>
