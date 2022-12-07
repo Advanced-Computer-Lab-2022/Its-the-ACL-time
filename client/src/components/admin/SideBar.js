@@ -14,7 +14,7 @@ function SideBar() {
   return (
     <>
       <IconContext.Provider value={{ color: '#fff' }}>
-        <div className='navbar bg-dark'>
+        <div className='navbar bg-dark adminbackground'>
           <Link to='#' className='menu-bars'>
             <FaIcons.FaBars onClick={showSidebar} />
           </Link>

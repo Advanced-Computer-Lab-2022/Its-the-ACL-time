@@ -1,5 +1,7 @@
 import React,{useState} from 'react'
 import axios from 'axios';
+import Fab from '@mui/material/Fab';
+import AddIcon from '@mui/icons-material/Add';
 
 
 
@@ -48,7 +50,7 @@ const GetAdmin = () => {
 
        </select>  </div>
   
-  <button type="submit" class=" btn btn-success float-end" onClick={addhandler}>add</button>
+  <button type="submit" class=" btn btn-outline-success float-end" onClick={addhandler}> Add</button>
 </form> 
     </div>
     

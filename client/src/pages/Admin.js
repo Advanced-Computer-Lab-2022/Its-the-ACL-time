@@ -3,7 +3,7 @@ import React from 'react'
 import { Outlet } from 'react-router-dom';
 
 import SideBar from '../components/admin/SideBar';
-
+import '../components/admin/background.css'
 const componentName = () => {
  
   
@@ -11,7 +11,7 @@ const componentName = () => {
     <>
     
     <SideBar></SideBar>
-    <Outlet></Outlet>
+    <Outlet ></Outlet>
     
 
     </>

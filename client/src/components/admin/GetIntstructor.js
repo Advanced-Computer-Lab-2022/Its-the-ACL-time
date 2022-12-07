@@ -1,17 +1,20 @@
-import React,{useState,useEffect} from 'react'
+import * as React from 'react';
+import {useEffect,useState} from 'react';
+import { makeStyles } from '@material-ui/core/styles';
+
 import axios from 'axios';
+import FormAdd from './FormAdd';
+import './background.css'
 
 
-function GetIntstructor() {
-  
-  
-  const[Instractor,setinst]=useState([])
-  
- useEffect(()=>{
+export default function GetIntstructor() {
+
+  const[user,setuser]=useState([]);
+  useEffect(()=>{
     
-    axios.get("http://localhost:8080/api/v1/admin/?type=Instructor").then(res=>{
+    axios.get("http://localhost:8080/api/v1/admin").then(res=>{
     console.log(res.data);
-    setinst(res.data);
+    setuser(res.data);
    })
    .catch(err=>
     {console.log(err)}
@@ -20,39 +23,46 @@ function GetIntstructor() {
   
  },[]);
 
- 
-  
 
   return (
-
-<>
-<div class="container mt-3">
-  <h2>Instractor</h2>
-  <table class="table table-striped table-hover bg-light border border-success ">
-    <thead>
-      <tr>
-        <th>Username</th>
-        <th>Email</th>
-        <th>Type</th>
-      </tr>
-    </thead>
-    <tbody>
-      {Instractor.map(user=>
-        <tr>
-          <td>{user.username}</td>
-          <td>{user.email}</td>
-          <td>{user.type}</td>
-
-        </tr>)
-      }
-      
-    </tbody>
-  </table>
+    <>
+    <div className="adminbackground">
+    <div className="container  ">
+    <h1 classNmae="adminbackground">Users</h1>
+    <div class="input-group mb-3 me-3">
+    <div className="container float-end">    <FormAdd></FormAdd>
 </div>
 
-</>  
-    
-  )
-}
+</div>
 
-export default GetIntstructor
+<table class="table  table-hover bg-white border border-success tabelcolor ">
+  <thead>
+  
+    <tr>
+
+      <th>UserName</th>
+      <th>Email</th>
+      <th>Type</th>
+     
+
+    </tr>
+  </thead>
+  <tbody>
+    {user.map(x=>
+      <tr>
+        <td>{x.username}</td>
+        <td>{x.email}</td>
+        <td>{x.type}</td>
+
+
+      </tr>)
+    }
+    
+  </tbody>
+</table>
+
+</div>
+</div>
+  </>
+)
+}
