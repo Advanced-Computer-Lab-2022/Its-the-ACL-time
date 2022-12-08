@@ -19,6 +19,8 @@ import Alert from '@material-ui/lab/Alert';
 import LockOutlinedIcon from '@material-ui/icons/LockOutlined';
 import { makeStyles } from '@material-ui/core/styles';
 import { useAppContext } from '../context/App/appContext';
+import AlertDialog from '../components/AlertDialog';
+import TermsAndConditions from '../components/TermsAndConditions';
 
 function Copyright() {
   return (
@@ -70,6 +72,9 @@ export default function Register() {
   const email = useRef(null);
   const category = useRef(null);
   const [country, setCountry] = useState('Country');
+  const [showCompanyPolicy, setShowCompanyPolicy] = useState(false);
+  const [disable, setDisable] = useState(false);
+  const [termsAndConditions, setTermsAndConditions] = useState(false);
   const navigate = useNavigate();
 
   const handleRegister = async (e) => {
@@ -101,6 +106,11 @@ export default function Register() {
         setTimeout(() => navigate('/'), 3000);
       }
     }
+  };
+
+  const handleCompanyPolicy = (value) => {
+    setShowCompanyPolicy(value);
+    setDisable(value);
   };
 
   return (
@@ -173,32 +183,62 @@ export default function Register() {
                 id='category'
                 defaultValue={'user'}
               >
-                <MenuItem value='Admin'>Admin</MenuItem>
-                <MenuItem value='Instructor'>Instructor</MenuItem>
-                <MenuItem value='Individual trainee'>
+                <MenuItem
+                  value='Instructor'
+                  onClick={() => handleCompanyPolicy(true)}
+                >
+                  Instructor
+                </MenuItem>
+                <MenuItem
+                  value='Individual trainee'
+                  onClick={() => handleCompanyPolicy(false)}
+                >
                   Individual trainee
                 </MenuItem>
-                <MenuItem value='Corporate trainee'>Corporate trainee</MenuItem>
               </TextField>
             </Grid>
             <Grid item xs={12}>
               <label>Country</label>
               <CountrySelector setCountry={setCountry} />
             </Grid>
-            {/* <Grid item xs={12}>
-              <InputLabel id='label'>Category</InputLabel>
-              <Select labelId='label' id='select' value='20' ref={category}>
-                <MenuItem value='Student'>Student</MenuItem>
-                <MenuItem value='Instructor'>Instructor</MenuItem>
-              </Select>
-            </Grid> */}
-            <Grid item xs={12}>
-              <FormControlLabel
-                control={<Checkbox value='allowExtraEmails' color='primary' />}
-                label='I want to receive inspiration, marketing promotions and updates via email.'
-              />
-            </Grid>
+
+            {showCompanyPolicy && (
+              <Grid item xs={12}>
+                <FormControlLabel
+                  control={
+                    <Checkbox
+                      value='allowExtraEmails'
+                      color='primary'
+                      onChange={(e) => setDisable(!e.target.checked)}
+                    />
+                  }
+                />
+                <p
+                  style={{
+                    fontSize: '0.8rem',
+                    color: 'gray',
+                    display: 'inline-block',
+                  }}
+                >
+                  I agree to the
+                  <span
+                    onClick={() => setTermsAndConditions(true)}
+                    style={{ color: 'blue', cursor: 'pointer' }}
+                  >
+                    Terms and Conditions{'  '}
+                  </span>
+                  of the company
+                </p>
+              </Grid>
+            )}
           </Grid>
+          <AlertDialog
+            open={termsAndConditions}
+            title='Terms and Conditions'
+            content={<TermsAndConditions />}
+            handleAgree={() => setTermsAndConditions(false)}
+            handleDisagree={() => setTermsAndConditions(false)}
+          ></AlertDialog>
           <Button
             type='submit'
             fullWidth
@@ -206,6 +246,7 @@ export default function Register() {
             color='primary'
             className={classes.submit}
             onClick={handleRegister}
+            disabled={disable}
           >
             Sign Up
           </Button>

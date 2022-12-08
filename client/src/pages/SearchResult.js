@@ -98,21 +98,23 @@ function SearchResult() {
     filterPrice: [],
     filterRatings: [],
     filteredCourses: [],
+    renderedCourses: [],
   });
 
   const [page, setPage] = useState(0);
   const [showFilters, setShowFilters] = useState(true);
 
   useEffect(() => {
+    let searchResults = search(searchParams.get('query'));
     setState({
       ...state,
-      filteredCourses: searchParams.get('query')
-        ? search(searchParams.get('query'))
-        : [],
+      filteredCourses: searchParams.get('query') ? searchResults : [],
+      renderedCourses: searchParams.get('query') ? searchResults : [],
     });
   }, [courses, searchParams]);
 
   const handleFilter = (filter, field) => {
+    console.log(filter, field);
     switch (field) {
       case 'Topic': {
         setState(() => {
@@ -123,7 +125,7 @@ function SearchResult() {
             topics = [...state.filterTopics, filter];
           }
 
-          const filteredCourses = courses.filter((course) => {
+          const renderedCourses = state.filteredCourses.filter((course) => {
             return checkCourse(
               course,
               topics,
@@ -135,7 +137,7 @@ function SearchResult() {
           return {
             ...state,
             filterTopics: topics,
-            filteredCourses: filteredCourses,
+            renderedCourses,
           };
         });
 
@@ -150,7 +152,7 @@ function SearchResult() {
             prices = [...state.filterPrice, filter];
           }
 
-          const filteredCourses = courses.filter((course) => {
+          const renderedCourses = state.filteredCourses.filter((course) => {
             return checkCourse(
               course,
               state.filterTopics,
@@ -162,7 +164,7 @@ function SearchResult() {
           return {
             ...state,
             filterPrice: prices,
-            filteredCourses: filteredCourses,
+            renderedCourses,
           };
         });
 
@@ -179,7 +181,7 @@ function SearchResult() {
             ratings = [...state.filterRatings, filter];
           }
 
-          const filteredCourses = courses.filter((course) => {
+          const renderedCourses = state.filteredCourses.filter((course) => {
             return checkCourse(
               course,
               state.filterTopics,
@@ -191,7 +193,7 @@ function SearchResult() {
           return {
             ...state,
             filterRatings: ratings,
-            filteredCourses: filteredCourses,
+            renderedCourses,
           };
         });
 
@@ -225,11 +227,6 @@ function SearchResult() {
       ratingFlag = ratingFlag || candidateCourse.rating === parseInt(rating);
     });
 
-    // console.log('Topic: ' + topicFlag);
-    // console.log('Price: ' + priceFlag);
-    // console.log('Rating: ' + ratingFlag);
-    // console.log('-------------------');
-
     return topicFlag && priceFlag && ratingFlag;
   };
 
@@ -259,10 +256,9 @@ function SearchResult() {
       <div className={classes.body}>
         <section className={`${classes.filterSection}`}>
           <CustomButton
-            text='Filter'
+            // text='Filter'
             onClick={() => setShowFilters(!showFilters)}
             icon={<FaFilter />}
-            className={classes.filterButton}
           ></CustomButton>
           <div className={`${classes.filters}`}>
             {showFilters && (
@@ -294,13 +290,13 @@ function SearchResult() {
             )}
           </div>
         </section>
-        {state.filteredCourses.length > 0 && (
+        {state.renderedCourses.length > 0 && (
           <section className={`${classes.coursesSection}`}>
             <p className={`${classes.results}`}>
-              {state.filteredCourses.slice(page * 5, (page + 1) * 5).length}{' '}
+              {state.renderedCourses.slice(page * 5, (page + 1) * 5).length}{' '}
               results
             </p>
-            {state.filteredCourses
+            {state.renderedCourses
               .slice(page * 5, (page + 1) * 5)
               .map((course) => {
                 return (
@@ -319,26 +315,10 @@ function SearchResult() {
               })}
             <div className={`${classes.pages}`}>
               <Pagination
-                count={Math.ceil(state.filteredCourses.length / 5)}
+                count={Math.ceil(state.renderedCourses.length / 5)}
                 color='secondary'
                 onChange={getPage}
               />
-              {/* {[...Array(Math.ceil(state.filteredCourses.length / 5))].map(
-            (e, i) => {
-              return (
-                <p
-                  key={`${i}`}
-                  onClick={getPage}
-                  className={`${classes.pageCircle}`}
-                  style={{
-                    backgroundColor: i === page ? '#000000' : '#F2F2F2',
-                  }}
-                >
-                  {i + 1}
-                </p>
-              );
-            }
-          )} */}
             </div>
           </section>
         )}

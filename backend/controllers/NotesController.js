@@ -9,7 +9,6 @@ const getNote = async (req, res) => {};
 // allowed only for admin
 const addNote = async (req, res) => {
   const { subtitleId, userId, description } = req.body;
-  console.log('note added');
 
   if (!subtitleId || !userId || !description) {
     res.status(StatusCodes.BAD_REQUEST).send('please provide all fields');
@@ -17,9 +16,12 @@ const addNote = async (req, res) => {
 
   const user = await User.findById(userId);
   if (!user) {
-    res.status(StatusCodes.BAD_REQUEST).send('please provide a valid user');
+    return res
+      .status(StatusCodes.BAD_REQUEST)
+      .send('please provide a valid user');
   }
 
+  console.log(subtitleId);
   const subtitle = await SubTitle.findById(subtitleId);
   if (!subtitle) {
     res.status(StatusCodes.BAD_REQUEST).send('please provide a valid subtitle');

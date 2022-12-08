@@ -2,9 +2,9 @@ const { UnauthorizedError } = require('../Errors');
 const { verifyToken } = require('../utils');
 
 const authMiddleware = (req, res, next) => {
-  console.log("header auth");
+  console.log('header auth');
   const authHeader = req.headers.authorization;
-  
+
   if (!authHeader || !authHeader.startsWith('Bearer')) {
     throw new UnauthorizedError('Authentication failed');
   } else {
@@ -12,26 +12,25 @@ const authMiddleware = (req, res, next) => {
     try {
       const payload = verifyToken(token);
       req.user = { userId: payload.userId, type: payload.type };
-      console.log("authHeader",req.user);
+      console.log('authHeader', req.user);
       next();
     } catch (error) {
       console.log(error);
       throw new UnauthorizedError('Authentication failed');
     }
   }
-  // next();
 };
 
 const authOwner = (req, res, next) => {
   //TODO check signed in user authorization
-  console.log("check if same user");
+  console.log('check if same user');
   next();
 };
 
 const authAdmin = (req, res, next) => {
   //TODO check singed in user is admin
-  if(req.user.type!=="Admin"){
-    res.status(401).send({msg:"you are not authorized"});
+  if (req.user.type !== 'Admin') {
+    res.status(401).send({ msg: 'you are not authorized' });
   }
   next();
 };

@@ -328,7 +328,7 @@ function NavBar() {
         </Container>
       </Navbar>
       <Outlet />
-      </>
+    </>
   );
 }
 

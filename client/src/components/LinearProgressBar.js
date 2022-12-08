@@ -8,8 +8,14 @@ const useStyles = makeStyles({
   },
 });
 
-export default function LinearProgressBar({ valueOfProgress }) {
+export default function LinearProgressBar({ valueOfProgress, style }) {
   const classes = useStyles();
+
+  // apply the style to the progress bar
+  if (style) {
+    classes.root = style;
+  }
+
   const [progress, setProgress] = React.useState(valueOfProgress);
 
   React.useEffect(() => {

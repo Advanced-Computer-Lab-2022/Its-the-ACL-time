@@ -86,7 +86,7 @@ const updateUser = async (req, res) => {
 const forgetPassword = async (req, res) => {
   const { email } = req.body;
   const user = await User.findOne({ email });
-
+  console.log(email);
   if (!user)
     return res
       .status(StatusCodes.BAD_REQUEST)

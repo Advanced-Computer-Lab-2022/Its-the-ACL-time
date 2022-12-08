@@ -14,6 +14,7 @@ import { jsPDF } from 'jspdf';
 import Review from '../components/Review';
 import RatingForm from '../components/RatingForm';
 import { useCourseContext } from '../context/Course/courseContext';
+import LinearProgressBar from '../components/LinearProgressBar';
 
 const useStyles = makeStyles((theme) => ({
   main: {
@@ -368,7 +369,7 @@ const SubtitlesPage = () => {
     async function fetchExams() {
       try {
         const response = await axios.get(
-          `http://localhost:8080/api/v1/exam?courseId=635f73a23569cc0d7e43d80e`,
+          `http://localhost:8080/api/v1/exam?courseId=${courseId}`,
           {
             headers: {
               Authorization: `Bearer ${token}`,
@@ -612,6 +613,20 @@ const SubtitlesPage = () => {
             ></Exam>
           ) : (
             <></>
+          )}
+
+          {!exam && (
+            <div className={`${classes.video}`}>
+              <iframe
+                width='911'
+                height='480'
+                src='https://www.youtube.com/embed/1v_TEnpqHXE'
+                title='YouTube video player'
+                frameborder='0'
+                allow='accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture'
+                allowfullscreen
+              ></iframe>
+            </div>
           )}
         </div>
         <div className={`${classes.videoInfo}`}>

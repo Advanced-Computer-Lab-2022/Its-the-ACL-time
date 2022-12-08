@@ -2,6 +2,7 @@ const html_to_pdf = require('html-pdf-node');
 
 const generatePDF = async (username, course) => {
   // console.log('html', html);
+  console.log('username', username);
   const file = {
     url: `http://localhost:3000/certificate?username=${username}&course=${course}`,
   };
