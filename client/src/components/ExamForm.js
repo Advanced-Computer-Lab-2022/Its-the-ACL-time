@@ -145,8 +145,9 @@ function ExamForm() {
       for (let i = 0; i < 4; i++) {
         let row = choices.children[i];
         choicesArray.push(row.children[0].children[0].children[1].value);
-        answer =
-          row.children[0].children[0].children[2].children[0].checked && i;
+        answer = row.children[0].children[0].children[2].children[0].checked
+          ? i
+          : answer;
       }
       question['choices'] = choicesArray;
       question['answer'] = answer;
@@ -162,7 +163,13 @@ function ExamForm() {
     const exam = await getExamData();
 
     try {
-      const res = await axios.post('/api/v1/exam', exam);
+      const res = await axios.post('http://localhost:8080/api/v1/exam', exam, {
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${localStorage.getItem('token')}`,
+        },
+      });
+      console.log(res);
       setAlert(res.data.message, 'success');
       setTimeout(() => {
         clearAlert();
