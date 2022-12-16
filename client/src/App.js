@@ -1,8 +1,31 @@
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
-import { SubtitlesPage, SuccessResetPassword, SearchResult, ResetPassword, Landing, ForgetPassword, Login, Register, CoursePage, Home, ProtectedRoute, Instructor, Admin, Payment, SuccessPayment, FailedPayment, } from './pages';
+import {
+  SubtitlesPage,
+  SuccessResetPassword,
+  SearchResult,
+  ResetPassword,
+  Landing,
+  ForgetPassword,
+  Login,
+  Register,
+  CoursePage,
+  Home,
+  ProtectedRoute,
+  Instructor,
+  Admin,
+  Payment,
+  SuccessPayment,
+  FailedPayment,
+} from './pages';
 import { NavBar, CourseForm, Courses } from './components';
-import {GetAdmin,GetCourse,GetIntstructor,Report,Getcorporttrainee,CourseRequest} from'./components/admin'
-
+import {
+  GetAdmin,
+  GetCourse,
+  GetIntstructor,
+  Report,
+  Getcorporttrainee,
+  CourseRequest,
+} from './components/admin';
 
 import AddSubtitleForm from './components/subtitle/AddSubtitleForm';
 import { CourseProvider } from './context/Course/courseContext';
@@ -23,6 +46,7 @@ import RatingStars from './components/RatingStars';
 import Instructorprofile from './components/instructor/Instructorprofile';
 import BioGraphy from './components/instructor/BioGraphy';
 import Setting from './components/instructor/Setting';
+import ExamForm from './components/ExamForm';
 
 function App() {
   return (
@@ -31,15 +55,23 @@ function App() {
         <CourseProvider>
           <SearchProvider>
             <Routes>
-            
-            <Route path="admin" element={<Admin />}>
-            <Route path="instructor" element={<GetIntstructor></GetIntstructor>}/>
-            <Route path="admin" element={<GetAdmin></GetAdmin>}/>
-            <Route path="Report" element={<Report></Report>}/>
-            <Route path="courserequest" element={<CourseRequest></CourseRequest>}/>
-            <Route path="course" element={<GetCourse></GetCourse>}/>
+              <Route path='admin' element={<Admin />}>
+                <Route
+                  path='instructor'
+                  element={<GetIntstructor></GetIntstructor>}
+                />
+                <Route path='admin' element={<GetAdmin></GetAdmin>} />
+                <Route path='Report' element={<Report></Report>} />
+                <Route
+                  path='courserequest'
+                  element={<CourseRequest></CourseRequest>}
+                />
+                <Route path='course' element={<GetCourse></GetCourse>} />
               </Route>
-            <Route path="corporatetrinee" element={<Getcorporttrainee></Getcorporttrainee>}></Route>
+              <Route
+                path='corporatetrinee'
+                element={<Getcorporttrainee></Getcorporttrainee>}
+              ></Route>
               <Route path='/resetPassword' element={<SuccessResetPassword />} />
               <Route path='/forgetPassword' element={<ForgetPassword />} />
               <Route path='/resetPassword/:token' element={<ResetPassword />} />
@@ -71,18 +103,26 @@ function App() {
                   }
                 />
                 <Route path='/addCourse' element={<CourseForm />} />
-                <Route path='/updateCourse/:courseId' element={<CourseForm />} />
+                <Route
+                  path='/updateCourse/:courseId'
+                  element={<CourseForm />}
+                />
                 <Route
                   path='/course/:courseId/subtitle'
-                  element={<AddSubtitleForm />} />
+                  element={<AddSubtitleForm />}
+                />
                 <Route
                   path='/course/:courseId/content'
                   element={<SubtitlesPage />}
                 />
                 <Route path='/course/:courseId' element={<CoursePage />} />
+                <Route
+                  path='/course/:courseId/createExam'
+                  element={<ExamForm />}
+                />
+
                 {/* <Route path='/course/:courseId' element={<CourseForm />} /> */}
                 <Route path='/results' element={<SearchResult />} />
-                
               </Route>
               <Route path='/rating' element={<RatingForm />} />
               <Route path='/filter' element={<Filter />} />
