@@ -3,6 +3,7 @@ import Col from 'react-bootstrap/Col';
 import Form from 'react-bootstrap/Form';
 import Row from 'react-bootstrap/Row';
 import Alert from '@material-ui/lab/Alert';
+import axios from 'axios';
 import { makeStyles } from '@material-ui/core/styles';
 import { useParams } from 'react-router-dom';
 import { useAppContext } from '../context/App/appContext';
@@ -159,6 +160,19 @@ function ExamForm() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     const exam = await getExamData();
+
+    try {
+      const res = await axios.post('/api/v1/exam', exam);
+      setAlert(res.data.message, 'success');
+      setTimeout(() => {
+        clearAlert();
+      }, 3000);
+    } catch (error) {
+      setAlert(error.response.data.message, 'error');
+      setTimeout(() => {
+        clearAlert();
+      }, 3000);
+    }
   };
 
   return (
