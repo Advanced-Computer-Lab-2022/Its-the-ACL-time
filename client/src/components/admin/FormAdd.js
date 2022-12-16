@@ -26,17 +26,17 @@ export default function FormAdd() {
 
   return (
     <div>
-      <button type="submit" class=" btn float-end back-to-top" onClick={handleClickOpen}><Fab color="primary" aria-label="add">
+      <button type="submit" className=" btn float-end back-to-top " onClick={handleClickOpen}><Fab color="primary" aria-label="add">
 <PersonAddIcon></PersonAddIcon>
 </Fab></button>
-      <Dialog open={open} onClose={handleClose} fullWidth={'true'}
+      <Dialog  open={open} onClose={handleClose} fullWidth={'true'}
         maxWidth={'md'}>
         <DialogTitle>Add</DialogTitle>
         <DialogContent>
           <DialogContentText>
           Add user                                       
           </DialogContentText>
-          <GetAdmin className="border"></GetAdmin>
+          <GetAdmin ></GetAdmin>
         </DialogContent>
       </Dialog>
     </div>

@@ -1,7 +1,7 @@
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import { SubtitlesPage, SuccessResetPassword, SearchResult, ResetPassword, Landing, ForgetPassword, Login, Register, CoursePage, Home, ProtectedRoute, Instructor, Admin, Payment, SuccessPayment, FailedPayment, } from './pages';
 import { NavBar, CourseForm, Courses } from './components';
-import {GetAdmin,GetCourse,GetIntstructor,Report,Getcorporttrainee,CourseRequest} from'./components/admin'
+import {UserforAdmin,GetCourse,Report,DataGridDemo,CourseRequest} from'./components/admin'
 
 
 import AddSubtitleForm from './components/subtitle/AddSubtitleForm';
@@ -33,13 +33,15 @@ function App() {
             <Routes>
             
             <Route path="admin" element={<Admin />}>
-            <Route path="instructor" element={<GetIntstructor></GetIntstructor>}/>
-            <Route path="admin" element={<GetAdmin></GetAdmin>}/>
+            <Route path="" element={<UserforAdmin/>}/>
+            <Route path="users" element={<UserforAdmin/>}/>
             <Route path="Report" element={<Report></Report>}/>
             <Route path="courserequest" element={<CourseRequest></CourseRequest>}/>
             <Route path="course" element={<GetCourse></GetCourse>}/>
+            <Route path="test" element={<DataGridDemo/>}/>
+
               </Route>
-            <Route path="corporatetrinee" element={<Getcorporttrainee></Getcorporttrainee>}></Route>
+            <Route path="corporatetrinee" element={<DataGridDemo></DataGridDemo>}></Route>
               <Route path='/resetPassword' element={<SuccessResetPassword />} />
               <Route path='/forgetPassword' element={<ForgetPassword />} />
               <Route path='/resetPassword/:token' element={<ResetPassword />} />

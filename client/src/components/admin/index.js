@@ -1,12 +1,10 @@
-import GetCourse from './GetCourse';
-import GetAdmin from'./getadmin';
-import Getcorporttrainee from'./Getcorportrainee';
-import GetIntstructor from'./GetIntstructor';
-import SideBar from'./SideBar';
+
+import DataGridDemo from'./DataGridDemo';
+import UserforAdmin from'./Userforadmin';
 import Report from'./report';
 import CourseRequest from'./CourseRequest';
-
-export{GetAdmin,GetCourse,GetIntstructor,Report,SideBar,Getcorporttrainee,CourseRequest}
+import GetCourse from './GetCourse';
+export{UserforAdmin,Report,CourseRequest,DataGridDemo,GetCourse}
 
 
 

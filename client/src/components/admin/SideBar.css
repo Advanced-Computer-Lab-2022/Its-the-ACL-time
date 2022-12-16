@@ -4,6 +4,7 @@
     display: flex;
     justify-content: start;
     align-items: center;
+    z-index: 200;
   }
   
   .menu-bars {
@@ -22,6 +23,7 @@
     top: 0;
     left: -100%;
     transition: 850ms;
+    z-index: 100;
   }
   
   .nav-menu.active {
@@ -61,7 +63,7 @@
   .navbar-toggle {
     background-color: #060b26;
     width: 100%;
-    height: 80px;
+    height: 10px;
     display: flex;
     justify-content: start;
     align-items: center;

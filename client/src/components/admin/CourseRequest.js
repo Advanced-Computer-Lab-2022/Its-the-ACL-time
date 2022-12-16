@@ -17,9 +17,9 @@ function CourseRequest() {
   },[]);
    return (
      <>
-       <div class="container mt-3">
+       <div className="container mt-3">
    <h2>CoursesRequests</h2>
-   <table class="table table-striped table-hover bg-light border border-success ">
+   <table className="table table-striped table-hover bg-light border border-success ">
      <thead>
        <tr>
          <th>Name of Student</th>
@@ -35,7 +35,7 @@ function CourseRequest() {
            <td>{course.user}</td>
            <td>{course.coursename}</td>
            <td>{course.status}</td>
-           <td> {<button type="button" class="btn btn-primary">Grant</button>}</td> 
+           <td> {<button type="button" className="btn btn-primary">Grant</button>}</td> 
  
  
          </tr>)

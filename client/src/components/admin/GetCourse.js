@@ -16,20 +16,23 @@ function GetCourse() {
    
   
  },[]);
+ for(let i=0;i<course.length;i++){
+  console.log(course[i].title);
+ }
   return (
     <>
-      <div class="container mt-3">
+      <div className="container mt-3">
       <h2>Courses</h2>
-      <div class="input-group mb-3 me-3">
-  <span class="input-group-text">promtion</span>
-  <input type="text" class="form-control" placeholder="promtion value"/>
-  <button type="button" class="btn btn-success">SetPromtion</button>
+      <div className="input-group mb-3 me-3">
+  <span className="input-group-text">promtion</span>
+  <input type="text" className="form-control" placeholder="promtion value"/>
+  <button type="button" className="btn btn-success">SetPromtion</button>
 </div>
  
-  <table class="table table-striped table-hover bg-light border border-success ">
+  <table className="table table-striped table-hover bg-light border border-success ">
     <thead>
       <tr>
-      <th>   <input class="form-check-input" type="checkbox" id="check1" value="something" />   </th>
+      <th>   <input className="form-check-input" type="checkbox" id="check1" value="something" />   </th>
         <th>Title</th>
         <th>Price</th>
         <th>Promtioin</th>
@@ -40,7 +43,7 @@ function GetCourse() {
     <tbody>
       {course.map(course=>
         <tr>
-        <td>   <input class="form-check-input" type="checkbox" id="check1" value="something" /></td>
+        <td>   <input className="form-check-input" type="checkbox" id="check1" value="something" /></td>
           <td>{course.title}</td>
           <td>{course.price}</td>
           <td>{course.promotion}</td>

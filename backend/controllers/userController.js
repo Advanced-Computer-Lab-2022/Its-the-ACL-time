@@ -29,9 +29,19 @@ const updateBio = async (req, res) => {
   await user.save();
   res.status(200).json(user);
 };
+const updateEmail = async (req, res) => {
+  const { Email } = req.body;
+  const { userId } = req.user;
+  console.log(Email);
+  const user = await User.findOne({ _id: userId });
+  user.email=Email;
+  await user.save();
+  res.status(200).json(user);
+};
+
 
 module.exports = {
   changePassword,
   GetBio,
-  updateBio
+  updateBio,updateEmail
 };

@@ -22,6 +22,9 @@ export default function GetIntstructor() {
    
   
  },[]);
+ for(let i=0;i<user.length;i++){
+  console.log(user[i].username);
+ }
 
 
   return (
@@ -29,13 +32,13 @@ export default function GetIntstructor() {
     <div className="adminbackground">
     <div className="container  ">
     <h1 classNmae="adminbackground">Users</h1>
-    <div class="input-group mb-3 me-3">
+    <div className="input-group mb-3 me-3">
     <div className="container float-end">    <FormAdd></FormAdd>
 </div>
 
 </div>
 
-<table class="table  table-hover bg-white border border-success tabelcolor ">
+<table className="table  table-hover bg-light border border-success tabelcolor ">
   <thead>
   
     <tr>
@@ -49,7 +52,7 @@ export default function GetIntstructor() {
   </thead>
   <tbody>
     {user.map(x=>
-      <tr>
+      <tr key={x._id}>
         <td>{x.username}</td>
         <td>{x.email}</td>
         <td>{x.type}</td>

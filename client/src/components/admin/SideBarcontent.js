@@ -8,16 +8,10 @@ export const SideBarcontent = [
    
 
   
+ 
   {
-    title: 'Admins',
-    
-    path: 'admin',
-    icon: <IconName.FcAssistant />,
-    cName: 'nav-text'
-  },
-  {
-    title: 'Intstructor',
-    path: '/admin/instructor',
+    title: 'Users',
+    path: '/admin/users',
     icon: <IconName.FcBusinessman />,
     cName: 'nav-text'
   },
@@ -40,9 +34,10 @@ export const SideBarcontent = [
     cName: 'nav-text'
   },
   {
-    title: 'Corport trainee',
-    path: '/admin/corporatetrinee',
-    icon: <IconName.FcGraduationCap />,
+    title: 'Test',
+    path: '/admin/test',
+    icon: <IconName.FcAbout/>,
     cName: 'nav-text'
-  }
+  },
+ 
 ];
