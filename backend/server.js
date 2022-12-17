@@ -5,7 +5,6 @@ const app = express();
 const cors = require('cors');
 const morgan = require('morgan');
 
-
 // db
 const connectDB = require('./db');
 
@@ -16,9 +15,13 @@ const {
   authMiddleware,
 } = require('./middlewares');
 
-
 // Routes
-const { authRouter, courseRouter, userRouter, paymentRouter } = require('./routes');
+const {
+  authRouter,
+  courseRouter,
+  userRouter,
+  paymentRouter,
+} = require('./routes');
 //Michael
 const examRouter = require('./routes/examRoutes');
 const adminroutes = require('./routes/AdminRoutes');
@@ -34,21 +37,18 @@ app.use(cors(corsOptions));
 app.use(morgan('tiny'));
 app.use(express.json());
 
-
 app.use('/api/v1/user', authMiddleware, userRouter);
 app.use('/api/v1/auth', authRouter);
 // app.use('/api/v1/user', userRouter);
 app.use('/api/v1/course', authMiddleware, courseRouter);
 // app.use('/api/v1/course', courseRouter);
 app.use('/api/v1/admin', adminroutes);
-app.use('/api/v1/payment',paymentRouter);
-
+app.use('/api/v1/payment', paymentRouter);
 
 //Michael
 app.use('/api/v1/note', notesRouter);
-app.use('/api/v1/exam', examRouter);
+app.use('/api/v1/exam', authMiddleware, examRouter);
 app.use('/api/v1/question', questionRouter);
-
 
 app.use(notFoundMiddleware);
 app.use(errorHandlerMiddleware);

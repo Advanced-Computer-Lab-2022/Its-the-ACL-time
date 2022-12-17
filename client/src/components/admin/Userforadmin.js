@@ -5,21 +5,27 @@ import { makeStyles } from '@material-ui/core/styles';
 import axios from 'axios';
 import FormAdd from './FormAdd';
 import './background.css'
+import Backdrop from '@mui/material/Backdrop';
+import CircularProgress from '@mui/material/CircularProgress';
+
 
 
 export default function GetIntstructor() {
 
   const[user,setuser]=useState([]);
+  const [open, setOpen] = React.useState(true);
   useEffect(()=>{
     
     axios.get("http://localhost:8080/api/v1/admin").then(res=>{
     console.log(res.data);
     setuser(res.data);
+    setOpen(false)
+
    })
    .catch(err=>
     {console.log(err)}
    );
-   
+
   
  },[]);
  for(let i=0;i<user.length;i++){
@@ -63,9 +69,15 @@ export default function GetIntstructor() {
     
   </tbody>
 </table>
+<Backdrop
+        sx={{ color: '#fff', zIndex: (theme) => theme.zIndex.drawer + 1 }}
+        open={open}
+      >
+        <CircularProgress  disableShrink  color="primary" />
+      </Backdrop>
+</div>
+</div>
 
-</div>
-</div>
   </>
 )
 }

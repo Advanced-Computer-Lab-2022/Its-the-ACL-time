@@ -3,11 +3,11 @@ import { useEffect,useState } from 'react';
 import axios from 'axios';
 import Avatar from '@mui/material/Avatar';
 import Box from '@mui/material/Box';
-import Button from '@mui/material/Button';
 import { deepOrange, deepPurple } from '@mui/material/colors';
 import { DataGrid, GridToolbarContainer, useGridApiContext } from '@mui/x-data-grid';
 
 import'./background.css'
+import Reportform from '../Reportform';
 
 const columns = [
   {
@@ -83,25 +83,9 @@ export default function DataGridDemo() {
 
  };
   return (
-    <div className="container  ms-5">
-       <Box sx={{ height: 650, width: '100%'}} >
-      <DataGrid
-        rows={rows}
-        columns={columns}
-        pageSize={rows.length}
-        rowsPerPageOptions={[5]}
-        checkboxSelection
-        disableSelectionOnClick
-     //   getSelectedRows={(e)=>{console.log(e)}}
-     onSelectionModelChange={(newSelection) => {
-                    console.log(newSelection);
-                }}
-        
-        experimentalFeatures={{ newEditingApi: true }}
-      />
-    </Box>
     
-    </div>
-   
+<>
+  <Reportform></Reportform>
+</>   
   );
 }

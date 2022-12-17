@@ -1,4 +1,6 @@
 const Exam = require('../models/Exam');
+const User = require('../models/User');
+const Question = require('../models/Question');
 const mongoose = require('mongoose');
 
 // GET a single exercise
@@ -26,13 +28,43 @@ const getAllExams = async (req, res) => {
 // POST a new Exam
 
 const createExam = async (req, res) => {
-  const { course, duration, questions, grade } = req.body;
-  try {
-    const exam = await Exam.create({ course, duration, questions, grade });
-    res.status(200).json(exam);
-  } catch (error) {
-    res.status(400).json({ error: error.message });
+  const { userId, type } = req.user;
+  console.log(req.body);
+  const { courseId, duration, questions } = req.body;
+
+  if (!courseId || !duration || !questions) {
+    console.log('Missing fields');
+    return res.status(400).json({ error: 'Missing fields' });
   }
+
+  const user = await User.findOne({ _id: userId });
+  if (!user) {
+    console.log('No such user');
+    return res.status(400).json({ error: 'No such user' });
+  }
+
+  if (type !== 'Instructor') {
+    console.log('Only Instructor can create exams');
+    return res.status(400).json({ error: 'Only Instructor can create exams' });
+  }
+
+  if (user.courses.find((c) => c.courseId == courseId) === undefined) {
+    return res
+      .status(400)
+      .json({ error: 'Instructor is not assigned to this course' });
+  }
+
+  for (let i = 0; i < questions.length; i++) {
+    const question = await Question.create(questions[i]);
+    questions[i] = question._id;
+  }
+
+  const exam = await Exam.create({
+    course: courseId,
+    duration,
+    questions,
+  });
+  res.status(200).json(exam);
 };
 
 // DELETE an Exam

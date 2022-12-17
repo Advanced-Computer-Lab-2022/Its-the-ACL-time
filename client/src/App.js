@@ -1,8 +1,24 @@
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
-import { SubtitlesPage, SuccessResetPassword, SearchResult, ResetPassword, Landing, ForgetPassword, Login, Register, CoursePage, Home, ProtectedRoute, Instructor, Admin, Payment, SuccessPayment, FailedPayment, } from './pages';
+import {
+  SubtitlesPage,
+  SuccessResetPassword,
+  SearchResult,
+  ResetPassword,
+  Landing,
+  ForgetPassword,
+  Login,
+  Register,
+  CoursePage,
+  Home,
+  ProtectedRoute,
+  Instructor,
+  Admin,
+  Payment,
+  SuccessPayment,
+  FailedPayment,
+} from './pages';
 import { NavBar, CourseForm, Courses } from './components';
 import {UserforAdmin,GetCourse,Report,DataGridDemo,CourseRequest} from'./components/admin'
-
 
 import AddSubtitleForm from './components/subtitle/AddSubtitleForm';
 import { CourseProvider } from './context/Course/courseContext';
@@ -23,6 +39,8 @@ import RatingStars from './components/RatingStars';
 import Instructorprofile from './components/instructor/Instructorprofile';
 import BioGraphy from './components/instructor/BioGraphy';
 import Setting from './components/instructor/Setting';
+import ExamForm from './components/ExamForm';
+import HomeV2 from './components/homepage/HomeV2';
 
 function App() {
   return (
@@ -41,7 +59,6 @@ function App() {
             <Route path="test" element={<DataGridDemo/>}/>
 
               </Route>
-            <Route path="corporatetrinee" element={<DataGridDemo></DataGridDemo>}></Route>
               <Route path='/resetPassword' element={<SuccessResetPassword />} />
               <Route path='/forgetPassword' element={<ForgetPassword />} />
               <Route path='/resetPassword/:token' element={<ResetPassword />} />
@@ -68,23 +85,31 @@ function App() {
                   index
                   element={
                     <ProtectedRoute>
-                      <Home />
+                      <HomeV2/>
                     </ProtectedRoute>
                   }
                 />
                 <Route path='/addCourse' element={<CourseForm />} />
-                <Route path='/updateCourse/:courseId' element={<CourseForm />} />
+                <Route
+                  path='/updateCourse/:courseId'
+                  element={<CourseForm />}
+                />
                 <Route
                   path='/course/:courseId/subtitle'
-                  element={<AddSubtitleForm />} />
+                  element={<AddSubtitleForm />}
+                />
                 <Route
                   path='/course/:courseId/content'
                   element={<SubtitlesPage />}
                 />
                 <Route path='/course/:courseId' element={<CoursePage />} />
+                <Route
+                  path='/course/:courseId/createExam'
+                  element={<ExamForm />}
+                />
+
                 {/* <Route path='/course/:courseId' element={<CourseForm />} /> */}
                 <Route path='/results' element={<SearchResult />} />
-                
               </Route>
               <Route path='/rating' element={<RatingForm />} />
               <Route path='/filter' element={<Filter />} />
