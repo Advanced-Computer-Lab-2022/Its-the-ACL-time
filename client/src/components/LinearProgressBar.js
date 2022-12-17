@@ -1,30 +1,24 @@
 import React from 'react';
-import { makeStyles } from '@material-ui/core/styles';
 import LinearProgress from '@material-ui/core/LinearProgress';
+import { Box, Typography } from '@material-ui/core';
 
-const useStyles = makeStyles({
-  root: {
-    width: '100%',
-  },
-});
-
-export default function LinearProgressBar({ valueOfProgress, style }) {
-  const classes = useStyles();
-
-  // apply the style to the progress bar
-  if (style) {
-    classes.root = style;
-  }
-
-  const [progress, setProgress] = React.useState(valueOfProgress);
+export default function LinearProgressBar({ value }) {
+  const [progress, setProgress] = React.useState(value);
 
   React.useEffect(() => {
-    setProgress(valueOfProgress);
-  }, [valueOfProgress]);
+    setProgress(value);
+  }, [value]);
 
   return (
-    <div className={classes.root}>
-      <LinearProgress variant='determinate' value={progress} />
-    </div>
+    <Box display='flex' alignItems='center'>
+      <Box width='100%' mr={1}>
+        <LinearProgress variant='determinate' value={progress} />
+      </Box>
+      <Box minWidth={35}>
+        <Typography variant='body2' color='textSecondary'>{`${Math.round(
+          progress
+        )}%`}</Typography>
+      </Box>
+    </Box>
   );
 }

@@ -17,15 +17,14 @@ const changePassword = async (req, res) => {
 const GetBio = async (req, res) => {
   const { userId } = req.user;
   const user = await User.findOne({ _id: userId });
- // await user.save();
+  // await user.save();
   res.status(200).json(user.biography);
-
 };
 const updateBio = async (req, res) => {
   const { Bio } = req.body;
   const { userId } = req.user;
   const user = await User.findOne({ _id: userId });
-  user.biography=Bio;
+  user.biography = Bio;
   await user.save();
   res.status(200).json(user);
 };
@@ -34,14 +33,56 @@ const updateEmail = async (req, res) => {
   const { userId } = req.user;
   console.log(Email);
   const user = await User.findOne({ _id: userId });
-  user.email=Email;
+  user.email = Email;
   await user.save();
   res.status(200).json(user);
 };
 
+const updateUser = async (req, res) => {
+  const { userId } = req.user;
+  const { completedSubtitles, completedExams, progress } = req.body;
+  const user = await User.findOne({
+    _id: userId,
+  });
+
+  const course = user.courses.find(
+    (course) => course.courseId.toString() === req.params.id
+  );
+  console.log(completedSubtitles);
+  if (completedExams) course.completedExams = completedExams;
+  if (completedSubtitles) course.completedSubtitles = completedSubtitles;
+  if (progress) course.progress = progress;
+
+  console.log(course);
+  await user.save();
+  res.status(200).json({
+    message: 'course progress updated successfully',
+  });
+};
+
+const getUser = async (req, res) => {
+  const { userId } = req.user;
+  const { id } = req.params;
+  if (id) {
+    // get the course progress of a specific user in a specific course
+    const user = await User.findOne({
+      _id: userId,
+    });
+
+    const courseProgress = user.courses.find(
+      (course) => course.courseId.toString() === id
+    );
+    console.log(courseProgress);
+    res.status(200).json(courseProgress);
+    return;
+  }
+};
 
 module.exports = {
   changePassword,
   GetBio,
-  updateBio,updateEmail
+  updateBio,
+  updateEmail,
+  updateUser,
+  getUser,
 };

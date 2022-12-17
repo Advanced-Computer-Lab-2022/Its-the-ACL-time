@@ -35,18 +35,25 @@ const UserSchema = mongoose.Schema({
   },
   biography: {
     type: String,
-    default:""
+    default: '',
   },
   courses: [
-    {courseId:{
-      type: mongoose.Types.ObjectId,
-      ref: 'Course',
+    {
+      courseId: {
+        type: mongoose.Types.ObjectId,
+        ref: 'Course',
+      },
+      completedSubtitles: {
+        type: [String],
+      },
+      completedExams: {
+        type: [String],
+      },
+      progress: {
+        type: Number,
+        default: 0,
+      },
     },
-    isCompleted:{
-      type: Boolean,
-      default:false,
-    }
-  }
   ],
 });
 

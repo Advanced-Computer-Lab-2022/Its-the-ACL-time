@@ -54,7 +54,6 @@ const FilterField = ({
 
   const handleCheck = async (e) => {
     onFilter(e.target.name, title, e.target.checked);
-
     setChecked({ ...checked, [e.target.name]: e.target.checked });
   };
 

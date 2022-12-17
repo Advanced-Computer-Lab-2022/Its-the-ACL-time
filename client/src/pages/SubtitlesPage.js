@@ -290,20 +290,18 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-const initialState = {
-  checkedSubtitles: [],
-  numOfCheckedSubtitles: 0,
-  checkedExams: [],
-};
-
 const SubtitlesPage = () => {
   const classes = useStyles();
 
+  const [seeProgress, setSeeProgress] = useState(false);
   const [showList, setShowList] = useState(true);
   const [subtitles, setSubtitles] = useState([]);
   const [exams, setExams] = useState([]);
   const [exam, setExam] = useState(null);
-  const [state, setState] = useState(initialState);
+  const [state, setState] = useState({
+    checkedSubtitles: [],
+    checkedExams: [],
+  });
   const [showMore, setShowMore] = useState(false);
   const [videoInfo, setVideoInfo] = useState(0);
   const [writeNote, setWriteNote] = useState(false);
@@ -332,25 +330,25 @@ const SubtitlesPage = () => {
     doc.save('notes.pdf');
   };
 
-  const addItemToLocalStorage = (item, type) => {
-    if (!localStorage.getItem(`${type}${courseId}`))
-      localStorage.setItem(`${type}${courseId}`, JSON.stringify([]));
-    let items = JSON.parse(localStorage.getItem(`${type}${courseId}`));
-    items.push(item);
-    localStorage.setItem(`${type}${courseId}`, JSON.stringify(items));
-  };
+  // const addItemToLocalStorage = (item, type) => {
+  //   if (!localStorage.getItem(`${type}${courseId}`))
+  //     localStorage.setItem(`${type}${courseId}`, JSON.stringify([]));
+  //   let items = JSON.parse(localStorage.getItem(`${type}${courseId}`));
+  //   items.push(item);
+  //   localStorage.setItem(`${type}${courseId}`, JSON.stringify(items));
+  // };
 
-  const removeItemFromLocalStorage = (item, type) => {
-    let items = JSON.parse(localStorage.getItem(`${type}${courseId}`));
-    let filteredItems = items.filter((i) => i !== item);
-    localStorage.setItem(`${type}${courseId}`, JSON.stringify(filteredItems));
-  };
+  // const removeItemFromLocalStorage = (item, type) => {
+  //   let items = JSON.parse(localStorage.getItem(`${type}${courseId}`));
+  //   let filteredItems = items.filter((i) => i !== item);
+  //   localStorage.setItem(`${type}${courseId}`, JSON.stringify(filteredItems));
+  // };
 
-  const getItemFromLocalStorage = (type) => {
-    if (!localStorage.getItem(`${type}${courseId}`))
-      localStorage.setItem(`${type}${courseId}`, JSON.stringify([]));
-    return JSON.parse(localStorage.getItem(`${type}${courseId}`));
-  };
+  // const getItemFromLocalStorage = (type) => {
+  //   if (!localStorage.getItem(`${type}${courseId}`))
+  //     localStorage.setItem(`${type}${courseId}`, JSON.stringify([]));
+  //   return JSON.parse(localStorage.getItem(`${type}${courseId}`));
+  // };
 
   useEffect(() => {
     console.log('courseId ' + courseId);
@@ -382,20 +380,30 @@ const SubtitlesPage = () => {
       }
     }
 
-    async function getState() {
-      const checkedSubTitles = getItemFromLocalStorage('checkedSubtitles');
-      const checkedExams = getItemFromLocalStorage('checkedExams');
-      setState({
-        checkedSubtitles: checkedSubTitles ? checkedSubTitles : [],
-        numOfCheckedSubtitles: checkedSubTitles?.length,
-        checkedExams: checkedExams ? checkedExams : [],
-      });
+    async function getProgress() {
+      try {
+        const response = await axios.get(
+          `http://localhost:8080/api/v1/user/progress/${courseId}`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+        setState({
+          checkedSubtitles: response.data.completedSubtitles,
+          checkedExams: response.data.completedExams,
+        });
+        setSeeProgress(true);
+      } catch (error) {
+        console.log(error);
+      }
     }
 
+    getProgress();
     fetchSubtitles();
     fetchExams();
-    getState();
-  }, [courseId, token]);
+  }, []);
 
   useEffect(() => {
     const getExam = async (examId) => {
@@ -460,35 +468,77 @@ const SubtitlesPage = () => {
     }
   }, [searchParams, user._id, token, videoInfo, courseId]);
 
-  const handleChecked = async (subtitle, title, checked) => {
-    let resultSubtitles = state.checkedSubtitles;
-    if (checked) {
-      addItemToLocalStorage(subtitle, 'checkedSubtitles');
-      resultSubtitles.push(subtitle);
-    } else {
-      removeItemFromLocalStorage(subtitle, 'checkedSubtitles');
-      resultSubtitles.filter((item) => item !== subtitle);
-    }
-    setState({
-      ...state,
-      checkedSubtitles: resultSubtitles,
-      numOfCheckedSubtitles: resultSubtitles.length,
-    });
+  const computeProgress = () => {
+    return Math.round(
+      ((state.checkedSubtitles.length + state.checkedExams.length) /
+        (subtitles.length + exams.length)) *
+        100
+    );
   };
 
-  const handleCheckedExam = (exam, title, checked) => {
-    let resultExams = state.checkedExams;
-    if (checked) {
-      addItemToLocalStorage(exam, 'checkedExams');
-      resultExams.push(exam);
-    } else {
-      removeItemFromLocalStorage(exam, 'checkedExams');
-      resultExams.filter((item) => item !== exam);
+  const updateProgress = async (checkedSubtitles, checkedExams) => {
+    console.log('checkedSubtitles: ' + checkedSubtitles.length);
+    console.log('checkedExams ' + checkedExams.length);
+    console.log('subtitles ' + subtitles.length);
+    console.log('exams ' + exams.length);
+    console.log('-----------------------------------------------------');
+    try {
+      const response = await axios.patch(
+        `http://localhost:8080/api/v1/user/progress/${courseId}`,
+        {
+          completedSubtitles: checkedSubtitles,
+          completedExams: checkedExams,
+          progress: computeProgress(),
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      // setCheckedSubtitles(response.data.completedSubtitles);
+      // setCheckedExams(response.data.completedExams);
+      // setProgress(response.data.progress);
+    } catch (error) {
+      console.log(error);
     }
-    setState({
-      ...state,
-      checkedExams: resultExams,
+  };
+
+  const handleChecked = async (subtitle, title, checked) => {
+    setState((prevState) => {
+      if (checked) {
+        prevState.checkedSubtitles.push(subtitle);
+      } else {
+        prevState.checkedSubtitles = prevState.checkedSubtitles.filter(
+          (item) => item !== subtitle
+        );
+      }
+
+      return {
+        ...prevState,
+      };
     });
+
+    await updateProgress(state.checkedSubtitles, state.checkedExams);
+  };
+
+  const handleCheckedExam = async (exam, title, checked) => {
+    setState((prevState) => {
+      if (checked) {
+        prevState.checkedExams.push(exam);
+      } else {
+        prevState.checkedExams = prevState.checkedExams.filter(
+          (item) => item !== exam
+        );
+      }
+
+      return {
+        ...prevState,
+      };
+    });
+
+    await updateProgress(state.checkedSubtitles, state.checkedExams);
   };
 
   const addNote = async () => {
@@ -547,6 +597,7 @@ const SubtitlesPage = () => {
   return (
     <main className={`${classes.main}`}>
       <section className={`${classes.subtitles}`}>
+        <LinearProgressBar value={computeProgress()} />
         <Box
           className={`${classes.courseContent}`}
           onClick={() => setShowList(!showList)}
@@ -555,6 +606,7 @@ const SubtitlesPage = () => {
           <AiFillCloseCircle />
         </Box>
         {showList &&
+          seeProgress &&
           subtitles
             .map((subtitle, idx) => (
               <FilterField
@@ -567,30 +619,31 @@ const SubtitlesPage = () => {
                   fontSize: '1rem',
                   fontWeight: '500',
                 }}
-                checkedOptions={state.checkedSubtitles.reduce((acc, item) => {
+                checkedOptions={state.checkedSubtitles?.reduce((acc, item) => {
                   acc[item] = true;
                   return acc;
                 }, {})}
               />
             ))
             .slice(0, showMore ? subtitles.length : 2)}
-        {exams.map((exam, idx) => (
-          <FilterField
-            title={`Exam ${idx + 1}`}
-            options={[...Array(`Let's take the exam ${idx + 1}`)]}
-            key={idx}
-            onFilter={handleCheckedExam}
-            optionOnClick={() => navigate(`?examId=${exam._id}`)}
-            titleStyle={{
-              fontSize: '1rem',
-              fontWeight: '500',
-            }}
-            checkedOptions={state.checkedExams.reduce((acc, item) => {
-              acc[item] = true;
-              return acc;
-            }, {})}
-          />
-        ))}
+        {seeProgress &&
+          exams.map((exam, idx) => (
+            <FilterField
+              title={`Exam ${idx + 1}`}
+              options={[...Array(`Let's take the exam ${idx + 1}`)]}
+              key={idx}
+              onFilter={handleCheckedExam}
+              optionOnClick={() => navigate(`?examId=${exam._id}`)}
+              titleStyle={{
+                fontSize: '1rem',
+                fontWeight: '500',
+              }}
+              checkedOptions={state.checkedExams?.reduce((acc, item) => {
+                acc[item] = true;
+                return acc;
+              }, {})}
+            />
+          ))}
         {subtitles.length > 2 && (
           <button
             className={`${classes.showMore}`}
@@ -617,7 +670,7 @@ const SubtitlesPage = () => {
 
           {!exam && (
             <div className={`${classes.video}`}>
-              <iframe
+              {/* <iframe
                 width='911'
                 height='480'
                 src='https://www.youtube.com/embed/1v_TEnpqHXE'
@@ -625,7 +678,7 @@ const SubtitlesPage = () => {
                 frameborder='0'
                 allow='accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture'
                 allowfullscreen
-              ></iframe>
+              ></iframe> */}
             </div>
           )}
         </div>
