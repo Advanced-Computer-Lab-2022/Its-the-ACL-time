@@ -30,37 +30,37 @@ function Courses() {
                             <Link className="position-relative d-block overflow-hidden" href="/results?query=software">
                                 <img className="img-fluid" src={img} alt=""/>
                                 <div className="bg-white text-center position-absolute bottom-0 end-0 py-2 px-3" style={v1}>
-                                    <h5 className="m-0">Soft Ware</h5>
-                                    <small className="text-primary">49 Courses</small>
+                                    <h5 className="m-0">Software</h5>
+                                    <small className="text-primary"> Courses</small>
                                 </div>
                             </Link>
                         </div>
                         <div className="col-lg-6 col-md-12 wow zoomIn" data-wow-delay="0.3s">
-                            <Link className="position-relative d-block overflow-hidden" href="/results?query=Graphic Design">
+                            <Link className="position-relative d-block overflow-hidden" href="/results?query=Deep learning">
                                 <img className="img-fluid" src={img1} alt=""/>
                                 <div className="bg-white text-center position-absolute bottom-0 end-0 py-2 px-3" style={v1}>
-                                    <h5 className="m-0">Graphic Design</h5>
-                                    <small className="text-primary">49 Courses</small>
+                                    <h5 className="m-0">Deep Learning</h5>
+                                    <small className="text-primary"> Courses</small>
                                 </div>
                             </Link>
                         </div>
                         <div className="col-lg-6 col-md-12 wow zoomIn" data-wow-delay="0.5s">
-                            <Link className="position-relative d-block overflow-hidden" href="/results?query=Graphic Design">
+                            <Link className="position-relative d-block overflow-hidden" href="/results?query=Voideo Editing">
                                 <img className="img-fluid" src={img2} alt=""/>
                                 <div className="bg-white text-center position-absolute bottom-0 end-0 py-2 px-3" style={v1}>
                                     <h5 className="m-0">Video Editing</h5>
-                                    <small className="text-primary">49 Courses</small>
+                                    <small className="text-primary"> Courses</small>
                                 </div>
                             </Link>
                         </div>
                     </div>
                 </div>
                 <div className="col-lg-5 col-md-6 wow zoomIn" data-wow-delay="0.7s" style={v3}>
-                    <Link className="position-relative d-block h-100 overflow-hidden" href="/results?query=Graphic Design">
+                    <Link className="position-relative d-block h-100 overflow-hidden" href="/results?query=Online Marketing">
                         <img className="img-fluid position-absolute w-100 h-100" src={img3} alt="" style={v2}/>
                         <div className="bg-white text-center position-absolute bottom-0 end-0 py-2 px-3" style={v1}>
                             <h5 className="m-0">Online Marketing</h5>
-                            <small className="text-primary">49 Courses</small>
+                            <small className="text-primary"> Courses</small>
                         </div>
                     </Link>
                 </div>

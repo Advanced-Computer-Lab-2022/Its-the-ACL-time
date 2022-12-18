@@ -62,7 +62,7 @@ export default function GetCourse() {
   const[course,setcourse]=useState([])
   const[selectcourse,setselect]=useState([]);
   const[promotion,setpromtion]=useState(0);
-  const [open, setOpen] = useState(false);
+  const [open, setOpen] = React.useState(false);
   let rows = [
   ];
  useEffect(()=>{
@@ -90,7 +90,9 @@ export default function GetCourse() {
 
     })
     .catch(err=>
-     {console.log(err)}
+     {console.log(err)
+      setOpen(false);}
+    
     );
   }
 
