@@ -263,8 +263,20 @@ const CoursePage = () => {
     <main className={`${classes.main}`}>
       <div className={`${classes.background}`}>
         <div className={`${classes.info}`}>
-          <h1>{course?.title}</h1>
-          <h2>{course?.subject}</h2>
+          <h1
+            style={{
+              color: 'white',
+            }}
+          >
+            {course?.title}
+          </h1>
+          <h2
+            style={{
+              color: 'white',
+            }}
+          >
+            {course?.subject}
+          </h2>
           <p>{course && course?.summary?.slice(0, 50)}</p>
         </div>
         <Box className={`${classes.reviewCourse}`}>

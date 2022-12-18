@@ -18,7 +18,13 @@ import {
   FailedPayment,
 } from './pages';
 import { NavBar, CourseForm, Courses } from './components';
-import {UserforAdmin,GetCourse,Report,DataGridDemo,CourseRequest} from'./components/admin'
+import {
+  UserforAdmin,
+  GetCourse,
+  Report,
+  DataGridDemo,
+  CourseRequest,
+} from './components/admin';
 
 import AddSubtitleForm from './components/subtitle/AddSubtitleForm';
 import { CourseProvider } from './context/Course/courseContext';
@@ -40,6 +46,7 @@ import BioGraphy from './components/instructor/BioGraphy';
 import Setting from './components/instructor/Setting';
 import ExamForm from './components/ExamForm';
 import HomeV2 from './components/homepage/HomeV2';
+import PromotionForm from './components/PromotionForm';
 
 function App() {
   return (
@@ -47,15 +54,16 @@ function App() {
         <CourseProvider>
           <SearchProvider>
             <Routes>
-            
-            <Route path="admin" element={<Admin />}>
-            <Route path="" element={<UserforAdmin/>}/>
-            <Route path="users" element={<UserforAdmin/>}/>
-            <Route path="Report" element={<Report></Report>}/>
-            <Route path="courserequest" element={<CourseRequest></CourseRequest>}/>
-            <Route path="course" element={<GetCourse></GetCourse>}/>
-            <Route path="test" element={<DataGridDemo/>}/>
-
+              <Route path='admin' element={<Admin />}>
+                <Route path='' element={<UserforAdmin />} />
+                <Route path='users' element={<UserforAdmin />} />
+                <Route path='Report' element={<Report></Report>} />
+                <Route
+                  path='courserequest'
+                  element={<CourseRequest></CourseRequest>}
+                />
+                <Route path='course' element={<GetCourse></GetCourse>} />
+                <Route path='test' element={<DataGridDemo />} />
               </Route>
               <Route path='/resetPassword' element={<SuccessResetPassword />} />
               <Route path='/forgetPassword' element={<ForgetPassword />} />
@@ -83,7 +91,7 @@ function App() {
                   index
                   element={
                     <ProtectedRoute>
-                      <HomeV2/>
+                      <HomeV2 />
                     </ProtectedRoute>
                   }
                 />
@@ -104,6 +112,11 @@ function App() {
                 <Route
                   path='/course/:courseId/createExam'
                   element={<ExamForm />}
+                />
+
+                <Route
+                  path='/course/:courseId/addPromotion'
+                  element={<PromotionForm />}
                 />
 
                 {/* <Route path='/course/:courseId' element={<CourseForm />} /> */}

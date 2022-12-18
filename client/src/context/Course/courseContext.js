@@ -29,6 +29,7 @@ const CourseProvider = ({ children }) => {
           },
         })
         .then(({ data }) => {
+          console.log('courses: ' + data.courses);
           dispatch({
             type: GET_COURSES,
             payload: {
@@ -48,6 +49,7 @@ const CourseProvider = ({ children }) => {
             },
           }
         );
+        console.log('myCourses: ' + response.data.courses);
         dispatch({
           type: GET_MY_COURSES,
           payload: {
@@ -60,7 +62,7 @@ const CourseProvider = ({ children }) => {
     };
 
     getAllCourses();
-    if(token){
+    if (token) {
       getMyCourses();
     }
   }, [token]);
@@ -98,10 +100,10 @@ const CourseProvider = ({ children }) => {
           },
         }
       );
-      dispatch({
-        type: UPDATE_COURSE,
-        payload: { course: response.data.updatedCourse },
-      });
+      // dispatch({
+      //   type: UPDATE_COURSE,
+      //   payload: { course: response.data.updatedCourse },
+      // });
       console.log(response.data.updatedCourse);
       return response.data.updatedCourse;
     } catch (error) {

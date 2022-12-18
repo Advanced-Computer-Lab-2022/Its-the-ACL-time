@@ -1,7 +1,12 @@
 import React, { useRef, useState } from 'react';
 import { makeStyles } from '@material-ui/core/styles';
 import FilterField from '../components/FilterField';
-import { Box, TextareaAutosize, Typography } from '@material-ui/core';
+import {
+  Box,
+  CircularProgress,
+  TextareaAutosize,
+  Typography,
+} from '@material-ui/core';
 import { AiFillCloseCircle, AiFillEdit, AiFillDelete } from 'react-icons/ai';
 import { useEffect } from 'react';
 import axios from 'axios';
@@ -288,12 +293,23 @@ const useStyles = makeStyles((theme) => ({
       transition: 'transform 0.3s ease-in-out',
     },
   },
+
+  loading: {
+    position: 'absolute',
+    top: '50%',
+    left: '50%',
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    width: '100vw',
+    height: '100vh',
+    zIndex: 1000,
+    color: 'white',
+  },
 }));
 
 const SubtitlesPage = () => {
   const classes = useStyles();
 
-  const [seeProgress, setSeeProgress] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [showList, setShowList] = useState(true);
   const [subtitles, setSubtitles] = useState([]);
   const [exams, setExams] = useState([]);
@@ -394,16 +410,16 @@ const SubtitlesPage = () => {
           checkedSubtitles: response.data.completedSubtitles,
           checkedExams: response.data.completedExams,
         });
-        setSeeProgress(true);
+        setLoading(false);
       } catch (error) {
         console.log(error);
       }
     }
 
-    getProgress();
     fetchSubtitles();
     fetchExams();
-  }, []);
+    getProgress();
+  }, [courseId, token]);
 
   useEffect(() => {
     const getExam = async (examId) => {
@@ -469,8 +485,10 @@ const SubtitlesPage = () => {
   }, [searchParams, user._id, token, videoInfo, courseId]);
 
   const computeProgress = () => {
+    if (!state.checkedSubtitles && !state.checkedExams) return 0;
+
     return Math.round(
-      ((state.checkedSubtitles.length + state.checkedExams.length) /
+      ((state.checkedSubtitles?.length + state.checkedExams?.length) /
         (subtitles.length + exams.length)) *
         100
     );
@@ -483,7 +501,7 @@ const SubtitlesPage = () => {
     console.log('exams ' + exams.length);
     console.log('-----------------------------------------------------');
     try {
-      const response = await axios.patch(
+      await axios.patch(
         `http://localhost:8080/api/v1/user/progress/${courseId}`,
         {
           completedSubtitles: checkedSubtitles,
@@ -496,10 +514,6 @@ const SubtitlesPage = () => {
           },
         }
       );
-
-      // setCheckedSubtitles(response.data.completedSubtitles);
-      // setCheckedExams(response.data.completedExams);
-      // setProgress(response.data.progress);
     } catch (error) {
       console.log(error);
     }
@@ -542,6 +556,7 @@ const SubtitlesPage = () => {
   };
 
   const addNote = async () => {
+    setLoading(true);
     try {
       const response = await axios.post('http://localhost:8080/api/v1/note', {
         subtitleId: searchParams.get('subtitleId'),
@@ -550,6 +565,7 @@ const SubtitlesPage = () => {
       });
       setNotes([...notes, response.data.response]);
       setWriteNote(false);
+      setLoading(false);
     } catch (error) {
       console.log(error);
     }
@@ -571,6 +587,7 @@ const SubtitlesPage = () => {
   };
 
   const postReview = async (rating, review) => {
+    setLoading(true);
     const course = courses.find((item) => item._id === courseId);
     updateCourse(courseId, {
       ...course,
@@ -583,7 +600,6 @@ const SubtitlesPage = () => {
         },
       ],
     });
-    console.log([...reviews]);
     setReviews([
       ...reviews,
       {
@@ -592,10 +608,12 @@ const SubtitlesPage = () => {
         rate: rating,
       },
     ]);
+    setLoading(false);
   };
 
   return (
     <main className={`${classes.main}`}>
+      {loading && <CircularProgress className={classes.loading} />}
       <section className={`${classes.subtitles}`}>
         <LinearProgressBar value={computeProgress()} />
         <Box
@@ -606,7 +624,7 @@ const SubtitlesPage = () => {
           <AiFillCloseCircle />
         </Box>
         {showList &&
-          seeProgress &&
+          !loading &&
           subtitles
             .map((subtitle, idx) => (
               <FilterField
@@ -626,7 +644,7 @@ const SubtitlesPage = () => {
               />
             ))
             .slice(0, showMore ? subtitles.length : 2)}
-        {seeProgress &&
+        {!loading &&
           exams.map((exam, idx) => (
             <FilterField
               title={`Exam ${idx + 1}`}
@@ -653,7 +671,6 @@ const SubtitlesPage = () => {
           </button>
         )}
       </section>
-
       <section className={`${classes.rightSection}`}>
         <div
           className={searchParams.get('examId') ? classes.exam : classes.video}
