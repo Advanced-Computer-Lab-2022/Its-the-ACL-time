@@ -1,14 +1,12 @@
 import React from 'react'
-import { usePaymentContext } from '../context/Payment/payment'
+import { handleCheckout } from '../services/Payment';
 export default function Payment() {
 
    // TODO only for testing purpose 
-   
-   const handleCheckout = usePaymentContext();
-   console.log('payment',handleCheckout);
+  let courseId = '635f73a23569cc0d7e43d80e';
   return (
     <div className="container d-flex justify-content-center">
-        <button className='btn btn-lg btn-primary' onClick={()=>handleCheckout(3,'price_1M8JRvCuvzY0BCZpqmytQWdY')}>checkout</button>
+        <button className='btn btn-lg btn-primary' onClick={()=>handleCheckout(courseId)}>checkout</button>
     </div>
   )
 }

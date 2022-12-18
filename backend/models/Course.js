@@ -47,6 +47,14 @@ const CourseSchema = mongoose.Schema(
       required: [true, 'Please provide the creator'],
       ref: 'User',
     },
+    stripeProductId:{
+      type: String,
+      required:false,
+    },
+    stripePriceId :{
+      type: String,
+      required:false
+    }
   },
   { timestamps: true }
 );

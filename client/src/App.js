@@ -23,7 +23,6 @@ import {UserforAdmin,GetCourse,Report,DataGridDemo,CourseRequest} from'./compone
 import AddSubtitleForm from './components/subtitle/AddSubtitleForm';
 import { CourseProvider } from './context/Course/courseContext';
 import { SearchProvider } from './context/Search/searchContext';
-import { PaymentProvider } from './context/Payment/payment';
 import Filter from './components/Filter';
 import { CourseComponent } from './components/course';
 import Certificate from './components/Certificate';
@@ -45,7 +44,6 @@ import HomeV2 from './components/homepage/HomeV2';
 function App() {
   return (
     <BrowserRouter>
-      <PaymentProvider>
         <CourseProvider>
           <SearchProvider>
             <Routes>
@@ -66,7 +64,7 @@ function App() {
               <Route path='/register' element={<Register />} />
               <Route path='/payment' element={<Payment />} />
               <Route path='/SuccessPayment' element={<SuccessPayment />} />
-              <Route path='/FailedPayment' element={<SuccessPayment />} />
+              <Route path='/FailedPayment' element={<FailedPayment />} />
               <Route path='/profile' element={<Instructorprofile />}>
                 <Route path='' element={<Instructor></Instructor>}></Route>
                 <Route path='BioGraphy' element={<BioGraphy></BioGraphy>} />
@@ -126,7 +124,6 @@ function App() {
             </Routes>
           </SearchProvider>
         </CourseProvider>
-      </PaymentProvider>
     </BrowserRouter>
   );
 }

@@ -1,65 +1,83 @@
 
-const { PaymentModel } = require('../models');
+const { default: mongoose } = require('mongoose');
+const { PaymentModel, User, Course, Wallet } = require('../models');
 const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
 
 
-const addPayment = async (req, res) => {
-  let data, eventType;
-
-  // Check if webhook signing is configured.
-  if (process.env.STRIPE_WEBHOOK_SECRET) {
-    // Retrieve the event by verifying the signature using the raw body and secret.
-    let event;
-    let signature = req.headers['stripe-signature'];
-    try {
-      event = stripe.webhooks.constructEvent(
-        req.rawBody,
-        signature,
-        process.env.STRIPE_WEBHOOK_SECRET
-      );
-    } catch (err) {
-      console.log(`⚠️  Webhook signature verification failed.`);
-      return res.sendStatus(400);
-    }
-    data = event.data;
-    eventType = event.type;
-  } else {
-    // Webhook signing is recommended, but if the secret is not configured in `config.js`,
-    // we can retrieve the event data directly from the request body.
-    data = req.body.data;
-    eventType = req.body.type;
+const addPayment = async (request, response) => {
+  const event = request.body;
+  // Handle the event
+  switch (event.type) {
+    case 'checkout.session.completed':
+      const paymentIntent = event.data.object;
+      PaymentModel.create({ sessionId: event.id, customerId: paymentIntent.client_reference_id, paymentId: paymentIntent.id });
+      const client_reference_id = paymentIntent.client_reference_id.split('#');
+      const userId = client_reference_id[0];
+      const courseId = client_reference_id[1];
+      const UserObject = await User.findById(userId);
+      UserObject.courses.push({ courseId: courseId });
+      UserObject.save();
+      const CourseObject = await Course.findById(courseId);
+      const balance = await Wallet.findOne({ owner: mongoose.Types.ObjectId(CourseObject.createdBy) });
+      console.log("balance", balance);
+      const wallet = await Wallet.updateOne({ owner: CourseObject.createdBy }, { balance: balance.balance + CourseObject.price * (1 - CourseObject.promotion / 100) });
+      console.log("wallet", wallet);
+      break;
+    default:
+      console.log(`Unhandled event type ${event.type}`);
   }
 
-  if (eventType === 'payment_intent.succeeded' || eventType === 'checkout.session.completed') {
-    // Funds have been captured
-    // Fulfill any orders, e-mail receipts, etc
-    // To cancel the payment after capture you will need to issue a Refund (https://stripe.com/docs/api/refunds)
-    const { id, subscription, customer } = data.object;
-    console.log('💰 Payment captured!');
-    console.log(" session ", data.object);
-    PaymentModel.create({ id, subscription, customer });
-  } else if (eventType === 'payment_intent.payment_failed') {
-    console.log('❌ Payment failed.');
-  }
-  res.sendStatus(200);
+  // Return a response to acknowledge receipt of the event
+  response.json({ received: true });
 };
 
 const getPaymentSession = async (req, res) => {
-  const {quantity,priceId} = req.body;
+  const { userId } = req.user;
+  const { courseId } = req.body;
+  if (!courseId) {
+    req.status(401).json({ msg: "please provide the course Id" });
+  }
+  const CourseObject = await Course.findById(mongoose.Types.ObjectId(courseId));
+  let productId = CourseObject?.stripeProductId;
+  const client_reference_id = userId + "#" + courseId;
+  const unit_amount = CourseObject.price;
+  const currency = "USD";
+  if (!productId) {
+    productId = await stripe.products.create(
+      { name: CourseObject.title }
+    );
+    productId = productId.id;
+    CourseObject.stripeProductId = productId;
+  }
+  let priceId = CourseObject.stripePriceId;
+  if (!priceId) {
+    priceId = await stripe.prices.create({
+      unit_amount: unit_amount * 100,
+      currency: currency,
+      product: productId,
+    });
+    priceId = priceId.id;
+    CourseObject.stripePriceId = priceId;
+  }
+  await CourseObject.save();
+  const coupon = await stripe.coupons.create({ percent_off: CourseObject.promotion || 1, duration: 'once' });
   const session = await stripe.checkout.sessions.create({
     success_url: 'http://localhost:3000/SuccessPayment?id={CHECKOUT_SESSION_ID}',
     cancel_url: 'http://localhost:3000/FailedPayment',
     payment_method_types: ['card'],
     mode: 'payment',
+    client_reference_id: client_reference_id,
     line_items: [{
       price: priceId,
-      quantity: quantity
-    }]
+      quantity: 1
+    }],
+    discounts: [{
+      coupon: coupon.id,
+    }],
   })
   res.json({
     id: session.id
   });
-
 }
 
 const createProduct = async (productName) => {
@@ -89,7 +107,7 @@ const deleteProduct = async (productId) => {
   );
 }
 
-const createPrice = async (unit_amount,productId,currency='usd') => {
+const createPrice = async (unit_amount, productId, currency = 'usd') => {
   // create price for a product required productId , unit_amount, and currency
   return await stripe.prices.create({
     unit_amount: unit_amount,
