@@ -114,28 +114,23 @@ module.exports.createUser = async (req, res) => {
   };
 
 */
-const updateCourse = async (req, res) => {
-    const { type, userId } = req.user;
-    const { courseId ,promotion} = req.params;
-    console.log(req.body);
-    if (!courseId) throw new BadRequestError('Please provide course id');
-  
-    if (type !== 'Admin')
-      throw new UnauthorizedError('you are not allowed to update course');
-  
-    const course = await Course.findOne({ _id: courseId });
-    if (!course)
-      throw new BadRequestError(`There is no course with this id ${courseId}`);
-  
-    if (userId !== course.createdBy.toString())
-      throw new UnauthorizedError('You are not the owner of that course');
-  
+module.exports.setpromtion = async (req, res) => {
+    const { coursesId ,promotion} = req.body;
+    console.log(coursesId);
+
+    for(let i=0;i<coursesId.length;i++){
+      console.log(coursesId[i])
+
     const updatedCourse = await Course.findOneAndUpdate(
-      { _id: courseId },
+      { _id: coursesId[i] },
       { promotion:promotion },
-      { new: true }
-    );
-    res.status(StatusCodes.OK).json({ updatedCourse });
+    );}
+
+
+    const course= await Course.find({});
+
+    
+    res.status(StatusCodes.OK).json( course );
   };
 
 

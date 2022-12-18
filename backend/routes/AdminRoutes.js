@@ -23,7 +23,7 @@ router.get('/courses',AdminController.getallcourses)
 // grant the course request
 router.patch('grantcourse',AdminController.updatecourserequest)
 //set promotion for course
-router.patch('setpromotion',)
+router.patch('/setpromotion',AdminController.setpromtion)
 
 
 
