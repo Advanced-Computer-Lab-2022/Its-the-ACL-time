@@ -64,7 +64,6 @@ const getUser = async (req, res) => {
   const { userId } = req.user;
   const { id } = req.params;
   if (id) {
-    // get the course progress of a specific user in a specific course
     const user = await User.findOne({
       _id: userId,
     });

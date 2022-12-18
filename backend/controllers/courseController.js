@@ -60,11 +60,12 @@ const getAllCourses = async (req, res) => {
       courses = await Course.find({ createdBy: userId }).select(`${query}`);
       return res.status(StatusCodes.OK).json({ courses });
     }
-    courses = await User.findOne({ _id: userId })
-      .select('courses')
-      .populate('courses', `${query}`);
+    courses = await User.findOne({ _id: userId });
 
-    return res.status(StatusCodes.OK).json(courses);
+    // log the fields that are in courses
+    console.log(courses.courses);
+    console.log(req.query + ' ' + courses);
+    return res.status(StatusCodes.OK).json(courses.courses);
   }
   courses = await Course.find({})
     .select(`${query}`)
@@ -75,7 +76,7 @@ const getAllCourses = async (req, res) => {
 const updateCourse = async (req, res) => {
   const { type, userId } = req.user;
   const { courseId } = req.params;
-  console.log(req.body);
+
   if (!courseId) throw new BadRequestError('Please provide course id');
 
   const course = await Course.findOne({ _id: courseId });
@@ -84,11 +85,15 @@ const updateCourse = async (req, res) => {
 
   const user = await User.findOne({
     _id: userId,
-    courses: { $in: [courseId] },
   });
 
-  if (userId !== course.createdBy.toString() && !user)
+  const isOwner =
+    course.createdBy.toString() === userId ||
+    user.courses.find((course) => course.courseId === courseId);
+
+  if (!isOwner) {
     throw new UnauthorizedError('You are not the owner of that course');
+  }
 
   const updatedCourse = await Course.findOneAndUpdate(
     { _id: courseId },
@@ -96,19 +101,17 @@ const updateCourse = async (req, res) => {
     { new: true }
   );
 
-  console.log(updatedCourse);
-
   res.status(StatusCodes.OK).json({ updatedCourse });
 };
 
 const getCoursesInstructor = async (req, res) => {
   const instructor = req.params.id;
-  const {userId,type} = req.user;
-  console.log("get courses Instructor");
+  const { userId, type } = req.user;
+  console.log('get courses Instructor');
   console.log(instructor);
   console.log(userId);
-  if(instructor !== userId && type!=="Instructor"){
-    res.status(401).send({msg:"you are not authorized to this data"});
+  if (instructor !== userId && type !== 'Instructor') {
+    res.status(401).send({ msg: 'you are not authorized to this data' });
   }
   Course.find({ createdBy: instructor }, (err, data) => {
     if (err) {
@@ -124,8 +127,8 @@ const courseEnroll = async (req, res) => {
   const { courseId } = req.params;
   const user = await User.findOne({
     _id: userId,
-    courses: { $ne: {courseId:courseId,isCompleted:false}},
-    courses: { $ne: {courseId:courseId,isCompleted:true}},
+    courses: { $ne: { courseId: courseId, isCompleted: false } },
+    courses: { $ne: { courseId: courseId, isCompleted: true } },
   });
 
   // if (type === 'Instructor') {
@@ -135,20 +138,20 @@ const courseEnroll = async (req, res) => {
   if (!user)
     throw new BadRequestError('You are already enrolled in this course');
 
-  user.courses.push({courseId:courseId,isCompleted:false});
+  user.courses.push({ courseId: courseId, isCompleted: false });
   await user.save();
   res.status(200).json({ msg: 'You are enrolled in this course' });
 };
 
-const getEnrolledCourses = async(req,res)=>{
+const getEnrolledCourses = async (req, res) => {
   const userId = req.params.id;
-  if(userId !== req.user.userId){
-    res.status(401).json({msg:"you are not authorized"});
+  if (userId !== req.user.userId) {
+    res.status(401).json({ msg: 'you are not authorized' });
   }
-  const {courses} = req.user;
+  const { courses } = req.user;
   let coursesPopulated = courses.populate('courseId');
-  res.status(200).json({courses:coursesPopulated});
-}
+  res.status(200).json({ courses: coursesPopulated });
+};
 
 module.exports = {
   createCourse,
