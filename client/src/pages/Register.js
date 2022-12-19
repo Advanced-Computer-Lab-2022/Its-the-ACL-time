@@ -1,5 +1,5 @@
 import React, { useRef, useState } from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import {
   Avatar,
   Button,
@@ -21,6 +21,7 @@ import { makeStyles } from '@material-ui/core/styles';
 import { useAppContext } from '../context/App/appContext';
 import AlertDialog from '../components/AlertDialog';
 import TermsAndConditions from '../components/TermsAndConditions';
+import contract from '../assets/contract.pdf';
 
 function Copyright() {
   return (
@@ -77,6 +78,16 @@ export default function Register() {
   const [termsAndConditions, setTermsAndConditions] = useState(false);
   const navigate = useNavigate();
 
+  const downloadContract = () => {
+    const element = document.createElement('a');
+    element.setAttribute('href', contract);
+    element.setAttribute('download', 'contract.pdf');
+    element.style.display = 'none';
+    document.body.appendChild(element);
+    element.click();
+    document.body.removeChild(element);
+  };
+
   const handleRegister = async (e) => {
     e.preventDefault();
     // get the values from the form
@@ -88,7 +99,6 @@ export default function Register() {
       country: country.value,
       endPoint: 'register',
     };
-
 
     if (
       !user.username ||
@@ -209,7 +219,9 @@ export default function Register() {
                     <Checkbox
                       value='allowExtraEmails'
                       color='primary'
-                      onChange={(e) => setDisable(!e.target.checked)}
+                      onChange={(e) => {
+                        setDisable(!e.target.checked);
+                      }}
                     />
                   }
                 />
@@ -236,7 +248,10 @@ export default function Register() {
             open={termsAndConditions}
             title='Terms and Conditions'
             content={<TermsAndConditions />}
-            handleAgree={() => setTermsAndConditions(false)}
+            handleAgree={() => {
+              downloadContract();
+              setTermsAndConditions(false);
+            }}
             handleDisagree={() => setTermsAndConditions(false)}
           ></AlertDialog>
           <Button
