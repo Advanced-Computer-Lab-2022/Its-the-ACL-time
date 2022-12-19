@@ -40,9 +40,9 @@ const CourseSchema = mongoose.Schema(
       type: Number,
     },
     promotion: {
-      type: Number,
-      start: { type: Date },
-      end: { type: Date },
+      promotionPercentage: { type: Number },
+      startDate: { type: Date },
+      endDate: { type: Date },
       promotionCode: { type: String },
     },
     createdBy: {
@@ -50,14 +50,14 @@ const CourseSchema = mongoose.Schema(
       required: [true, 'Please provide the creator'],
       ref: 'User',
     },
-    stripeProductId:{
+    stripeProductId: {
       type: String,
-      required:false,
+      required: false,
     },
-    stripePriceId :{
+    stripePriceId: {
       type: String,
-      required:false
-    }
+      required: false,
+    },
   },
   { timestamps: true }
 );

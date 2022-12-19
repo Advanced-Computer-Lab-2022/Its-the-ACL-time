@@ -1,15 +1,15 @@
-import React, { useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { useCourseContext } from '../context/Course/courseContext';
 import { makeStyles } from '@material-ui/core/styles';
-import { useParams } from 'react-router-dom';
-import { useAppContext } from '../context/App/appContext';
 import axios from 'axios';
-import { Alert } from '@material-ui/lab';
 import Button from 'react-bootstrap/Button';
 import Col from 'react-bootstrap/Col';
 import Form from 'react-bootstrap/Form';
 import Row from 'react-bootstrap/Row';
 import { FormControl, Select } from '@material-ui/core';
+import SnackBar from './SnackBar';
+import { useAppContext } from '../context/App/appContext';
+import Loading from './Loading';
 
 const useStyles = makeStyles((theme) => ({
   container: {
@@ -106,22 +106,80 @@ const useStyles = makeStyles((theme) => ({
 
 function PromotionForm() {
   const classes = useStyles();
-  const { myCourses } = useCourseContext();
-  const { courseId } = useParams();
-  const { alert, setAlert, clearAlert, alertText, alertType } = useAppContext();
-  console.log(myCourses);
+  const { myCourses, courses } = useCourseContext();
+  const [tmpCourses, setTmpCourses] = useState([]);
+  const [selectedCourse, setSelectedCourse] = useState('');
+  const [alert, setAlert] = useState(null);
+  const promotionCodeRef = useRef();
+  const startDateRef = useRef();
+  const endDateRef = useRef();
+  const promotionPercentageRef = useRef();
+  const [loading, setLoading] = useState(false);
 
-  const handleSubmit = async (e) => {};
+  useEffect(() => {
+    const tmp = [];
+    myCourses.forEach((course) => {
+      courses.forEach((c) => {
+        if (course.courseId === c._id) {
+          tmp.push(c);
+        }
+      });
+      setTmpCourses(tmp);
+    });
+  }, [myCourses, courses]);
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    const promotionPercentage = promotionPercentageRef.current.value;
+    const promotionCode = promotionCodeRef.current.value;
+    const startDate = startDateRef.current.value;
+    const endDate = endDateRef.current.value;
+
+    if (!promotionCode || !startDate || !endDate || !promotionPercentage) {
+      setAlert('Please fill in all the fields');
+      setTimeout(() => {
+        setAlert(null);
+      }, 3000);
+      return;
+    }
+    setLoading(true);
+    try {
+      const res = await axios.patch(
+        `http://localhost:8080/api/v1/course/${selectedCourse}`,
+        {
+          promotion: {
+            promotionCode,
+            promotionPercentage,
+            startDate,
+            endDate,
+          },
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem('token')}`,
+          },
+        }
+      );
+      console.log(res.data);
+      setAlert('Promotion code added successfully');
+      setTimeout(() => {
+        setAlert(null);
+      }, 3000);
+    } catch (err) {
+      console.log(err);
+      setAlert("Can't add promotion code");
+      setTimeout(() => {
+        setAlert(null);
+      }, 3000);
+    }
+    setLoading(false);
+  };
 
   return (
     <div className={`${classes.container}`}>
       <h1 className={`${classes.title}`}>Promotion Code</h1>
-
-      {alert && (
-        <Alert variant='filled' severity={alertType} sx={{ width: 20 }}>
-          {alertText}
-        </Alert>
-      )}
+      {loading && <Loading type='spin' color='white' />}
+      {alert && <SnackBar content={alert} />}
       <Form className={`${classes.form}`} onSubmit={handleSubmit}>
         <Row className='mb-3'>
           <Form.Group as={Col} controlId='formGridTitle'>
@@ -129,6 +187,7 @@ function PromotionForm() {
             <Form.Control
               type='text'
               placeholder='Enter course promotion code'
+              ref={promotionCodeRef}
             />
           </Form.Group>
 
@@ -143,9 +202,10 @@ function PromotionForm() {
                   id: 'subject',
                 }}
                 className={classes.select}
+                onChange={(e) => setSelectedCourse(e.target.value)}
               >
                 <option aria-label='None' value='' />
-                {myCourses.map((course, i) => (
+                {tmpCourses.map((course, i) => (
                   <option value={course._id} key={course._id}>
                     {course.title}
                   </option>
@@ -155,15 +215,33 @@ function PromotionForm() {
           </Form.Group>
         </Row>
         <Row className='mb-3'>
+          <Form.Group as={Col} controlId='formGridNumberOfHours'>
+            <Form.Label>Promotion Percentage</Form.Label>
+            {/* make the type of the form.control date */}
+            <Form.Control
+              type='number'
+              placeholder='Enter promotion percentage'
+              ref={promotionPercentageRef}
+            />
+          </Form.Group>
+
           <Form.Group as={Col} controlId='formGridPrice'>
             <Form.Label>Start Date</Form.Label>
-            <Form.Control type='date' placeholder='Enter course start date' />
+            <Form.Control
+              type='date'
+              placeholder='Enter course start date'
+              ref={startDateRef}
+            />
           </Form.Group>
 
           <Form.Group as={Col} controlId='formGridNumberOfHours'>
             <Form.Label>End Date</Form.Label>
             {/* make the type of the form.control date */}
-            <Form.Control type='date' placeholder='Enter course end date' />
+            <Form.Control
+              type='date'
+              placeholder='Enter course end date'
+              ref={endDateRef}
+            />
           </Form.Group>
         </Row>
 
@@ -172,7 +250,6 @@ function PromotionForm() {
           type='submit'
           className={`${classes.addCourseButton}`}
           id='addCourseButton'
-          disabled={!courseId}
         >
           Add Promotion Code
         </Button>

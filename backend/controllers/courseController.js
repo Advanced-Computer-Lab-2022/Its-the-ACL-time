@@ -53,7 +53,6 @@ const getAllCourses = async (req, res) => {
     .join(' ');
 
   let courses;
-  console.log(query);
   if (myCourses === 'true') {
     const { userId, type } = req.user;
     if (type === 'Instructor') {
@@ -61,11 +60,7 @@ const getAllCourses = async (req, res) => {
       return res.status(StatusCodes.OK).json({ courses });
     }
     courses = await User.findOne({ _id: userId });
-
-    // log the fields that are in courses
-    console.log(courses.courses);
-    console.log(req.query + ' ' + courses);
-    return res.status(StatusCodes.OK).json(courses.courses);
+    return res.status(StatusCodes.OK).json({ courses: courses.courses });
   }
   courses = await Course.find({})
     .select(`${query}`)
@@ -89,7 +84,7 @@ const updateCourse = async (req, res) => {
 
   const isOwner =
     course.createdBy.toString() === userId ||
-    user.courses.find((course) => course.courseId === courseId);
+    user.courses.find((course) => course.courseId.toString() === courseId);
 
   if (!isOwner) {
     throw new UnauthorizedError('You are not the owner of that course');

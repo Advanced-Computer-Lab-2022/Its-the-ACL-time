@@ -1,12 +1,7 @@
 import React, { useRef, useState } from 'react';
 import { makeStyles } from '@material-ui/core/styles';
 import FilterField from '../components/FilterField';
-import {
-  Box,
-  CircularProgress,
-  TextareaAutosize,
-  Typography,
-} from '@material-ui/core';
+import { Box, TextareaAutosize, Typography } from '@material-ui/core';
 import { AiFillCloseCircle, AiFillEdit, AiFillDelete } from 'react-icons/ai';
 import { useEffect } from 'react';
 import axios from 'axios';
@@ -20,6 +15,7 @@ import Review from '../components/Review';
 import RatingForm from '../components/RatingForm';
 import { useCourseContext } from '../context/Course/courseContext';
 import LinearProgressBar from '../components/LinearProgressBar';
+import { Loading } from '../components';
 
 const useStyles = makeStyles((theme) => ({
   main: {
@@ -293,17 +289,6 @@ const useStyles = makeStyles((theme) => ({
       transition: 'transform 0.3s ease-in-out',
     },
   },
-
-  loading: {
-    position: 'absolute',
-    top: '50%',
-    left: '50%',
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
-    width: '100vw',
-    height: '100vh',
-    zIndex: 1000,
-    color: 'white',
-  },
 }));
 
 const SubtitlesPage = () => {
@@ -345,26 +330,6 @@ const SubtitlesPage = () => {
     });
     doc.save('notes.pdf');
   };
-
-  // const addItemToLocalStorage = (item, type) => {
-  //   if (!localStorage.getItem(`${type}${courseId}`))
-  //     localStorage.setItem(`${type}${courseId}`, JSON.stringify([]));
-  //   let items = JSON.parse(localStorage.getItem(`${type}${courseId}`));
-  //   items.push(item);
-  //   localStorage.setItem(`${type}${courseId}`, JSON.stringify(items));
-  // };
-
-  // const removeItemFromLocalStorage = (item, type) => {
-  //   let items = JSON.parse(localStorage.getItem(`${type}${courseId}`));
-  //   let filteredItems = items.filter((i) => i !== item);
-  //   localStorage.setItem(`${type}${courseId}`, JSON.stringify(filteredItems));
-  // };
-
-  // const getItemFromLocalStorage = (type) => {
-  //   if (!localStorage.getItem(`${type}${courseId}`))
-  //     localStorage.setItem(`${type}${courseId}`, JSON.stringify([]));
-  //   return JSON.parse(localStorage.getItem(`${type}${courseId}`));
-  // };
 
   useEffect(() => {
     console.log('courseId ' + courseId);
@@ -613,7 +578,7 @@ const SubtitlesPage = () => {
 
   return (
     <main className={`${classes.main}`}>
-      {loading && <CircularProgress className={classes.loading} />}
+      {loading && <Loading />}
       <section className={`${classes.subtitles}`}>
         <LinearProgressBar value={computeProgress()} />
         <Box

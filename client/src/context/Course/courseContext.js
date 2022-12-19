@@ -49,7 +49,6 @@ const CourseProvider = ({ children }) => {
             },
           }
         );
-        console.log('myCourses: ' + response.data.courses);
         dispatch({
           type: GET_MY_COURSES,
           payload: {
