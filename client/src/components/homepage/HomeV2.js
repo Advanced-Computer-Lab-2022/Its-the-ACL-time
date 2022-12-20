@@ -6,6 +6,7 @@ import Courses from './Courses'
 import Topcourses from './Topcourses'
 import About from './About'
 import Service from './Service'
+import Footer from '../Footer'
 
 
 function HomeV2() {
@@ -17,6 +18,8 @@ function HomeV2() {
        <About/>
      <Courses></Courses>
      <Topcourses/>
+     <Footer/>
+
         </div>
     </>
   )
