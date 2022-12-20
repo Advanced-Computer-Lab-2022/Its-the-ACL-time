@@ -1,11 +1,6 @@
 import React, { useContext, useReducer, useEffect } from 'react';
 import courseReducer from './courseReducer';
-import {
-  CREATE_COURSE,
-  GET_COURSES,
-  UPDATE_COURSE,
-  GET_MY_COURSES,
-} from './courseActions';
+import { CREATE_COURSE, GET_COURSES, GET_MY_COURSES } from './courseActions';
 import axios from 'axios';
 import { useAppContext } from '../App/appContext';
 
@@ -20,6 +15,15 @@ const CourseProvider = ({ children }) => {
 
   const { token } = useAppContext();
 
+  const formMyCourses = (courses) => {
+    let tmpCourses = [];
+    courses.forEach((course) => {
+      const totalInfo = state.courses.find((c) => c._id === course.courseId);
+      tmpCourses.push({ ...course, ...totalInfo });
+    });
+    return tmpCourses;
+  };
+
   useEffect(() => {
     const getAllCourses = async () =>
       axios
@@ -29,7 +33,6 @@ const CourseProvider = ({ children }) => {
           },
         })
         .then(({ data }) => {
-          console.log('courses: ' + data.courses);
           dispatch({
             type: GET_COURSES,
             payload: {
@@ -39,6 +42,10 @@ const CourseProvider = ({ children }) => {
         })
         .catch((error) => console.log(error));
 
+    getAllCourses();
+  }, [token]);
+
+  useEffect(() => {
     const getMyCourses = async () => {
       try {
         const response = await axios.get(
@@ -52,7 +59,7 @@ const CourseProvider = ({ children }) => {
         dispatch({
           type: GET_MY_COURSES,
           payload: {
-            courses: response.data.courses,
+            courses: formMyCourses(response.data.courses),
           },
         });
       } catch (error) {
@@ -60,11 +67,10 @@ const CourseProvider = ({ children }) => {
       }
     };
 
-    getAllCourses();
-    if (token) {
+    if ((token, state.courses.length > 0)) {
       getMyCourses();
     }
-  }, [token]);
+  }, [state.courses, token]);
 
   const createCourse = async (course) => {
     console.log(course);
