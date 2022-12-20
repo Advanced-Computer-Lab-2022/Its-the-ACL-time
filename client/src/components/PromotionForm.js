@@ -110,7 +110,6 @@ function PromotionForm() {
   const [tmpCourses, setTmpCourses] = useState([]);
   const [selectedCourse, setSelectedCourse] = useState('');
   const [alert, setAlert] = useState(null);
-  const promotionCodeRef = useRef();
   const startDateRef = useRef();
   const endDateRef = useRef();
   const promotionPercentageRef = useRef();
@@ -131,11 +130,10 @@ function PromotionForm() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     const promotionPercentage = promotionPercentageRef.current.value;
-    const promotionCode = promotionCodeRef.current.value;
     const startDate = startDateRef.current.value;
     const endDate = endDateRef.current.value;
 
-    if (!promotionCode || !startDate || !endDate || !promotionPercentage) {
+    if (!startDate || !endDate || !promotionPercentage) {
       setAlert('Please fill in all the fields');
       setTimeout(() => {
         setAlert(null);
@@ -148,7 +146,6 @@ function PromotionForm() {
         `http://localhost:8080/api/v1/course/${selectedCourse}`,
         {
           promotion: {
-            promotionCode,
             promotionPercentage,
             startDate,
             endDate,
@@ -182,19 +179,9 @@ function PromotionForm() {
       {alert && <SnackBar content={alert} />}
       <Form className={`${classes.form}`} onSubmit={handleSubmit}>
         <Row className='mb-3'>
-          <Form.Group as={Col} controlId='formGridTitle'>
-            <Form.Label>Promotion Code</Form.Label>
-            <Form.Control
-              type='text'
-              placeholder='Enter course promotion code'
-              ref={promotionCodeRef}
-            />
-          </Form.Group>
-
           <Form.Group as={Col} controlId='formGridSubject'>
             <FormControl variant='filled' className={classes.formControl}>
               <Form.Label>Course</Form.Label>
-
               <Select
                 native
                 inputProps={{
@@ -213,8 +200,7 @@ function PromotionForm() {
               </Select>
             </FormControl>
           </Form.Group>
-        </Row>
-        <Row className='mb-3'>
+
           <Form.Group as={Col} controlId='formGridNumberOfHours'>
             <Form.Label>Promotion Percentage</Form.Label>
             {/* make the type of the form.control date */}
@@ -224,7 +210,8 @@ function PromotionForm() {
               ref={promotionPercentageRef}
             />
           </Form.Group>
-
+        </Row>
+        <Row className='mb-3'>
           <Form.Group as={Col} controlId='formGridPrice'>
             <Form.Label>Start Date</Form.Label>
             <Form.Control

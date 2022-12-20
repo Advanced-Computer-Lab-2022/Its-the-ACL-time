@@ -43,7 +43,6 @@ const CourseSchema = mongoose.Schema(
       promotionPercentage: { type: Number },
       startDate: { type: Date },
       endDate: { type: Date },
-      promotionCode: { type: String },
     },
     createdBy: {
       type: mongoose.Types.ObjectId,
