@@ -1,7 +1,7 @@
 import Grid from '@material-ui/core/Grid';
 import Typography from '@material-ui/core/Typography';
 import { makeStyles } from '@material-ui/core/styles';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import LinearProgressBar from '../LinearProgressBar';
 import { useRef, useState } from 'react';
 import {
@@ -11,6 +11,7 @@ import {
 } from 'react-icons/ai';
 import { FaStar } from 'react-icons/fa';
 import RatingStars from '../RatingStars';
+import { Box } from '@material-ui/core';
 
 const useStyles = makeStyles((theme) => ({
   img: {
@@ -24,6 +25,7 @@ const useStyles = makeStyles((theme) => ({
     padding: '1rem',
     boxShadow: '0 0 10px rgba(.5,.5,.5,0.1)',
     marginBottom: '1rem',
+    width: '100%',
   },
 
   course: {
@@ -211,15 +213,17 @@ function CourseComponent({
   const classes = useStyles();
   const [showDemo, setShowDemo] = useState(false);
   const courseRef = useRef();
+  const navigate = useNavigate();
+
   return (
     <>
       {horizontal && (
         <div className={`${classes.root}`} ref={courseRef}>
-          <Link
-            to={`/course/${courseId}`}
+          <Box
             style={{
               textDecoration: 'none',
               color: 'black',
+              cursor: 'pointer',
             }}
             onMouseEnter={() => {
               setShowDemo(true);
@@ -227,7 +231,7 @@ function CourseComponent({
             onMouseLeave={() => setShowDemo(false)}
           >
             <Grid container spacing={2}>
-              <Grid item>
+              <Grid item onClick={() => navigate(`/course/${courseId}`)}>
                 <img
                   className={classes.img}
                   alt='complex'
@@ -238,21 +242,62 @@ function CourseComponent({
               <Grid item xs={5} sm container>
                 <Grid item xs container direction='column' spacing={2}>
                   <Grid item xs>
-                    <Typography gutterBottom style={{ fontWeight: 'bold' }}>
-                      {title && title}
-                    </Typography>
-                    <Typography variant='body2' gutterBottom>
-                      {description && description}
-                    </Typography>
-                    <Typography gutterBottom variant='body2'>
-                      {instructor && instructor}
-                    </Typography>
-                    <Typography variant='body2' color='textSecondary'>
-                      {subject && subject}
-                    </Typography>
+                    <div onClick={() => navigate(`/course/${courseId}`)}>
+                      <Typography gutterBottom style={{ fontWeight: 'bold' }}>
+                        {title && title}
+                      </Typography>
+                      <Typography variant='body2' gutterBottom>
+                        {description && description.slice(0, 100)}
+                      </Typography>
+                      <Typography gutterBottom variant='body2'>
+                        {instructor && instructor}
+                      </Typography>
+                      <Typography variant='body2' color='textSecondary'>
+                        {subject && subject}
+                      </Typography>
+                    </div>
+                    {progress && (
+                      <div
+                        style={{
+                          width: '100%',
+                          display: 'flex',
+                          flexDirection: 'column',
+                          justifyContent: 'center',
+                        }}
+                      >
+                        <LinearProgressBar value={progress} />
+                        <Typography
+                          gutterBottom
+                          style={{ fontWeight: '300' }}
+                          variant='caption'
+                        >
+                          {progress}% Completed
+                        </Typography>
+                      </div>
+                    )}
 
-                    <div>
+                    <div
+                      style={{
+                        display: 'flex',
+                        flexDirection: 'row',
+                        alignItems: 'center',
+                        justifyContent: 'space-between',
+                      }}
+                    >
                       <RatingStars rate={rating} />
+                      {progress === 100 && (
+                        <Typography
+                          variant='body2'
+                          color='textSecondary'
+                          style={{
+                            fontWeight: 'bold',
+                            cursor: 'pointer',
+                            textDecoration: 'underline',
+                          }}
+                        >
+                          Download Certificate
+                        </Typography>
+                      )}
                     </div>
                   </Grid>
                 </Grid>
@@ -302,7 +347,7 @@ function CourseComponent({
                 />
               )}
             </div>
-          </Link>
+          </Box>
         </div>
       )}
       {!horizontal && (
@@ -357,7 +402,8 @@ function CourseComponent({
                 color='textSecondary'
                 className={`${classes.description}`}
               >
-                {description?.slice(0, 50) || 'Course Description'}
+                {(description && description.slice(0, 50)) ||
+                  'Course Description'}
               </Typography>
               {price && <Typography variant='subtitle1'>${price}</Typography>}
               {progress && (

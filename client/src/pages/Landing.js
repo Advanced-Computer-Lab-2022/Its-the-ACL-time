@@ -1,10 +1,8 @@
 import React from 'react';
-import { useCourseContext } from '../context/Course/courseContext';
+import HomeV2 from '../components/homepage/HomeV2';
 
 const Landing = () => {
-  const courses = useCourseContext();
-
-  return <div>Landing</div>;
+  return <HomeV2></HomeV2>;
 };
 
 export default Landing;

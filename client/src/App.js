@@ -54,6 +54,7 @@ function App() {
       <CourseProvider>
         <SearchProvider>
           <Routes>
+            <Route path='/landing' element={<Landing />} />
             <Route path='admin' element={<Admin />}>
               <Route path='' element={<UserforAdmin />} />
               <Route path='users' element={<UserforAdmin />} />
@@ -86,12 +87,11 @@ function App() {
                 </>
               }
             >
-              <Route path='/landing' element={<Landing />} />
               <Route
                 index
                 element={
                   <ProtectedRoute>
-                    <HomeV2 />
+                    <Home />
                   </ProtectedRoute>
                 }
               />

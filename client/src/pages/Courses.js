@@ -1,54 +1,41 @@
 import React from 'react';
 import { makeStyles } from '@material-ui/core/styles';
-import Course from '../components/course/CourseComponent';
-import { useCourseContext } from '../context/Course/courseContext';
+import CourseComponent from '../components/course/CourseComponent';
 
 const useStyles = makeStyles((theme) => ({
-  root: {
-    display: 'flex',
-    flexWrap: 'wrap',
-    justifyContent: 'space-between',
-  },
-
-  coursesSection: {
-    width: '70%',
+  container: {
     display: 'flex',
     flexDirection: 'column',
-    marginTop: '12rem',
-    marginRight: '1rem',
-  },
-  results: {
-    marginLeft: 'auto',
-    marginRight: '1.3rem',
-    fontSize: '1.2rem',
-    fontWeight: '600',
-    color: '#A9A9A9',
+    alignItems: 'flex-start',
+    width: '100%',
   },
 }));
 
-export default function SearchResult() {
+export default function Courses({ courses, page, completed }) {
   const classes = useStyles();
-  const { courses } = useCourseContext();
-  console.log("courses",courses);
+
   return (
-    <div className="container">
-      <section className='d-flex flex-wrap'>
-        {courses.map((course) => {
-          return (
-            <Course
-              key={course._id}
-              title={course.title}
-              subject={course.subject}
-              description={course.summary}
-              instructor={course.createdBy.username}
-              price={course.price}
-              courseId={course._id}
-              horizontal={true}
-              rating={course.rating}
-            />
-          );
-        })}
-      </section>
-    </div>
+    <>
+      <div className={classes.container}>
+        {courses
+          .slice(page * 3, Math.min(page * 3 + 3, courses.length))
+          .map((course) => {
+            return (
+              <CourseComponent
+                key={course?._id}
+                title={course?.title}
+                subject={course?.subject}
+                description={course?.summary}
+                instructor={course?.createdBy.username}
+                price={course?.price}
+                courseId={course?._id}
+                horizontal={true}
+                rating={course?.rating}
+                progress={course?.progress}
+              />
+            );
+          })}
+      </div>
+    </>
   );
 }

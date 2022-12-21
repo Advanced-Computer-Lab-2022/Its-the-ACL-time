@@ -3,7 +3,6 @@ import html2canvas from 'html2canvas';
 import { jsPDF } from 'jspdf';
 import { makeStyles } from '@material-ui/core';
 import certificate from '../assets/images/certificate.svg';
-import { useSearchParams } from 'react-router-dom';
 
 const useStyles = makeStyles((theme) => ({
   certificate: {
@@ -49,11 +48,9 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-const Certificate = () => {
+const Certificate = ({ username, course }) => {
   const inputRef = useRef(null);
   const classes = useStyles();
-  const [searchParams, setSearchParams] = useSearchParams();
-  console.log(searchParams);
 
   const downloadCertificate = () => {
     html2canvas(inputRef.current).then((canvas) => {
@@ -81,11 +78,11 @@ const Certificate = () => {
         <main className={`${classes.main}`}>
           <p>Awarded to</p>
           <p>
-            <strong>{searchParams.get('username')}</strong>
+            <strong>{username}</strong>
           </p>
           <p>for successfully completing</p>
           <p>
-            <strong>{searchParams.get('course')}</strong>
+            <strong>{course}</strong>
           </p>
         </main>
         <footer className={`${classes.footer}`}>
