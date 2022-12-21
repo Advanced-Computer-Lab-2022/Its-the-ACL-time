@@ -13,6 +13,8 @@ const {
   GetBio,
   updateBio,
   updateEmail,
+  createreport,
+  getreport,
 } = require('../controllers/userController');
 
 const {
@@ -49,6 +51,14 @@ router.delete('/certification/:id', authAdmin, deleteCertification);
 router.patch('/restestpassword', changePassword);
 router.patch('/updateBio', updateBio);
 router.patch('/updateEmail', updateEmail);
+router.post('/reportproblem', createreport);
+router.get('/getrport', getreport);
+
+router.post('/courserequest', updateEmail);
+
+
+
+
 
 router.get('/GetBio', GetBio);
 

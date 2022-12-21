@@ -14,14 +14,14 @@ router.get('/report',AdminController.getAllreport);
 //mark report as resovle or pending
 router.patch('/reportstate',AdminController.updatereport)
 //refund an amoute to trainee
-router.patch('trineerefund',)
+router.patch('/trineerefund',)
 //get all course request
 router.get('/coursereqeut',AdminController.getAllcourserequest)
 router.get('/courses',AdminController.getallcourses)
 
 
 // grant the course request
-router.patch('grantcourse',AdminController.updatecourserequest)
+router.patch('/grantcourse',AdminController.updatecourserequest)
 //set promotion for course
 router.patch('/setpromotion',AdminController.setpromtion)
 
