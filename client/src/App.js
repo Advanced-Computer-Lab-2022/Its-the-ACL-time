@@ -18,12 +18,17 @@ import {
   FailedPayment,
 } from './pages';
 import { NavBar, CourseForm, Courses } from './components';
-import {UserforAdmin,GetCourse,Report,DataGridDemo,CourseRequest} from'./components/admin'
+import {
+  UserforAdmin,
+  GetCourse,
+  Report,
+  DataGridDemo,
+  CourseRequest,
+} from './components/admin';
 
 import AddSubtitleForm from './components/subtitle/AddSubtitleForm';
 import { CourseProvider } from './context/Course/courseContext';
 import { SearchProvider } from './context/Search/searchContext';
-import { PaymentProvider } from './context/Payment/payment';
 import Filter from './components/Filter';
 import { CourseComponent } from './components/course';
 import Certificate from './components/Certificate';
@@ -41,92 +46,94 @@ import BioGraphy from './components/instructor/BioGraphy';
 import Setting from './components/instructor/Setting';
 import ExamForm from './components/ExamForm';
 import HomeV2 from './components/homepage/HomeV2';
+import PromotionForm from './components/PromotionForm';
 
 function App() {
   return (
     <BrowserRouter>
-      <PaymentProvider>
-        <CourseProvider>
-          <SearchProvider>
-            <Routes>
-            
-            <Route path="admin" element={<Admin />}>
-            <Route path="" element={<UserforAdmin/>}/>
-            <Route path="users" element={<UserforAdmin/>}/>
-            <Route path="Report" element={<Report></Report>}/>
-            <Route path="courserequest" element={<CourseRequest></CourseRequest>}/>
-            <Route path="course" element={<GetCourse></GetCourse>}/>
-            <Route path="test" element={<DataGridDemo/>}/>
-
-              </Route>
-              <Route path='/resetPassword' element={<SuccessResetPassword />} />
-              <Route path='/forgetPassword' element={<ForgetPassword />} />
-              <Route path='/resetPassword/:token' element={<ResetPassword />} />
-              <Route path='/login' element={<Login />} />
-              <Route path='/register' element={<Register />} />
-              <Route path='/payment' element={<Payment />} />
-              <Route path='/SuccessPayment' element={<SuccessPayment />} />
-              <Route path='/FailedPayment' element={<SuccessPayment />} />
-              <Route path='/profile' element={<Instructorprofile />}>
-                <Route path='' element={<Instructor></Instructor>}></Route>
-                <Route path='BioGraphy' element={<BioGraphy></BioGraphy>} />
-                <Route path='myCourses' element={<Instructor></Instructor>} />
-                <Route path='gg' element={<Setting></Setting>} />
-              </Route>
+      <CourseProvider>
+        <SearchProvider>
+          <Routes>
+            <Route path='admin' element={<Admin />}>
+              <Route path='' element={<UserforAdmin />} />
+              <Route path='users' element={<UserforAdmin />} />
+              <Route path='Report' element={<Report></Report>} />
               <Route
+                path='courserequest'
+                element={<CourseRequest></CourseRequest>}
+              />
+              <Route path='course' element={<GetCourse></GetCourse>} />
+              <Route path='test' element={<DataGridDemo />} />
+            </Route>
+            <Route path='/resetPassword' element={<SuccessResetPassword />} />
+            <Route path='/forgetPassword' element={<ForgetPassword />} />
+            <Route path='/resetPassword/:token' element={<ResetPassword />} />
+            <Route path='/login' element={<Login />} />
+            <Route path='/register' element={<Register />} />
+            <Route path='/payment' element={<Payment />} />
+            <Route path='/SuccessPayment' element={<SuccessPayment />} />
+            <Route path='/FailedPayment' element={<FailedPayment />} />
+            <Route path='/profile' element={<Instructorprofile />}>
+              <Route path='' element={<Instructor></Instructor>}></Route>
+              <Route path='BioGraphy' element={<BioGraphy></BioGraphy>} />
+              <Route path='myCourses' element={<Instructor></Instructor>} />
+              <Route path='gg' element={<Setting></Setting>} />
+            </Route>
+            <Route
+              element={
+                <>
+                  <NavBar />
+                </>
+              }
+            >
+              <Route path='/landing' element={<Landing />} />
+              <Route
+                index
                 element={
-                  <>
-                    <NavBar />
-                  </>
+                  <ProtectedRoute>
+                    <HomeV2 />
+                  </ProtectedRoute>
                 }
-              >
-                <Route path='/landing' element={<Landing />} />
-                <Route
-                  index
-                  element={
-                    <ProtectedRoute>
-                      <HomeV2/>
-                    </ProtectedRoute>
-                  }
-                />
-                <Route path='/addCourse' element={<CourseForm />} />
-                <Route
-                  path='/updateCourse/:courseId'
-                  element={<CourseForm />}
-                />
-                <Route
-                  path='/course/:courseId/subtitle'
-                  element={<AddSubtitleForm />}
-                />
-                <Route
-                  path='/course/:courseId/content'
-                  element={<SubtitlesPage />}
-                />
-                <Route path='/course/:courseId' element={<CoursePage />} />
-                <Route
-                  path='/course/:courseId/createExam'
-                  element={<ExamForm />}
-                />
+              />
+              <Route path='/addCourse' element={<CourseForm />} />
+              <Route path='/updateCourse/:courseId' element={<CourseForm />} />
+              <Route
+                path='/course/:courseId/subtitle'
+                element={<AddSubtitleForm />}
+              />
+              <Route
+                path='/course/:courseId/content'
+                element={<SubtitlesPage />}
+              />
+              <Route path='/course/:courseId' element={<CoursePage />} />
+              <Route
+                path='/course/:courseId/createExam'
+                element={<ExamForm />}
+              />
 
-                {/* <Route path='/course/:courseId' element={<CourseForm />} /> */}
-                <Route path='/results' element={<SearchResult />} />
-              </Route>
-              <Route path='/rating' element={<RatingForm />} />
-              <Route path='/filter' element={<Filter />} />
-              <Route path='/certificate' element={<Certificate />} />
-              <Route path='/dialog' element={<AlertDialog />} />
-              <Route path='/test' element={<Test />} />
-              <Route path='/question' element={<Question />} />
-              <Route path='/exam' element={<Exam />} />
-              <Route path='/courseComponent' element={<CourseComponent />} />
-              <Route path='/progress' element={<LinearProgressBar />} />
-              <Route path='/footer' element={<Footer />} />
-              <Route path='/review' element={<Review />} />
-              <Route path='/rate' element={<RatingStars />} />
-            </Routes>
-          </SearchProvider>
-        </CourseProvider>
-      </PaymentProvider>
+              <Route
+                path='/myCourses/addPromotion'
+                element={<PromotionForm />}
+              />
+
+              {/* <Route path='/course/:courseId' element={<CourseForm />} /> */}
+              <Route path='/results' element={<SearchResult />} />
+            </Route>
+            <Route path='/rating' element={<RatingForm />} />
+            <Route path='/filter' element={<Filter />} />
+            <Route path='/certificate' element={<Certificate />} />
+            <Route path='/dialog' element={<AlertDialog />} />
+            <Route path='/test' element={<Test />} />
+            <Route path='/question' element={<Question />} />
+            <Route path='/exam' element={<Exam />} />
+            <Route path='/courseComponent' element={<CourseComponent />} />
+            <Route path='/progress' element={<LinearProgressBar />} />
+            <Route path='/footer' element={<Footer />} />
+            <Route path='/review' element={<Review />} />
+            <Route path='/rate' element={<RatingStars />} />
+          </Routes>
+        </SearchProvider>
+      </CourseProvider>
     </BrowserRouter>
   );
 }

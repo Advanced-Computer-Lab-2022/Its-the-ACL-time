@@ -1,17 +1,19 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { makeStyles } from '@material-ui/core/styles';
-import { useParams } from 'react-router-dom';
+import { Link, useParams } from 'react-router-dom';
 import axios from 'axios';
 import { useCourseContext } from '../context/Course/courseContext';
 import SubTitles from '../components/subtitle/SubTitles';
 import { Box, Typography } from '@material-ui/core';
 import Review from '../components/Review';
-import { CourseComponent } from '../components';
+import { CourseComponent, Loading } from '../components';
 import { AiOutlineCheck } from 'react-icons/ai';
 import { useAppContext } from '../context/App/appContext';
 import { AiFillVideoCamera } from 'react-icons/ai';
 import { MdOutlineArticle } from 'react-icons/md';
 import { TbCertificate } from 'react-icons/tb';
+import AlertDialog from '../components/AlertDialog';
+import SnackBar from '../components/SnackBar';
 
 const useStyles = makeStyles((theme) => ({
   main: {
@@ -227,16 +229,34 @@ const CoursePage = () => {
   const classes = useStyles();
   const { courseId } = useParams();
   const [subtitles, setSubtitles] = useState([]);
-  const { courses } = useCourseContext();
+  const { courses, myCourses } = useCourseContext();
   const [course, setCourse] = useState({});
   const { token } = useAppContext();
   const [showDescription, setShowDescription] = useState(false);
   const [applyCoupon, setApplyCoupon] = useState(false);
+  const [requestRefund, setRequestRefund] = useState(false);
+  const [isOwner, setIsOwner] = useState(false);
+  const [discountPrice, setDiscountPrice] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [alert, setAlert] = useState(null);
+  const inputRef = useRef();
 
   useEffect(() => {
     function getCourse() {
       const course = courses.find((course) => course._id === courseId);
       setCourse(course);
+      if (course) {
+        const promotion = course.promotion;
+        const currentDate = new Date();
+        const startDate = new Date(promotion.startDate);
+        const endDate = new Date(promotion.endDate);
+        if (currentDate >= startDate && currentDate <= endDate) {
+          setDiscountPrice(
+            course.price - (course.price * promotion.promotionPercentage) / 100
+          );
+        }
+      }
+      setLoading(false);
     }
 
     async function getSubtitles() {
@@ -251,74 +271,153 @@ const CoursePage = () => {
       console.log(response.data.subTitles);
       setSubtitles(response.data.subTitles);
     }
+
+    function isOwner() {
+      const course = myCourses.find((course) => course._id === courseId);
+      if (course) {
+        setIsOwner(true);
+      }
+    }
+
+    isOwner();
     getCourse();
     getSubtitles();
-  }, [courseId, courses]);
+  }, [courseId, courses, myCourses, token]);
+
+  const requestRefundHandler = () => {
+    setLoading(true);
+    const money = inputRef.current.value;
+    setRequestRefund(false);
+    try {
+      const response = axios.post(
+        `http://localhost:8080/api/v1/refund`,
+        {
+          refundMoney: money,
+          courseId,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      console.log(response);
+      setAlert("You've requested a refund successfully");
+    } catch (error) {
+      console.log(error);
+      setAlert('Something went wrong');
+    }
+    setLoading(false);
+    setTimeout(() => {
+      setAlert(null);
+    }, 3000);
+  };
 
   const applyCouponHandler = () => {
     console.log('apply coupon');
   };
 
   return (
-    <main className={`${classes.main}`}>
-      <div className={`${classes.background}`}>
-        <div className={`${classes.info}`}>
-          <h1>{course?.title}</h1>
-          <h2>{course?.subject}</h2>
-          <p>{course && course?.summary?.slice(0, 50)}</p>
-        </div>
-        <Box className={`${classes.reviewCourse}`}>
-          <div className={`${classes.reviewVideo}`}></div>
-          <div className={`${classes.finalPrice}`}>
-            <Typography variant='h6' className={`${classes.discountPrice}`}>
-              {course?.price || 'discount price'} $
-            </Typography>
-            <Typography variant='h6' className={`${classes.actualPrice}`}>
-              {course?.price - course?.price * (course?.promotion / 100) ||
-                'actual price'}{' '}
-              $
-            </Typography>
-            <Typography variant='h6' className={`${classes.discount}`}>
-              {course?.promotion || 'promotion'}%
-            </Typography>
-          </div>
-          <button className={`${classes.addToCart}`}>Add To Cart</button>
-          <p>
-            <AiOutlineCheck /> 30-Day Money-Back Guarantee
-          </p>
-          <p>
-            <AiOutlineCheck />
-            Full Lifetime Access
-          </p>
-          {!applyCoupon && (
-            <button
-              className={classes.coupon}
-              onClick={() => setApplyCoupon(true)}
-            >
-              Apply Coupon
-            </button>
-          )}
-          {applyCoupon && (
-            <>
-              <hr className={`${classes.line}`} />
-              <div className={`{${classes.applyCoupon}}`}>
-                <input
-                  type='text'
-                  placeholder='Enter Coupon Code'
-                  className={`${classes.applyCouponInput}`}
-                />
+    <>
+      {loading && <Loading type={'spin'} color={'#3f51b5'} />}
+      {!loading && (
+        <main className={`${classes.main}`}>
+          <div className={`${classes.background}`}>
+            <div className={`${classes.info}`}>
+              <h1
+                style={{
+                  color: 'white',
+                }}
+              >
+                {course?.title}
+              </h1>
+              <h2
+                style={{
+                  color: 'white',
+                }}
+              >
+                {course?.subject}
+              </h2>
+              <p>{course && course?.summary?.slice(0, 50)}</p>
+            </div>
+            <AlertDialog
+              handleAgree={() => requestRefundHandler()}
+              handleDisagree={() => setRequestRefund(false)}
+              open={requestRefund}
+              title='Request Refund'
+              content='Are you sure you want to request refund?'
+            />
+            {alert && <SnackBar content={alert} />}
+
+            <Box className={`${classes.reviewCourse}`}>
+              <div className={`${classes.reviewVideo}`}></div>
+              {!isOwner && (
+                <div className={`${classes.finalPrice}`}>
+                  <Typography
+                    variant='h6'
+                    className={`${classes.discountPrice}`}
+                  >
+                    {discountPrice && discountPrice}
+                    {!discountPrice && course?.price}$
+                  </Typography>
+                  <Typography variant='h6' className={`${classes.actualPrice}`}>
+                    {discountPrice && course?.price}
+                  </Typography>
+                  <Typography variant='h6' className={`${classes.discount}`}>
+                    {discountPrice &&
+                      `${course?.promotion.promotionPercentage}%`}
+                  </Typography>
+                </div>
+              )}
+
+              <button className={`${classes.addToCart}`}>
+                {isOwner ? (
+                  <Link to={`/course/${courseId}/content`}>Go to course</Link>
+                ) : (
+                  <Link to={``}>Buy Now</Link>
+                )}
+              </button>
+              <p>
+                <AiOutlineCheck /> 30-Day Money-Back Guarantee
+              </p>
+              <p>
+                <AiOutlineCheck />
+                Full Lifetime Access
+              </p>
+              {!applyCoupon && (
                 <button
-                  className={classes.applyCouponButton}
-                  onClick={applyCouponHandler}
+                  className={classes.coupon}
+                  onClick={() => setApplyCoupon(true)}
                 >
-                  Apply
+                  {isOwner ? <>Request Refund</> : <>Apply Coupon</>}
                 </button>
-              </div>
-            </>
-          )}
-        </Box>
-        {/* frame for youtube video here  */}
-        {/* <iframe
+              )}
+              {applyCoupon && (
+                <>
+                  <hr className={`${classes.line}`} />
+                  <div className={`{${classes.applyCoupon}}`}>
+                    <input
+                      type={isOwner ? 'number' : 'text'}
+                      placeholder={
+                        isOwner ? 'Enter the amount of money' : 'Enter coupon'
+                      }
+                      className={`${classes.applyCouponInput}`}
+                      ref={inputRef}
+                    />
+                    <button
+                      className={classes.applyCouponButton}
+                      onClick={() => {
+                        isOwner ? setRequestRefund(true) : applyCouponHandler();
+                      }}
+                    >
+                      {isOwner ? 'Request' : 'Apply'}
+                    </button>
+                  </div>
+                </>
+              )}
+            </Box>
+            {/* frame for youtube video here  */}
+            {/* <iframe
           width='560'
           height='315'
           src='https://www.youtube.com/embed/QPzmsQ86_HM'
@@ -327,110 +426,112 @@ const CoursePage = () => {
           allow='accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture'
           allowfullscreen
         ></iframe> */}
-      </div>
-      <div className={`${classes.content}`}>
-        <section className={`${classes.description}`}>
-          <h2 className={`${classes.title}`}>Description</h2>
-          {course?.summary && (
-            <Box>
-              {course?.summary.slice(
-                0,
-                showDescription ? course?.summary.length : 300
-              )}
-              {course?.summary.length > 300 && (
-                <p>
-                  <button
-                    className={`${classes.showMore}`}
-                    onClick={() => setShowDescription(!showDescription)}
-                  >
-                    {showDescription ? 'Show less' : 'Show more'}
-                  </button>
-                </p>
-              )}
-            </Box>
-          )}
-        </section>
-
-        <section className={classes.courseInclude}>
-          <h2 className={`${classes.title}`}>This course includes</h2>
-          <div className={`${classes.included}`}>
-            <Box className={classes.cart}>
-              <AiFillVideoCamera className={classes.icon} />
-              <p className={classes.comment}> 10 hours on-demand video</p>
-            </Box>
-            <Box className={classes.cart}>
-              <MdOutlineArticle className={classes.icon} />
-              <p className={classes.comment}> 10 articles</p>
-            </Box>
-            <Box className={classes.cart}>
-              <TbCertificate className={classes.icon} />
-              <p className={classes.comment}> Certificate of Completion</p>
-            </Box>
           </div>
-        </section>
+          <div className={`${classes.content}`}>
+            <section className={`${classes.description}`}>
+              <h2 className={`${classes.title}`}>Description</h2>
+              {course?.summary && (
+                <Box>
+                  {course?.summary.slice(
+                    0,
+                    showDescription ? course?.summary.length : 300
+                  )}
+                  {course?.summary.length > 300 && (
+                    <p>
+                      <button
+                        className={`${classes.showMore}`}
+                        onClick={() => setShowDescription(!showDescription)}
+                      >
+                        {showDescription ? 'Show less' : 'Show more'}
+                      </button>
+                    </p>
+                  )}
+                </Box>
+              )}
+            </section>
 
-        <section>
-          <h2 className={`${classes.title}`}>Content</h2>
-          <div className={`${classes.subtitle}`}>
-            <SubTitles data={subtitles} />
-            <br />
-            <br />
-          </div>
-        </section>
+            <section className={classes.courseInclude}>
+              <h2 className={`${classes.title}`}>This course includes</h2>
+              <div className={`${classes.included}`}>
+                <Box className={classes.cart}>
+                  <AiFillVideoCamera className={classes.icon} />
+                  <p className={classes.comment}> 10 hours on-demand video</p>
+                </Box>
+                <Box className={classes.cart}>
+                  <MdOutlineArticle className={classes.icon} />
+                  <p className={classes.comment}> 10 articles</p>
+                </Box>
+                <Box className={classes.cart}>
+                  <TbCertificate className={classes.icon} />
+                  <p className={classes.comment}> Certificate of Completion</p>
+                </Box>
+              </div>
+            </section>
 
-        <section>
-          <h2 className={`${classes.title}`}>Reviews</h2>
-          {course && course?.reviews && (
-            <Box
-              display='flex'
-              flexDirection='row'
-              className={`${classes.Items}`}
-            >
-              {course?.reviews.map((review) => (
-                <Review
-                  key={review._id}
-                  username={review.username}
-                  reviewText={review.review}
-                  rate={review?.rate}
-                />
-              ))}
-            </Box>
-          )}
-          <br />
-        </section>
+            <section>
+              <h2 className={`${classes.title}`}>Content</h2>
+              <div className={`${classes.subtitle}`}>
+                <SubTitles data={subtitles} />
+                <br />
+                <br />
+              </div>
+            </section>
 
-        <section>
-          <h2 className={`${classes.title}`}>Suggested Courses</h2>
-          {courses && (
-            <Box
-              display='flex'
-              flexDirection='row'
-              justifyContent='center'
-              className={`${classes.Items}`}
-            >
-              {courses.map(
-                (item) =>
-                  course &&
-                  course.subject === item.subject && (
-                    <CourseComponent
-                      key={item._id}
-                      title={item.title}
-                      subject={item.subject}
-                      description={item.summary}
-                      instructor={item.createdBy.username}
-                      price={item.price}
-                      courseId={item._id}
-                      horizontal={false}
+            <section>
+              <h2 className={`${classes.title}`}>Reviews</h2>
+              {course && course?.reviews && (
+                <Box
+                  display='flex'
+                  flexDirection='row'
+                  className={`${classes.Items}`}
+                >
+                  {course?.reviews.map((review) => (
+                    <Review
+                      key={review._id}
+                      username={review.username}
+                      reviewText={review.review}
+                      rate={review?.rate}
                     />
-                  )
+                  ))}
+                </Box>
               )}
-            </Box>
-          )}
-        </section>
-        <br />
-        <br />
-      </div>
-    </main>
+              <br />
+            </section>
+
+            <section>
+              <h2 className={`${classes.title}`}>Suggested Courses</h2>
+              {courses && (
+                <Box
+                  display='flex'
+                  flexDirection='row'
+                  justifyContent='center'
+                  className={`${classes.Items}`}
+                >
+                  {courses.map(
+                    (item) =>
+                      course &&
+                      course.subject === item.subject && (
+                        <CourseComponent
+                          key={item._id}
+                          title={item.title}
+                          subject={item.subject}
+                          description={item.summary}
+                          instructor={item.createdBy.username}
+                          price={item.price}
+                          courseId={item._id}
+                          horizontal={false}
+                        />
+                      )
+                  )}
+                </Box>
+              )}
+            </section>
+            <br />
+            <br />
+          </div>
+        </main>
+      )}
+    </>
   );
 };
 

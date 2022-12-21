@@ -1,10 +1,8 @@
 import { useRef } from 'react';
 import html2canvas from 'html2canvas';
 import { jsPDF } from 'jspdf';
-import { Box } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core';
 import certificate from '../assets/images/certificate.svg';
-import axios from 'axios';
 import { useSearchParams } from 'react-router-dom';
 
 const useStyles = makeStyles((theme) => ({

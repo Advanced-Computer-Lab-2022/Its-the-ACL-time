@@ -15,6 +15,7 @@ import Review from '../components/Review';
 import RatingForm from '../components/RatingForm';
 import { useCourseContext } from '../context/Course/courseContext';
 import LinearProgressBar from '../components/LinearProgressBar';
+import { Loading } from '../components';
 
 const useStyles = makeStyles((theme) => ({
   main: {
@@ -293,7 +294,7 @@ const useStyles = makeStyles((theme) => ({
 const SubtitlesPage = () => {
   const classes = useStyles();
 
-  const [seeProgress, setSeeProgress] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [showList, setShowList] = useState(true);
   const [subtitles, setSubtitles] = useState([]);
   const [exams, setExams] = useState([]);
@@ -329,26 +330,6 @@ const SubtitlesPage = () => {
     });
     doc.save('notes.pdf');
   };
-
-  // const addItemToLocalStorage = (item, type) => {
-  //   if (!localStorage.getItem(`${type}${courseId}`))
-  //     localStorage.setItem(`${type}${courseId}`, JSON.stringify([]));
-  //   let items = JSON.parse(localStorage.getItem(`${type}${courseId}`));
-  //   items.push(item);
-  //   localStorage.setItem(`${type}${courseId}`, JSON.stringify(items));
-  // };
-
-  // const removeItemFromLocalStorage = (item, type) => {
-  //   let items = JSON.parse(localStorage.getItem(`${type}${courseId}`));
-  //   let filteredItems = items.filter((i) => i !== item);
-  //   localStorage.setItem(`${type}${courseId}`, JSON.stringify(filteredItems));
-  // };
-
-  // const getItemFromLocalStorage = (type) => {
-  //   if (!localStorage.getItem(`${type}${courseId}`))
-  //     localStorage.setItem(`${type}${courseId}`, JSON.stringify([]));
-  //   return JSON.parse(localStorage.getItem(`${type}${courseId}`));
-  // };
 
   useEffect(() => {
     console.log('courseId ' + courseId);
@@ -394,16 +375,16 @@ const SubtitlesPage = () => {
           checkedSubtitles: response.data.completedSubtitles,
           checkedExams: response.data.completedExams,
         });
-        setSeeProgress(true);
+        setLoading(false);
       } catch (error) {
         console.log(error);
       }
     }
 
-    getProgress();
     fetchSubtitles();
     fetchExams();
-  }, []);
+    getProgress();
+  }, [courseId, token]);
 
   useEffect(() => {
     const getExam = async (examId) => {
@@ -469,8 +450,10 @@ const SubtitlesPage = () => {
   }, [searchParams, user._id, token, videoInfo, courseId]);
 
   const computeProgress = () => {
+    if (!state.checkedSubtitles && !state.checkedExams) return 0;
+
     return Math.round(
-      ((state.checkedSubtitles.length + state.checkedExams.length) /
+      ((state.checkedSubtitles?.length + state.checkedExams?.length) /
         (subtitles.length + exams.length)) *
         100
     );
@@ -483,7 +466,7 @@ const SubtitlesPage = () => {
     console.log('exams ' + exams.length);
     console.log('-----------------------------------------------------');
     try {
-      const response = await axios.patch(
+      await axios.patch(
         `http://localhost:8080/api/v1/user/progress/${courseId}`,
         {
           completedSubtitles: checkedSubtitles,
@@ -496,10 +479,6 @@ const SubtitlesPage = () => {
           },
         }
       );
-
-      // setCheckedSubtitles(response.data.completedSubtitles);
-      // setCheckedExams(response.data.completedExams);
-      // setProgress(response.data.progress);
     } catch (error) {
       console.log(error);
     }
@@ -542,6 +521,7 @@ const SubtitlesPage = () => {
   };
 
   const addNote = async () => {
+    setLoading(true);
     try {
       const response = await axios.post('http://localhost:8080/api/v1/note', {
         subtitleId: searchParams.get('subtitleId'),
@@ -550,6 +530,7 @@ const SubtitlesPage = () => {
       });
       setNotes([...notes, response.data.response]);
       setWriteNote(false);
+      setLoading(false);
     } catch (error) {
       console.log(error);
     }
@@ -571,6 +552,7 @@ const SubtitlesPage = () => {
   };
 
   const postReview = async (rating, review) => {
+    setLoading(true);
     const course = courses.find((item) => item._id === courseId);
     updateCourse(courseId, {
       ...course,
@@ -583,7 +565,6 @@ const SubtitlesPage = () => {
         },
       ],
     });
-    console.log([...reviews]);
     setReviews([
       ...reviews,
       {
@@ -592,10 +573,12 @@ const SubtitlesPage = () => {
         rate: rating,
       },
     ]);
+    setLoading(false);
   };
 
   return (
     <main className={`${classes.main}`}>
+      {loading && <Loading />}
       <section className={`${classes.subtitles}`}>
         <LinearProgressBar value={computeProgress()} />
         <Box
@@ -606,7 +589,7 @@ const SubtitlesPage = () => {
           <AiFillCloseCircle />
         </Box>
         {showList &&
-          seeProgress &&
+          !loading &&
           subtitles
             .map((subtitle, idx) => (
               <FilterField
@@ -626,7 +609,7 @@ const SubtitlesPage = () => {
               />
             ))
             .slice(0, showMore ? subtitles.length : 2)}
-        {seeProgress &&
+        {!loading &&
           exams.map((exam, idx) => (
             <FilterField
               title={`Exam ${idx + 1}`}
@@ -653,7 +636,6 @@ const SubtitlesPage = () => {
           </button>
         )}
       </section>
-
       <section className={`${classes.rightSection}`}>
         <div
           className={searchParams.get('examId') ? classes.exam : classes.video}
