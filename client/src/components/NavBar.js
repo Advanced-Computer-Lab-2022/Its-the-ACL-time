@@ -12,6 +12,16 @@ const useStyles = makeStyles((theme) => ({
   name: {
     borderRadius: '15px',
     padding: '5px 15px',
+    color: 'white',
+    fontFamily: 'Roboto',
+    fontStyle: 'normal',
+    fontWeight: 'bold',
+    fontSize: '1.7rem',
+    lineHeight: '19px',
+    textDecoration: 'none',
+    '&:hover': {
+      color: 'grey',
+    },
   },
   nav: {
     display: 'block',
@@ -93,19 +103,21 @@ const useStyles = makeStyles((theme) => ({
   },
 
   btn: {
-    width: '5rem',
-    height: '2rem',
     display: 'flex',
     justifyContent: 'center',
     alignItems: 'center',
-    border: '1px solid grey',
-    backgroundColor: 'rgb(240, 237, 237)',
-    color: 'black',
+    color: 'white',
+    fontFamily: 'Roboto',
+    fontStyle: 'normal',
+    fontWeight: 'bold',
+    fontSize: '1.2rem',
+    lineHeight: '19px',
     textDecoration: 'none',
     '&:hover': {
-      backgroundColor: 'rgba(135, 132, 132, 0.5)',
+      color: 'grey',
     },
     marginRight: '1rem',
+    padding: '0.5rem 1rem',
   },
 }));
 
@@ -163,10 +175,12 @@ function NavBar() {
         size='lg'
       >
         <Container fluid>
-          <Link to='/' className='navbar-brand text-light'>
-            <Navbar.Brand href='#' className={`bg-light ${classes.name}`}>
-              Nerd
-            </Navbar.Brand>
+          <Link to='/' className={`${classes.name}`}>
+            <i
+              className='fa fa-graduation-cap'
+              style={{ fontSize: '2rem', marginRight: '0.5rem' }}
+            />
+            Nerd Academy
           </Link>
           <Search />
           {user && (
@@ -179,19 +193,16 @@ function NavBar() {
               </div>
               {user && showProfileList && (
                 <div className={`${classes.profileList}`} ref={profileList}>
-                
                   <div className={`${classes.profileListHeader}`}>
-                 
                     <div
                       className={`${classes.profileIcon}`}
                       style={{ backgroundColor: 'black', color: 'white' }}
                     >
-                     <Link to='/profile'>
-                      {user?.username.slice(0, 2).toUpperCase()}
+                      <Link to='/profile'>
+                        {user?.username.slice(0, 2).toUpperCase()}
                       </Link>
                     </div>
                     <div className={`${classes.profileListHeaderInfo}`}>
-                    
                       <p
                         style={{
                           fontSize: '1.2rem',
@@ -212,7 +223,6 @@ function NavBar() {
                       >
                         {user?.email.slice(0, 18)}
                       </p>
-                      
                     </div>
                   </div>
                   <div
@@ -222,7 +232,6 @@ function NavBar() {
                       backgroundColor: 'rgba(0,0,0,0.2)',
                       margin: '1rem 0',
                     }}
-                    
                   ></div>
                   <div className={`${classes.profileListBody}`}>
                     <Link to='/profile/myCourses'>
@@ -294,17 +303,18 @@ function NavBar() {
           {!user && (
             <div className={classes.identity}>
               <Link to='/login' className={classes.btn}>
-                <Button>Login</Button>
+                Login
               </Link>
               <Link to='/register' className={classes.btn}>
-                <Button>Signup</Button>
+                Signup
               </Link>
-              <Button
+              <div
                 className={classes.btn}
                 onClick={() => setOpenLanguages(true)}
+                style={{ cursor: 'pointer' }}
               >
                 <i className='fas fa-globe'></i>
-              </Button>
+              </div>
               {openLanguages && (
                 <Select
                   labelId='demo-controlled-open-select-label'

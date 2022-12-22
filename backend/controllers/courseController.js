@@ -1,6 +1,7 @@
 const { StatusCodes } = require('http-status-codes');
 const { Course, User } = require('../models');
 const { UnauthorizedError, BadRequestError } = require('../Errors');
+const { verifyToken } = require('../utils/jwt');
 
 const createCourse = async (req, res) => {
   console.log('req.body ' + req.body);
@@ -48,13 +49,16 @@ const getCourse = async (req, res) => {
 
 const getAllCourses = async (req, res) => {
   const { myCourses } = req.query;
+  console.log('token: ' + req.headers);
+  const token = req.headers.authorization?.split(' ')[1];
   const query = Object.keys(req.query)
     .map((key) => (req.query[key] === 'false' ? `-${key}` : ''))
     .join(' ');
 
   let courses;
-  if (myCourses === 'true') {
-    const { userId, type } = req.user;
+
+  if (myCourses === 'true' && token) {
+    const { type, userId } = verifyToken(token);
     if (type === 'Instructor') {
       courses = await Course.find({ createdBy: userId }).select(`${query}`);
       return res.status(StatusCodes.OK).json({ courses });
@@ -62,6 +66,7 @@ const getAllCourses = async (req, res) => {
     courses = await User.findOne({ _id: userId });
     return res.status(StatusCodes.OK).json({ courses: courses.courses });
   }
+
   courses = await Course.find({})
     .select(`${query}`)
     .populate('createdBy', 'username');

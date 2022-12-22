@@ -17,21 +17,29 @@ const {
   updateSubTitle,
 } = require('../controllers/subTitleController');
 
-router.route('/').post(createCourse).get(getAllCourses);
-router.route('/:courseId').get(getCourse).patch(updateCourse);
-router.get('/instructor/:id', getCoursesInstructor);
-router.get('/usersCourses', getCoursesInstructor);
-router.get('/enrolledCourses',getEnrolledCourses);
+const { authMiddleware } = require('../middlewares');
+
+router.route('/').post(authMiddleware, createCourse).get(getAllCourses);
+router
+  .route('/:courseId')
+  .get(authMiddleware, getCourse)
+  .patch(authMiddleware, updateCourse);
+router.get('/instructor/:id', authMiddleware, getCoursesInstructor);
+router.get('/usersCourses', authMiddleware, getCoursesInstructor);
+router.get('/enrolledCourses', authMiddleware, getEnrolledCourses);
 
 // SubTitle Routes
 
-router.route('/:courseId/subtitle/').post(createSubTitle).get(getAllSubTitles);
+router
+  .route('/:courseId/subtitle/')
+  .post(authMiddleware, createSubTitle)
+  .get(getAllSubTitles);
 router
   .route('/:courseId/subtitle/:subtitleId')
-  .get(getSubTitle)
-  .patch(updateSubTitle);
+  .get(authMiddleware, getSubTitle)
+  .patch(authMiddleware, updateSubTitle);
 
 // student routes
-router.route('/:courseId/enroll').post(courseEnroll);
+router.route('/:courseId/enroll').post(authMiddleware, courseEnroll);
 
 module.exports = router;
