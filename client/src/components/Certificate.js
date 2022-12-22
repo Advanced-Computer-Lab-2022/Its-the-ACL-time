@@ -1,10 +1,19 @@
-import { useRef } from 'react';
+import { useRef, useState } from 'react';
 import html2canvas from 'html2canvas';
 import { jsPDF } from 'jspdf';
 import { makeStyles } from '@material-ui/core';
 import certificate from '../assets/images/certificate.svg';
+import { useParams, useSearchParams } from 'react-router-dom';
+import { useEffect } from 'react';
 
 const useStyles = makeStyles((theme) => ({
+  root: {
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'center',
+    height: '100vh',
+    backgroundColor: 'rgba(0,0,0,0.5)',
+  },
   certificate: {
     width: '45rem',
     height: '30rem',
@@ -18,6 +27,25 @@ const useStyles = makeStyles((theme) => ({
     backgroundColor: '#fff',
     border: '1px solid #000',
     backgroundImage: `url(${certificate})`,
+    // diplay p element as none to hide the text
+    '& span': {
+      display: 'none',
+    },
+    // on hover show the text and change the cursor to pointer to indicate that it is clickable to download the certificate as pdf file
+    '&:hover': {
+      cursor: 'pointer',
+      backgroundColor: 'grey',
+      '& span': {
+        display: 'block',
+        position: 'absolute',
+
+        top: '50%',
+        left: '46%',
+        fontSize: '1.2rem',
+        fontWeight: '600',
+        color: '#fff',
+      },
+    },
   },
   header: {
     display: 'flex',
@@ -48,9 +76,10 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-const Certificate = ({ username, course }) => {
+const Certificate = () => {
   const inputRef = useRef(null);
   const classes = useStyles();
+  const [searchParams, setSearchParams] = useSearchParams();
 
   const downloadCertificate = () => {
     html2canvas(inputRef.current).then((canvas) => {
@@ -62,8 +91,12 @@ const Certificate = ({ username, course }) => {
   };
 
   return (
-    <>
-      <div ref={inputRef} className={`${classes.certificate}`}>
+    <div className={classes.root}>
+      <div
+        ref={inputRef}
+        className={`${classes.certificate}`}
+        onClick={downloadCertificate}
+      >
         <header className={`${classes.header}`}>
           <h1
             style={{
@@ -78,11 +111,11 @@ const Certificate = ({ username, course }) => {
         <main className={`${classes.main}`}>
           <p>Awarded to</p>
           <p>
-            <strong>{username}</strong>
+            <strong>{searchParams.get('username')}</strong>
           </p>
           <p>for successfully completing</p>
           <p>
-            <strong>{course}</strong>
+            <strong>{searchParams.get('course')}</strong>
           </p>
         </main>
         <footer className={`${classes.footer}`}>
@@ -91,8 +124,9 @@ const Certificate = ({ username, course }) => {
           </p>
           <p>Nerd academy</p>
         </footer>
+        <span>Download</span>
       </div>
-    </>
+    </div>
   );
 };
 export default Certificate;

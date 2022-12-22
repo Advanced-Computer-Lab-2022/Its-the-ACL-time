@@ -5,10 +5,10 @@ import Paper from '@material-ui/core/Paper';
 import Tabs from '@material-ui/core/Tabs';
 import Tab from '@material-ui/core/Tab';
 import { useCourseContext } from '../context/Course/courseContext';
+import { useAppContext } from '../context/App/appContext';
 import { Pagination } from '@material-ui/lab';
 import motivationalImage from '../assets/images/motivational.jpg';
 import Footer from '../components/Footer';
-import Certificate from '../components/Certificate';
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -98,6 +98,7 @@ const useStyles = makeStyles((theme) => ({
     boxShadow: '0 0 10px rgba(0,0,0,0.1)',
     backgroundColor: '#f5f5f5',
   },
+  course: {},
 }));
 
 function EmptyCard() {
@@ -140,6 +141,7 @@ function CenteredTabs({ changeTab }) {
 const Home = () => {
   const classes = useStyles();
   const [tab, setTab] = useState(0);
+  const { user } = useAppContext();
   const { courses, myCourses } = useCourseContext();
   const [sortedCourses, setSortedCourses] = useState([]);
   const [inProgress, setInprogress] = useState([]);

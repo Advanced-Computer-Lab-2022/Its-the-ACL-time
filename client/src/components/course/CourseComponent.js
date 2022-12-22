@@ -12,6 +12,7 @@ import {
 import { FaStar } from 'react-icons/fa';
 import RatingStars from '../RatingStars';
 import { Box } from '@material-ui/core';
+import { useAppContext } from '../../context/App/appContext';
 
 const useStyles = makeStyles((theme) => ({
   img: {
@@ -214,6 +215,7 @@ function CourseComponent({
   const [showDemo, setShowDemo] = useState(false);
   const courseRef = useRef();
   const navigate = useNavigate();
+  const { user } = useAppContext();
 
   return (
     <>
@@ -294,6 +296,11 @@ function CourseComponent({
                             cursor: 'pointer',
                             textDecoration: 'underline',
                           }}
+                          onClick={() =>
+                            navigate(
+                              `/certificate?username=${user.username}&course=${title}`
+                            )
+                          }
                         >
                           Download Certificate
                         </Typography>
