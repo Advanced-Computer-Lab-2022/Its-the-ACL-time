@@ -10,6 +10,7 @@ import { FormControl, Select } from '@material-ui/core';
 import SnackBar from './SnackBar';
 import { useAppContext } from '../context/App/appContext';
 import Loading from './Loading';
+import { useParams } from 'react-router-dom';
 
 const useStyles = makeStyles((theme) => ({
   container: {
@@ -106,26 +107,14 @@ const useStyles = makeStyles((theme) => ({
 
 function PromotionForm() {
   const classes = useStyles();
-  const { myCourses, courses } = useCourseContext();
-  const [tmpCourses, setTmpCourses] = useState([]);
-  const [selectedCourse, setSelectedCourse] = useState('');
   const [alert, setAlert] = useState(null);
   const startDateRef = useRef();
   const endDateRef = useRef();
   const promotionPercentageRef = useRef();
   const [loading, setLoading] = useState(false);
-
-  useEffect(() => {
-    const tmp = [];
-    myCourses.forEach((course) => {
-      courses.forEach((c) => {
-        if (course.courseId === c._id) {
-          tmp.push(c);
-        }
-      });
-      setTmpCourses(tmp);
-    });
-  }, [myCourses, courses]);
+  // get courseId from the params
+  const { courseId } = useParams();
+  console.log();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -143,7 +132,7 @@ function PromotionForm() {
     setLoading(true);
     try {
       const res = await axios.patch(
-        `http://localhost:8080/api/v1/course/${selectedCourse}`,
+        `http://localhost:8080/api/v1/course/${courseId}`,
         {
           promotion: {
             promotionPercentage,
@@ -173,74 +162,53 @@ function PromotionForm() {
   };
 
   return (
-    <div className={`${classes.container}`}>
-      <h1 className={`${classes.title}`}>Promotion Code</h1>
-      {loading && <Loading type='spin' color='white' />}
-      {alert && <SnackBar content={alert} />}
-      <Form className={`${classes.form}`} onSubmit={handleSubmit}>
-        <Row className='mb-3'>
-          <Form.Group as={Col} controlId='formGridSubject'>
-            <FormControl variant='filled' className={classes.formControl}>
-              <Form.Label>Course</Form.Label>
-              <Select
-                native
-                inputProps={{
-                  name: 'age',
-                  id: 'subject',
-                }}
-                className={classes.select}
-                onChange={(e) => setSelectedCourse(e.target.value)}
-              >
-                <option aria-label='None' value='' />
-                {tmpCourses.map((course, i) => (
-                  <option value={course._id} key={course._id}>
-                    {course.title}
-                  </option>
-                ))}
-              </Select>
-            </FormControl>
-          </Form.Group>
+    <div className={classes.root}>
+      <div className={`${classes.container}`}>
+        <h1 className={`${classes.title}`}>Add Promotion</h1>
+        {loading && <Loading type='spin' color='white' />}
+        {alert && <SnackBar content={alert} />}
+        <Form className={`${classes.form}`} onSubmit={handleSubmit}>
+          <Row className='mb-3'>
+            <Form.Group as={Col} controlId='formGridNumberOfHours'>
+              <Form.Label>Promotion Percentage</Form.Label>
+              <Form.Control
+                type='number'
+                placeholder='Enter promotion percentage'
+                ref={promotionPercentageRef}
+              />
+            </Form.Group>
+          </Row>
+          <Row className='mb-3'>
+            <Form.Group as={Col} controlId='formGridPrice'>
+              <Form.Label>Start Date</Form.Label>
+              <Form.Control
+                type='date'
+                placeholder='Enter course start date'
+                ref={startDateRef}
+              />
+            </Form.Group>
 
-          <Form.Group as={Col} controlId='formGridNumberOfHours'>
-            <Form.Label>Promotion Percentage</Form.Label>
-            {/* make the type of the form.control date */}
-            <Form.Control
-              type='number'
-              placeholder='Enter promotion percentage'
-              ref={promotionPercentageRef}
-            />
-          </Form.Group>
-        </Row>
-        <Row className='mb-3'>
-          <Form.Group as={Col} controlId='formGridPrice'>
-            <Form.Label>Start Date</Form.Label>
-            <Form.Control
-              type='date'
-              placeholder='Enter course start date'
-              ref={startDateRef}
-            />
-          </Form.Group>
+            <Form.Group as={Col} controlId='formGridNumberOfHours'>
+              <Form.Label>End Date</Form.Label>
+              {/* make the type of the form.control date */}
+              <Form.Control
+                type='date'
+                placeholder='Enter course end date'
+                ref={endDateRef}
+              />
+            </Form.Group>
+          </Row>
 
-          <Form.Group as={Col} controlId='formGridNumberOfHours'>
-            <Form.Label>End Date</Form.Label>
-            {/* make the type of the form.control date */}
-            <Form.Control
-              type='date'
-              placeholder='Enter course end date'
-              ref={endDateRef}
-            />
-          </Form.Group>
-        </Row>
-
-        <Button
-          variant='primary'
-          type='submit'
-          className={`${classes.addCourseButton}`}
-          id='addCourseButton'
-        >
-          Add Promotion Code
-        </Button>
-      </Form>
+          <Button
+            variant='primary'
+            type='submit'
+            className={`${classes.addCourseButton}`}
+            id='addCourseButton'
+          >
+            Add Promotion Code
+          </Button>
+        </Form>
+      </div>
     </div>
   );
 }

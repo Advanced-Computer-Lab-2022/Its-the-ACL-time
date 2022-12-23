@@ -47,11 +47,13 @@ const useStyles = makeStyles((theme) => ({
   name: {
     fontSize: '1.5rem',
     fontWeight: 'bold',
-    marginRight: '.5rem',
+    margin: '0',
   },
   upper: {
     display: 'flex',
     alignItems: 'center',
+    justifyContent: 'flex-start',
+    margin: '0',
   },
 }));
 
@@ -68,10 +70,23 @@ const Review = ({ username, reviewText, rate }) => {
     <Box className={`${classes.review}`}>
       <span className={`${classes.upper}`}>
         <span className={`${classes.pic}`}>{name.charAt(0).toUpperCase()}</span>
-        <span className={`${classes.name}`}>{name}</span>
-        <RatingStars rate={rate} />
+        <div
+          style={{
+            display: 'flex',
+            flexDirection: 'column',
+            justifyContent: 'space-between',
+          }}
+        >
+          <span className={`${classes.name}`}>{name}</span>
+          <RatingStars rate={rate} />
+        </div>
       </span>
-      <p>
+      <p
+        style={{
+          paddingLeft: '1rem',
+          paddingTop: '1rem',
+        }}
+      >
         {text.slice(0, showMore ? text.length : 100)}
         {text.length > 100 && (
           <span

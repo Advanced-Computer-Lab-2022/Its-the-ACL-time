@@ -194,12 +194,12 @@ function ExamForm() {
       <Form className={`${classes.form}`} onSubmit={handleSubmit}>
         <Row className='mb-3'>
           <Form.Group as={Col} controlId='formGridNumberOfHours' id='hours'>
-            <Form.Label>Number Of Hours</Form.Label>
+            <Form.Label>Hours</Form.Label>
             <Form.Control type='number' placeholder='Hours' ref={hoursRef} />
           </Form.Group>
 
           <Form.Group as={Col} controlId='formGridPromotion' id='minutes'>
-            <Form.Label>Number Of Minutes</Form.Label>
+            <Form.Label>Minutes</Form.Label>
             <Form.Control
               type='number'
               placeholder='Minutes'
@@ -211,7 +211,7 @@ function ExamForm() {
             controlId='formGridPromotionDuration'
             id='seconds'
           >
-            <Form.Label>Number Of Seconds</Form.Label>
+            <Form.Label>Seconds</Form.Label>
             <Form.Control
               type='number'
               placeholder='seconds'

@@ -64,8 +64,6 @@ const CourseProvider = ({ children }) => {
     };
 
     if (token && state.courses.length > 0) {
-      console.log();
-      console.log('get my courses');
       getMyCourses();
     }
   }, [state.courses, token]);

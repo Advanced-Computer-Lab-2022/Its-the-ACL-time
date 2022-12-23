@@ -27,11 +27,9 @@ const useStyles = makeStyles((theme) => ({
     backgroundColor: '#fff',
     border: '1px solid #000',
     backgroundImage: `url(${certificate})`,
-    // diplay p element as none to hide the text
     '& span': {
       display: 'none',
     },
-    // on hover show the text and change the cursor to pointer to indicate that it is clickable to download the certificate as pdf file
     '&:hover': {
       cursor: 'pointer',
       backgroundColor: 'grey',

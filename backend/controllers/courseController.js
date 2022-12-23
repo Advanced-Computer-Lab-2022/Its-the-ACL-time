@@ -4,7 +4,6 @@ const { UnauthorizedError, BadRequestError } = require('../Errors');
 const { verifyToken } = require('../utils/jwt');
 
 const createCourse = async (req, res) => {
-  console.log('req.body ' + req.body);
   const {
     title,
     subject,
@@ -42,14 +41,12 @@ const getCourse = async (req, res) => {
   let query = Object.keys(req.query)
     .map((key) => (req.query[key] === 'false' ? `-${key}` : key))
     .join(' ');
-  console.log('query: ' + query);
   const course = await Course.findOne({ _id: courseId }).select(`${query}`);
   res.status(StatusCodes.OK).json({ course });
 };
 
 const getAllCourses = async (req, res) => {
   const { myCourses } = req.query;
-  console.log('token: ' + req.headers);
   const token = req.headers.authorization?.split(' ')[1];
   const query = Object.keys(req.query)
     .map((key) => (req.query[key] === 'false' ? `-${key}` : ''))
@@ -107,9 +104,6 @@ const updateCourse = async (req, res) => {
 const getCoursesInstructor = async (req, res) => {
   const instructor = req.params.id;
   const { userId, type } = req.user;
-  console.log('get courses Instructor');
-  console.log(instructor);
-  console.log(userId);
   if (instructor !== userId && type !== 'Instructor') {
     res.status(401).send({ msg: 'you are not authorized to this data' });
   }

@@ -26,7 +26,7 @@ import {
   CourseRequest,
 } from './components/admin';
 
-import AddSubtitleForm from './components/subtitle/AddSubtitleForm';
+import SubtitleForm from './components/subtitle/SubtitleForm';
 import { CourseProvider } from './context/Course/courseContext';
 import { SearchProvider } from './context/Search/searchContext';
 import Filter from './components/Filter';
@@ -99,7 +99,7 @@ function App() {
               <Route path='/updateCourse/:courseId' element={<CourseForm />} />
               <Route
                 path='/course/:courseId/subtitle'
-                element={<AddSubtitleForm />}
+                element={<SubtitleForm />}
               />
               <Route
                 path='/course/:courseId/content'
