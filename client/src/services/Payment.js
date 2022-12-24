@@ -3,7 +3,8 @@ import { loadStripe } from '@stripe/stripe-js';
 import { backendApi } from '../projectConfig';
 
 async function handleCheckout(courseId) {
-    let stripe = await loadStripe('pk_test_51M8HKWCuvzY0BCZpQFkHj8ZSCqYaPlaT80wQBurxPWz1n7ZASwUdWqWN8vge5FIOZRo8k0G3Ba6foSnUnr8aPuPO003bMeZ64R')
+    let stripe = await loadStripe(process.env.REACT_APP_STRIPE_PUBLISHABLE_KEY)
+    console.log("auth",localStorage.getItem('token'));
     await axios.post(`${backendApi}payment/create-checkout-session`,
         { courseId: courseId },
         {
