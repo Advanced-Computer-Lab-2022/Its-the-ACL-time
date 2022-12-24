@@ -47,6 +47,7 @@ import Setting from './components/instructor/Setting';
 import ExamForm from './components/ExamForm';
 import HomeV2 from './components/homepage/HomeV2';
 import PromotionForm from './components/PromotionForm';
+import Profile from './pages/Profile';
 
 function App() {
   return (
@@ -74,12 +75,11 @@ function App() {
             <Route path='/payment' element={<Payment />} />
             <Route path='/SuccessPayment' element={<SuccessPayment />} />
             <Route path='/FailedPayment' element={<FailedPayment />} />
-            <Route path='/profile' element={<Instructorprofile />}>
-              <Route path='' element={<Instructor></Instructor>}></Route>
-              <Route path='BioGraphy' element={<BioGraphy></BioGraphy>} />
-              <Route path='myCourses' element={<Instructor></Instructor>} />
-              <Route path='gg' element={<Setting></Setting>} />
-            </Route>
+            <Route path='/profile' element={<Profile />}></Route>
+            <Route path='' element={<Instructor></Instructor>}></Route>
+            <Route path='BioGraphy' element={<BioGraphy></BioGraphy>} />
+            <Route path='myCourses' element={<Instructor></Instructor>} />
+            <Route path='gg' element={<Setting></Setting>} />
             <Route
               element={
                 <>
@@ -106,17 +106,7 @@ function App() {
                 element={<SubtitlesPage />}
               />
               <Route path='/course/:courseId' element={<CoursePage />} />
-              <Route
-                path='/course/:courseId/createExam'
-                element={<ExamForm />}
-              />
 
-              <Route
-                path='/myCourses/addPromotion'
-                element={<PromotionForm />}
-              />
-
-              {/* <Route path='/course/:courseId' element={<CourseForm />} /> */}
               <Route path='/results' element={<SearchResult />} />
             </Route>
             <Route path='/rating' element={<RatingForm />} />

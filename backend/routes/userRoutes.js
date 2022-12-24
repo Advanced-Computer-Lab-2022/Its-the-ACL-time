@@ -23,7 +23,11 @@ const {
   deleteCertification,
 } = require('../controllers/CertificationController');
 
-const { updateUser, getUser } = require('../controllers/userController');
+const {
+  updateUserProgress,
+  getUser,
+  updateUserInfo,
+} = require('../controllers/userController');
 
 const { authOwner, authAdmin, authMiddleware } = require('../middlewares');
 
@@ -49,11 +53,11 @@ router.delete('/certification/:id', authAdmin, deleteCertification);
 router.patch('/restestpassword', changePassword);
 router.patch('/updateBio', updateBio);
 router.patch('/updateEmail', updateEmail);
-
 router.get('/GetBio', GetBio);
+router.patch('/', authMiddleware, updateUserInfo);
 
 // update course progress
 router.get('/progress/:id', authMiddleware, getUser);
-router.patch('/progress/:id', authMiddleware, updateUser);
+router.patch('/progress/:id', authMiddleware, updateUserProgress);
 
 module.exports = router;

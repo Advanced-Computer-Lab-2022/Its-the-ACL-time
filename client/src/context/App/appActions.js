@@ -6,3 +6,4 @@ export const USER_SETUP_ERROR = 'USER_SETUP_ERROR';
 export const START_ACTION = 'START_ACTION';
 export const END_ACTION = 'END_ACTION';
 export const USER_RESET = 'USER_RESET';
+export const UPDATE_USER = 'UPDATE_USER';

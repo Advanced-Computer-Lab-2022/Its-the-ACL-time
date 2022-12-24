@@ -38,7 +38,7 @@ const updateEmail = async (req, res) => {
   res.status(200).json(user);
 };
 
-const updateUser = async (req, res) => {
+const updateUserProgress = async (req, res) => {
   const { userId } = req.user;
   const { completedSubtitles, completedExams, progress } = req.body;
   const user = await User.findOne({
@@ -58,6 +58,29 @@ const updateUser = async (req, res) => {
   res.status(200).json({
     message: 'course progress updated successfully',
   });
+};
+
+const updateUserInfo = async (req, res) => {
+  const { userId } = req.user;
+  console.log(req.body);
+  const { username, oldPassword, newPassword, email, biography, country } =
+    req.body;
+
+  const user = await User.findOne({ _id: userId });
+
+  if (!user) throw new UnauthorizedError('Invalid credentials');
+  if (username) user.username = username;
+  if (email) user.email = email;
+  if (biography) user.biography = biography;
+  if (country) user.country = country;
+  if (oldPassword && newPassword) {
+    const isMatch = await user.comparePassword(oldPassword.toString());
+    if (!isMatch) throw new UnauthorizedError('Invalid credentials');
+    user.password = newPassword;
+  }
+  console.log(biography);
+  await user.save();
+  res.status(200).json(user);
 };
 
 const getUser = async (req, res) => {
@@ -82,6 +105,7 @@ module.exports = {
   GetBio,
   updateBio,
   updateEmail,
-  updateUser,
+  updateUserProgress,
   getUser,
+  updateUserInfo,
 };
