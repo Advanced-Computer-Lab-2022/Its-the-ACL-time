@@ -15,7 +15,19 @@ function CourseRequest() {
     
    
   },[]);
+  const resovle =(id,courseid)=>{
+    // id.preventDefault();
+     axios.patch(`http://localhost:8080/api/v1/admin/grantcourse`,{id:id,courseid:courseid}).then(res=>{
+       console.log(res.data);
+       const c=res.data
+       setcourse((old)=> old.filter((report)=>report._id!==c._id));
+      })
+      .catch(err=>
+       {console.log(err)}
+      );
+    }
    return (
+    
      <>
        <div className="container mt-3">
    <h2>CoursesRequests</h2>
@@ -35,7 +47,7 @@ function CourseRequest() {
            <td>{course.user}</td>
            <td>{course.coursename}</td>
            <td>{course.status}</td>
-           <td> {<button type="button" className="btn btn-primary">Grant</button>}</td> 
+           <td> {<button type="button" className="btn btn-primary" onClick={()=>{resovle(course.createdBy._id,course.course._id)}}>Grant</button>}</td> 
  
  
          </tr>)

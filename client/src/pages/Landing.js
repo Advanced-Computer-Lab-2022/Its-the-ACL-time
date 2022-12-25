@@ -1,10 +1,16 @@
 import React from 'react';
-import { useCourseContext } from '../context/Course/courseContext';
+import HomeV2 from '../components/homepage/HomeV2';
+import NavBar from '../components/NavBar';
+import Footer from '../components/Footer';
 
 const Landing = () => {
-  const courses = useCourseContext();
-
-  return <div>Landing</div>;
+  return (
+    <>
+      <NavBar />
+      <HomeV2 />
+      <Footer />
+    </>
+  );
 };
 
 export default Landing;

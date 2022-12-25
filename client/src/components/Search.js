@@ -106,25 +106,28 @@ const Search = () => {
   }
 
   return (
-    <Wrapper className="w-50" style={{ maxWidth: "500px" }}>
+    <Wrapper className='w-50' style={{ maxWidth: '500px' }}>
       <div className='search'>
         <div className='searchInputs position-relative'>
-            <form onSubmit={handleSearchSubmit} className="w-100 d-block">
-              <input
-                type='text'
-                className="rounded rounded-5 w-100 px-2"
-                placeholder='Search for a courses'
-                value={state.query}
-                name="searchInput"
-                onChange={(e) => search(e.target.value)}
-                onFocus={(e) => {
-                  if (dataResult.current)
-                    dataResult.current.style.display =
-                      state.filteredCourses.length > 0 ? 'block' : 'none';
-                }}
-              />
-            </form>
-          <div className='searchIcon position-absolute rounded rounded-5' style={{ right: "0px" }}>
+          <form onSubmit={handleSearchSubmit} className='w-100 d-block'>
+            <input
+              type='text'
+              className='rounded rounded-5 w-100 px-2'
+              placeholder='Search for a courses'
+              value={state.query}
+              name='searchInput'
+              onChange={(e) => search(e.target.value)}
+              onFocus={(e) => {
+                if (dataResult.current)
+                  dataResult.current.style.display =
+                    state.filteredCourses.length > 0 ? 'block' : 'none';
+              }}
+            />
+          </form>
+          <div
+            className='searchIcon position-absolute rounded rounded-5'
+            style={{ right: '0px' }}
+          >
             {courses.length === 0 ? (
               <SearchIcon />
             ) : (

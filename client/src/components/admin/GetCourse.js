@@ -70,7 +70,7 @@ export default function GetCourse() {
     axios.get("http://localhost:8080/api/v1/admin/courses").then(res=>{
    // console.log(res.data);
     setcourse(res.data);
-    
+    console.log(res.data)
    })
    .catch(err=>
     {console.log(err)}

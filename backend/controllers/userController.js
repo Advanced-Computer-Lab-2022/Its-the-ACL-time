@@ -99,7 +99,7 @@ const createreport = async (req, res) => {
     status:"unseen",
     type,
     createdBy:userId
-  });
+  })
   res.status(200).json({ report });
 };
 ///get specific report
@@ -114,7 +114,7 @@ const getreport = async (req, res) => {
   const report=await Report.find({
     createdBy:userId,
     course:req.query.id
-  })
+  }).populate("User")
   res.status(200).json(report);
 };
 

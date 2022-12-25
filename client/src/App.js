@@ -26,7 +26,7 @@ import {
   CourseRequest,
 } from './components/admin';
 
-import AddSubtitleForm from './components/subtitle/AddSubtitleForm';
+import SubtitleForm from './components/subtitle/SubtitleForm';
 import { CourseProvider } from './context/Course/courseContext';
 import { SearchProvider } from './context/Search/searchContext';
 import Filter from './components/Filter';
@@ -54,6 +54,7 @@ function App() {
       <CourseProvider>
         <SearchProvider>
           <Routes>
+            <Route path='/landing' element={<Landing />} />
             <Route path='admin' element={<Admin />}>
               <Route path='' element={<UserforAdmin />} />
               <Route path='users' element={<UserforAdmin />} />
@@ -86,12 +87,11 @@ function App() {
                 </>
               }
             >
-              <Route path='/landing' element={<Landing />} />
               <Route
                 index
                 element={
                   <ProtectedRoute>
-                    <HomeV2 />
+                    <Home />
                   </ProtectedRoute>
                 }
               />
@@ -99,7 +99,7 @@ function App() {
               <Route path='/updateCourse/:courseId' element={<CourseForm />} />
               <Route
                 path='/course/:courseId/subtitle'
-                element={<AddSubtitleForm />}
+                element={<SubtitleForm />}
               />
               <Route
                 path='/course/:courseId/content'

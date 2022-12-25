@@ -53,7 +53,7 @@ function SubTitle() {
   );
 }
 
-function AddSubtitleForm() {
+function SubtitleForm() {
   const classes = useStyles();
   const [subtitles, setSubtitles] = useState(0);
   const { courseId } = useParams();
@@ -112,4 +112,4 @@ function AddSubtitleForm() {
   );
 }
 
-export default AddSubtitleForm;
+export default SubtitleForm;

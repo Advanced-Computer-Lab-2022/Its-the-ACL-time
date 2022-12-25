@@ -49,12 +49,12 @@ module.exports.createUser = async (req, res) => {
   
  module.exports.getAllreport = async (req, res) => {
     const status=req.query.status;
-    const Questions = await Report.find({status});
+    const Questions = await Report.find({status}).populate("createdBy","username").populate("course","title");
     res.status(200).json(Questions);
   };
   
   module.exports.getAllcourserequest = async (req, res) => {
-   const courses= await CourseRequest.find({});
+   const courses= await CourseRequest.find({}).populate('createdBy', 'username').populate("course");
     //const courses = await CoursesRequest.find({});
     res.status(200).json(courses);
   };
@@ -71,23 +71,31 @@ module.exports.createUser = async (req, res) => {
     
     res.status(200).json(report);
   };
+  
   module.exports.updatecourserequest = async (req, res) => {
-    const { id } = req.params;
-    const{state}=req.body;
-    if (!mongoose.Types.ObjectId.isValid(id)) {
-      return req.status(404).json({ error: 'No such courserequest' });
-    }
-    const report = await CourseRequest.findOneAndUpdate(
-      { _id: id },
-      {
-        state: true
-      }
+    const { id } = req.body;
+    const{courseid}=req.body;
+    console.log("id:"+id)
+  
+    const user = await User.findOne(
+      { _id: id }
     );
-    if (!report) {
-      return res.status(400).json({ error: 'No such courserequest' });
-    }
-    res.status(200).json(report);
+    console.log(user)
+      user.courses.push({courseId:courseid})
+      await user.save();
+    const courserequest= await CourseRequest.findOne({
+      createdBy:id,
+      course:courseid
+    })  
+    if (courserequest!=null){
+    courserequest.state="accepted"
+    courserequest.save();}
+    
+
+
+    res.status(200).json(courserequest);
   };
+  
   module.exports.getallcourses = async (req, res) => {
     const courses= await Course.find({});
      //const courses = await CoursesRequest.find({});

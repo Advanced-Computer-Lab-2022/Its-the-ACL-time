@@ -4,7 +4,21 @@ import { Link, useParams } from 'react-router-dom';
 import axios from 'axios';
 import { useCourseContext } from '../context/Course/courseContext';
 import SubTitles from '../components/subtitle/SubTitles';
-import { Box, Typography } from '@material-ui/core';
+import {
+  Box,
+  Button,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
+  Divider,
+  Drawer,
+  List,
+  ListItem,
+  ListItemIcon,
+  ListItemText,
+  Typography,
+} from '@material-ui/core';
 import Review from '../components/Review';
 import { CourseComponent, Loading } from '../components';
 import { AiOutlineCheck } from 'react-icons/ai';
@@ -12,8 +26,13 @@ import { useAppContext } from '../context/App/appContext';
 import { AiFillVideoCamera } from 'react-icons/ai';
 import { MdOutlineArticle } from 'react-icons/md';
 import { TbCertificate } from 'react-icons/tb';
+import { GiReceiveMoney } from 'react-icons/gi';
 import AlertDialog from '../components/AlertDialog';
 import SnackBar from '../components/SnackBar';
+import Footer from '../components/Footer';
+import PromotionForm from '../components/PromotionForm';
+import ExamForm from '../components/ExamForm';
+import SubtitleForm from '../components/subtitle/SubtitleForm';
 
 const useStyles = makeStyles((theme) => ({
   main: {
@@ -231,14 +250,18 @@ const CoursePage = () => {
   const [subtitles, setSubtitles] = useState([]);
   const { courses, myCourses } = useCourseContext();
   const [course, setCourse] = useState({});
-  const { token } = useAppContext();
+  const { token, user } = useAppContext();
   const [showDescription, setShowDescription] = useState(false);
   const [applyCoupon, setApplyCoupon] = useState(false);
   const [requestRefund, setRequestRefund] = useState(false);
   const [isOwner, setIsOwner] = useState(false);
+  const [isEnrolled, setIsEnrolled] = useState(false);
   const [discountPrice, setDiscountPrice] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [showExamForm, setShowExamForm] = useState(false);
+  const [showSubtitleForm, setShowSubtitleForm] = useState(false);
   const [alert, setAlert] = useState(null);
+  const [showPromotionForm, setShowPromotionForm] = useState(false);
   const inputRef = useRef();
 
   useEffect(() => {
@@ -268,18 +291,21 @@ const CoursePage = () => {
           },
         }
       );
-      console.log(response.data.subTitles);
       setSubtitles(response.data.subTitles);
     }
 
-    function isOwner() {
+    function checkOwnership() {
       const course = myCourses.find((course) => course._id === courseId);
       if (course) {
-        setIsOwner(true);
+        if (course.createdBy.toString() === user._id.toString()) {
+          setIsOwner(true);
+        } else {
+          setIsEnrolled(true);
+        }
       }
     }
 
-    isOwner();
+    checkOwnership();
     getCourse();
     getSubtitles();
   }, [courseId, courses, myCourses, token]);
@@ -351,7 +377,7 @@ const CoursePage = () => {
 
             <Box className={`${classes.reviewCourse}`}>
               <div className={`${classes.reviewVideo}`}></div>
-              {!isOwner && (
+              {!isEnrolled && (
                 <div className={`${classes.finalPrice}`}>
                   <Typography
                     variant='h6'
@@ -371,7 +397,7 @@ const CoursePage = () => {
               )}
 
               <button className={`${classes.addToCart}`}>
-                {isOwner ? (
+                {isEnrolled ? (
                   <Link to={`/course/${courseId}/content`}>Go to course</Link>
                 ) : (
                   <Link to={``}>Buy Now</Link>
@@ -389,7 +415,7 @@ const CoursePage = () => {
                   className={classes.coupon}
                   onClick={() => setApplyCoupon(true)}
                 >
-                  {isOwner ? <>Request Refund</> : <>Apply Coupon</>}
+                  {isEnrolled ? <>Request Refund</> : <>Apply Coupon</>}
                 </button>
               )}
               {applyCoupon && (
@@ -397,9 +423,11 @@ const CoursePage = () => {
                   <hr className={`${classes.line}`} />
                   <div className={`{${classes.applyCoupon}}`}>
                     <input
-                      type={isOwner ? 'number' : 'text'}
+                      type={isEnrolled ? 'number' : 'text'}
                       placeholder={
-                        isOwner ? 'Enter the amount of money' : 'Enter coupon'
+                        isEnrolled
+                          ? 'Enter the amount of money'
+                          : 'Enter coupon'
                       }
                       className={`${classes.applyCouponInput}`}
                       ref={inputRef}
@@ -407,10 +435,12 @@ const CoursePage = () => {
                     <button
                       className={classes.applyCouponButton}
                       onClick={() => {
-                        isOwner ? setRequestRefund(true) : applyCouponHandler();
+                        isEnrolled
+                          ? setRequestRefund(true)
+                          : applyCouponHandler();
                       }}
                     >
-                      {isOwner ? 'Request' : 'Apply'}
+                      {isEnrolled ? 'Request' : 'Apply'}
                     </button>
                   </div>
                 </>
@@ -450,23 +480,108 @@ const CoursePage = () => {
               )}
             </section>
 
-            <section className={classes.courseInclude}>
-              <h2 className={`${classes.title}`}>This course includes</h2>
-              <div className={`${classes.included}`}>
-                <Box className={classes.cart}>
-                  <AiFillVideoCamera className={classes.icon} />
-                  <p className={classes.comment}> 10 hours on-demand video</p>
-                </Box>
-                <Box className={classes.cart}>
-                  <MdOutlineArticle className={classes.icon} />
-                  <p className={classes.comment}> 10 articles</p>
-                </Box>
-                <Box className={classes.cart}>
-                  <TbCertificate className={classes.icon} />
-                  <p className={classes.comment}> Certificate of Completion</p>
-                </Box>
+            {!isOwner && (
+              <section className={classes.courseInclude}>
+                <h2 className={`${classes.title}`}>This course includes</h2>
+                <div className={`${classes.included}`}>
+                  <Box className={classes.cart}>
+                    <AiFillVideoCamera className={classes.icon} />
+                    <p className={classes.comment}> 10 hours on-demand video</p>
+                  </Box>
+                  <Box className={classes.cart}>
+                    <MdOutlineArticle className={classes.icon} />
+                    <p className={classes.comment}> 10 articles</p>
+                  </Box>
+                  <Box className={classes.cart}>
+                    <TbCertificate className={classes.icon} />
+                    <p className={classes.comment}>
+                      {' '}
+                      Certificate of Completion
+                    </p>
+                  </Box>
+                </div>
+              </section>
+            )}
+
+            {isOwner && (
+              <section className={classes.courseInclude}>
+                <h2 className={`${classes.title}`}>Course Control Board</h2>
+                <div className={`${classes.included}`}>
+                  <Box
+                    className={classes.cart}
+                    style={{ cursor: 'pointer' }}
+                    onClick={() => {
+                      if (showExamForm) setShowExamForm(false);
+                      if (showPromotionForm) setShowPromotionForm(false);
+                      setShowSubtitleForm((prev) => !prev);
+                    }}
+                  >
+                    <AiFillVideoCamera className={classes.icon} />
+                    <p className={classes.comment}> Upload Subtitle </p>
+                  </Box>
+                  <Box
+                    className={classes.cart}
+                    style={{ cursor: 'pointer' }}
+                    onClick={() => {
+                      if (showSubtitleForm) setShowSubtitleForm(false);
+                      if (showPromotionForm) setShowPromotionForm(false);
+                      setShowExamForm((prev) => !prev);
+                    }}
+                  >
+                    <MdOutlineArticle className={classes.icon} />
+                    <p className={classes.comment}> Upload Exam</p>
+                  </Box>
+                  <Box
+                    className={classes.cart}
+                    style={{ cursor: 'pointer' }}
+                    onClick={() => {
+                      if (showSubtitleForm) setShowSubtitleForm(false);
+                      if (showExamForm) setShowExamForm(false);
+                      setShowPromotionForm((prev) => !prev);
+                    }}
+                  >
+                    <GiReceiveMoney className={classes.icon} />
+                    <p className={classes.comment}>Define Promotion</p>
+                  </Box>
+                </div>
+              </section>
+            )}
+
+            {showPromotionForm && (
+              <div
+                style={{
+                  display: 'flex',
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                }}
+              >
+                <PromotionForm />
               </div>
-            </section>
+            )}
+
+            {showExamForm && (
+              <div
+                style={{
+                  display: 'flex',
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                }}
+              >
+                <ExamForm />
+              </div>
+            )}
+
+            {showSubtitleForm && (
+              <div
+                style={{
+                  display: 'flex',
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                }}
+              >
+                <SubtitleForm />
+              </div>
+            )}
 
             <section>
               <h2 className={`${classes.title}`}>Content</h2>
@@ -529,6 +644,8 @@ const CoursePage = () => {
             <br />
             <br />
           </div>
+          <div></div>
+          <Footer />
         </main>
       )}
     </>

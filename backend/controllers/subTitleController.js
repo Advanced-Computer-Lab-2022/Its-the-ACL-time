@@ -39,7 +39,6 @@ const createSubTitle = async (req, res) => {
 const getAllSubTitles = async (req, res) => {
   const { courseId } = req.params;
   const subTitles = await SubTitle.find({ course: courseId });
-  console.log(subTitles);
   res.status(StatusCodes.OK).json({ subTitles });
 };
 

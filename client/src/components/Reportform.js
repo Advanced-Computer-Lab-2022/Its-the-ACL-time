@@ -9,20 +9,35 @@ import DialogContentText from '@mui/material/DialogContentText';
 import DialogTitle from '@mui/material/DialogTitle';
 import { useAppContext } from '../context/App/appContext';
 import axios from 'axios';
+import Snackbar from '@mui/material/Snackbar';
+import MuiAlert from '@mui/material/Alert';
+import Backdrop from '@mui/material/Backdrop';
+import CircularProgress from '@mui/material/CircularProgress';
 
-
+const Alert = React.forwardRef(function Alert(props, ref) {
+  return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
+});
 export default function Reportform() {
   const [open, setOpen] = React.useState(false);
   const[type,settype]=useState("");
   const[decsription,setdes]=useState("");
   const {user,token} = useAppContext();
+  const[opensnake,setopensnake]=useState(false);
+  const[message,setmessage]=useState("");
+  const[typemessage,settypemessage]=useState("");
+  const[oenncircule,setcir]=useState(false)
 
 
 
   const handleClickOpen = () => {
+    settype("");
+    setdes("");
     setOpen(true);
+
+    setopensnake(false)
   };
   const handlersubmit = async (e) => {
+    setcir(true)
 
     e.preventDefault();
     await axios.post(
@@ -33,15 +48,26 @@ export default function Reportform() {
     })
       .then(res => {
         console.log(res);
+        setopensnake(true);
+        setmessage("report add sussefully")
+        settypemessage("success")
+
         console.log(res.data);
        
       }).catch((err) => {
+        setopensnake(true);
+        setmessage("report failed")
+        settypemessage("error")
+
         console.log(err);
       })
+      setcir(false)
+
   };
 
   const handleClose = () => {
     setOpen(false);
+    setopensnake(false)
   };
 
   return (
@@ -74,6 +100,22 @@ export default function Reportform() {
           <Button onClick={handlersubmit}>Sumbit</Button>
         </DialogActions>
       </Dialog>
+      <div>
+
+      <Snackbar
+        anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
+        open={opensnake}
+        onClose={opensnake}
+        message={message}
+        key={"top" + "center"}
+      >
+       <Alert onClose={()=> setopensnake(false)} severity={typemessage} sx={{ width: '100%' }}>
+          {message}
+        </Alert>
+      </Snackbar>
+    </div>
+    
+
     </div>
   );
 }

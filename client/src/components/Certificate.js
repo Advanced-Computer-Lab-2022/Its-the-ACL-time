@@ -1,11 +1,19 @@
-import { useRef } from 'react';
+import { useRef, useState } from 'react';
 import html2canvas from 'html2canvas';
 import { jsPDF } from 'jspdf';
 import { makeStyles } from '@material-ui/core';
 import certificate from '../assets/images/certificate.svg';
-import { useSearchParams } from 'react-router-dom';
+import { useParams, useSearchParams } from 'react-router-dom';
+import { useEffect } from 'react';
 
 const useStyles = makeStyles((theme) => ({
+  root: {
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'center',
+    height: '100vh',
+    backgroundColor: 'rgba(0,0,0,0.5)',
+  },
   certificate: {
     width: '45rem',
     height: '30rem',
@@ -19,6 +27,23 @@ const useStyles = makeStyles((theme) => ({
     backgroundColor: '#fff',
     border: '1px solid #000',
     backgroundImage: `url(${certificate})`,
+    '& span': {
+      display: 'none',
+    },
+    '&:hover': {
+      cursor: 'pointer',
+      backgroundColor: 'grey',
+      '& span': {
+        display: 'block',
+        position: 'absolute',
+
+        top: '50%',
+        left: '46%',
+        fontSize: '1.2rem',
+        fontWeight: '600',
+        color: '#fff',
+      },
+    },
   },
   header: {
     display: 'flex',
@@ -53,7 +78,6 @@ const Certificate = () => {
   const inputRef = useRef(null);
   const classes = useStyles();
   const [searchParams, setSearchParams] = useSearchParams();
-  console.log(searchParams);
 
   const downloadCertificate = () => {
     html2canvas(inputRef.current).then((canvas) => {
@@ -65,8 +89,12 @@ const Certificate = () => {
   };
 
   return (
-    <>
-      <div ref={inputRef} className={`${classes.certificate}`}>
+    <div className={classes.root}>
+      <div
+        ref={inputRef}
+        className={`${classes.certificate}`}
+        onClick={downloadCertificate}
+      >
         <header className={`${classes.header}`}>
           <h1
             style={{
@@ -94,8 +122,9 @@ const Certificate = () => {
           </p>
           <p>Nerd academy</p>
         </footer>
+        <span>Download</span>
       </div>
-    </>
+    </div>
   );
 };
 export default Certificate;

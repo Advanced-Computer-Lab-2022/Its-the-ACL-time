@@ -27,11 +27,7 @@ const CourseProvider = ({ children }) => {
   useEffect(() => {
     const getAllCourses = async () =>
       axios
-        .get('http://localhost:8080/api/v1/course', {
-          headers: {
-            authorization: `Bearer ${token}`,
-          },
-        })
+        .get('http://localhost:8080/api/v1/course')
         .then(({ data }) => {
           dispatch({
             type: GET_COURSES,
@@ -67,7 +63,7 @@ const CourseProvider = ({ children }) => {
       }
     };
 
-    if ((token, state.courses.length > 0)) {
+    if (token && state.courses.length > 0) {
       getMyCourses();
     }
   }, [state.courses, token]);
