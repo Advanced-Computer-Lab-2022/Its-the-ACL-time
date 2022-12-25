@@ -3,8 +3,8 @@ import axios from 'axios';
 function Reports() {
   const[reports,setreports]=useState([]);
   useEffect(()=>{
-    
-    axios.get(`http://localhost:8080/api/v1/admin/report`).then(res=>{
+    const state="unseen"
+    axios.get(`http://localhost:8080/api/v1/admin/report/?status=${state}`).then(res=>{
     console.log(res.data);
     setreports(res.data);
    })
@@ -57,7 +57,9 @@ function Reports() {
   <table class="table  table-hover bg-light border border-success ">
     <thead>
       <tr>
-        <th>Title</th>
+        <th>UserName</th>
+        <th>Course</th>
+        <th>Descrption</th>
         <th>Type</th>
         <th>Status</th>
         <th>      </th>
@@ -69,6 +71,8 @@ function Reports() {
     <tbody>
       {reports.map(report=>
         <tr>
+        <td>{report.createdBy.username }</td>
+        <td>{report.course.title}</td>
           <td>{report.title}</td>
           <td>{report.type}</td>
           <td>{report.status}</td>

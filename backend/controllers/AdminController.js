@@ -54,7 +54,7 @@ module.exports.createUser = async (req, res) => {
   };
   
   module.exports.getAllcourserequest = async (req, res) => {
-   const courses= await CourseRequest.find({}).populate('createdBy', 'username').populate("course");
+   const courses= await CourseRequest.find({}).populate('createdBy', 'username').populate("course","title");
     //const courses = await CoursesRequest.find({});
     res.status(200).json(courses);
   };
@@ -67,7 +67,7 @@ module.exports.createUser = async (req, res) => {
       {
         status: req.body.state
       }
-    );
+    ).populate("createdBy","username").populate("course","title");
     
     res.status(200).json(report);
   };

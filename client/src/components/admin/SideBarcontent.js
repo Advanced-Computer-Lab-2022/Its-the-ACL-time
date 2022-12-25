@@ -22,14 +22,26 @@ export const SideBarcontent = [
     cName: 'nav-text'
   },
   {
-    title: 'reports',
+    title: 'Reports',
     path: '/admin/Report',
     icon: <IconName.FcSupport />,
     cName: 'nav-text'
   },
   {
-    title: 'CourseReqest',
+    title: 'Course Access Reqest',
     path: '/admin/courserequest',
+    icon: <IconName.FcAbout/>,
+    cName: 'nav-text'
+  },
+  {
+    title: 'Access Request',
+    path: '/admin/Access Request',
+    icon: <IconName.FcAbout/>,
+    cName: 'nav-text'
+  },
+  {
+    title: 'Refund Request',
+    path: '/admin/Refund',
     icon: <IconName.FcAbout/>,
     cName: 'nav-text'
   },
