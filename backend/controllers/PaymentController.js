@@ -60,7 +60,7 @@ const getPaymentSession = async (req, res) => {
     CourseObject.stripePriceId = priceId;
   }
   await CourseObject.save();
-  const coupon = await stripe.coupons.create({ percent_off: CourseObject.promotion || 1, duration: 'once' });
+  const coupon = await stripe.coupons.create({ percent_off: parseInt(CourseObject.promotion) || 1, duration: 'once' });
   const session = await stripe.checkout.sessions.create({
     success_url: 'http://localhost:3000/SuccessPayment?id={CHECKOUT_SESSION_ID}',
     cancel_url: 'http://localhost:3000/FailedPayment',

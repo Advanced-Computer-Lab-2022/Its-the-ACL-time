@@ -7,6 +7,7 @@ import {
   START_ACTION,
   END_ACTION,
   USER_RESET,
+  UPDATE_USER,
 } from './appActions';
 
 const appReducer = (state, action) => {
@@ -76,6 +77,13 @@ const appReducer = (state, action) => {
         ...state,
         user: null,
         token: null,
+      };
+    }
+
+    case UPDATE_USER: {
+      return {
+        ...state,
+        user: action.payload.user,
       };
     }
 

@@ -2,7 +2,7 @@ import React, { useState, useMemo } from 'react';
 import countryList from 'react-select-country-list';
 import Select from 'react-select';
 
-function CountrySelector({ setCountry }) {
+function CountrySelector({country,setCountry }) {
   const [value, setValue] = useState('Country');
   const options = useMemo(() => countryList().getData(), []);
   options.forEach((element, index) => {

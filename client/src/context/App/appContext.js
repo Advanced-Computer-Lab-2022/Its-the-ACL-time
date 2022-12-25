@@ -7,6 +7,7 @@ import {
   SET_ALERT,
   CLEAR_ALERT,
   USER_RESET,
+  UPDATE_USER,
 } from './appActions';
 import axios from 'axios';
 import { backendApi } from '../../projectConfig';
@@ -103,6 +104,41 @@ const AppProvider = ({ children }) => {
     dispatch({ type: USER_RESET });
   };
 
+  const updateUser = async (user) => {
+    console.log(user);
+    try {
+      const response = await axios.patch(
+        'http://localhost:8080/api/v1/user/',
+        {
+          ...user,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${tokenFromLocalStorage}`,
+          },
+        }
+      );
+
+      const { data } = response;
+
+      dispatch({
+        type: UPDATE_USER,
+        payload: {
+          user: data,
+        },
+      });
+      addToLocalStorage({ user: data, token: tokenFromLocalStorage });
+      setAlert('success', 'User updated successfully');
+      setTimeout(() => {
+        clearAlert();
+      }, 3000);
+    } catch (error) {
+      setAlert('error', error.response.data.msg);
+      setTimeout(() => {
+        clearAlert();
+      }, 3000);
+    }
+  };
 
   return (
     <AppContext.Provider
@@ -114,6 +150,7 @@ const AppProvider = ({ children }) => {
         setup,
         resetUser,
         addToLocalStorage,
+        updateUser,
       }}
     >
       {children}

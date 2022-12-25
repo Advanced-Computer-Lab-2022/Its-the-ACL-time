@@ -16,6 +16,9 @@ import RatingForm from '../components/RatingForm';
 import { useCourseContext } from '../context/Course/courseContext';
 import LinearProgressBar from '../components/LinearProgressBar';
 import { Loading } from '../components';
+import Post from '../components/Post';
+import { Pagination } from '@material-ui/lab';
+import Footer from '../components/Footer';
 
 const useStyles = makeStyles((theme) => ({
   main: {
@@ -289,6 +292,29 @@ const useStyles = makeStyles((theme) => ({
       transition: 'transform 0.3s ease-in-out',
     },
   },
+
+  postTitle: {
+    width: '100%',
+    height: '3rem',
+    borderRadius: '0.5rem',
+    padding: '0.5rem',
+    fontSize: '1.2rem',
+    marginBottom: '1rem',
+    border: '1px solid #e0e0e0',
+    resize: 'none',
+    outline: 'none',
+    '&:focus': {
+      border: '1px solid #0294d4',
+    },
+  },
+
+  posts: {
+    width: '100%',
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'center',
+    flexDirection: 'column',
+  },
 }));
 
 const SubtitlesPage = () => {
@@ -316,6 +342,9 @@ const SubtitlesPage = () => {
   const { courses, updateCourse } = useCourseContext();
   const [notes, setNotes] = useState([]);
   const [reviews, setReviews] = useState([]);
+  const [posts, setPosts] = useState([]);
+  const [writePost, setWritePost] = useState(false);
+  const [postPage, setPostPage] = useState(0);
 
   const downloadNotes = () => {
     const doc = new jsPDF();
@@ -435,6 +464,23 @@ const SubtitlesPage = () => {
       }
     }
 
+    async function fetchPosts() {
+      try {
+        const response = await axios.get(
+          `http://localhost:8080/api/v1/post/${courseId}`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+        console.log(response.data);
+        setPosts(response.data);
+      } catch (error) {
+        console.log(error);
+      }
+    }
+
     if (searchParams.has('examId')) {
       getExam(searchParams.get('examId'));
     }
@@ -446,6 +492,11 @@ const SubtitlesPage = () => {
     if (videoInfo === 2) {
       console.log('fetch reviews');
       fetchReviews();
+    }
+
+    if (videoInfo === 3) {
+      console.log('fetch posts');
+      fetchPosts();
     }
   }, [searchParams, user._id, token, videoInfo, courseId]);
 
@@ -520,6 +571,37 @@ const SubtitlesPage = () => {
     await updateProgress(state.checkedSubtitles, state.checkedExams);
   };
 
+  const addPost = async (e) => {
+    e.preventDefault();
+    const title = e.target.children[1].value;
+    const text = e.target.children[3].value;
+    console.log(user.username);
+    console.log(courseId);
+    setWritePost(false);
+    setLoading(true);
+    try {
+      const response = await axios.post(
+        'http://localhost:8080/api/v1/post',
+        {
+          courseId,
+          title,
+          text,
+          username: user.username,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      console.log(response.data);
+      setPosts([...posts, response.data]);
+    } catch (error) {
+      console.log(error);
+    }
+    setLoading(false);
+  };
+
   const addNote = async () => {
     setLoading(true);
     try {
@@ -530,10 +612,10 @@ const SubtitlesPage = () => {
       });
       setNotes([...notes, response.data.response]);
       setWriteNote(false);
-      setLoading(false);
     } catch (error) {
       console.log(error);
     }
+    setLoading(false);
   };
 
   const deleteNote = async (noteId) => {
@@ -687,6 +769,13 @@ const SubtitlesPage = () => {
               style={{ color: videoInfo === 2 ? 'black' : '#666f73' }}
             >
               Reviews
+            </button>
+            <button
+              className={`${classes.button}`}
+              onClick={() => setVideoInfo(3)}
+              style={{ color: videoInfo === 3 ? 'black' : '#666f73' }}
+            >
+              Q&A
             </button>
           </div>
           <div className={`${classes.line}`}></div>
@@ -853,6 +942,115 @@ const SubtitlesPage = () => {
                       },
                     }}
                     onSubmit={postReview}
+                  />
+                </div>
+              </>
+            )}
+
+            {videoInfo === 3 && writePost && (
+              <form
+                action=''
+                className={`${classes.writeNote}`}
+                onSubmit={addPost}
+              >
+                <div
+                  style={{
+                    width: '100%',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'flex-start',
+                  }}
+                >
+                  <label
+                    htmlFor='title'
+                    style={{
+                      fontSize: '1.2rem',
+                      fontWeight: '600',
+                      marginRight: '1rem',
+                    }}
+                  >
+                    Title
+                  </label>
+                </div>
+                <input
+                  type='text'
+                  id='title'
+                  className={`${classes.postTitle}`}
+                />
+                <div
+                  style={{
+                    width: '100%',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'flex-start',
+                  }}
+                >
+                  <label
+                    htmlFor='details'
+                    style={{
+                      fontSize: '1.2rem',
+                      fontWeight: '600',
+                      marginRight: '1rem',
+                    }}
+                  >
+                    Details
+                  </label>
+                </div>
+                <TextareaAutosize
+                  ref={noteContent}
+                  minRows={3}
+                  aria-label='maximum height'
+                  placeholder='Write your post here'
+                  className={`${classes.textarea}`}
+                />
+                <div className={`${classes.buttons}`}>
+                  <button
+                    className={`${classes.cancel}`}
+                    onClick={() => setWritePost(false)}
+                  >
+                    Cancel
+                  </button>
+                  <button className={`${classes.save}`} type='submit'>
+                    Post
+                  </button>
+                </div>
+              </form>
+            )}
+
+            {videoInfo === 3 && !writePost && (
+              <>
+                <button
+                  onClick={() => setWritePost(true)}
+                  className={`${classes.addNote}`}
+                >
+                  Create a post
+                  <span>
+                    <AiOutlinePlusCircle />
+                  </span>
+                </button>
+                {posts.length !== 0 && (
+                  <div className={`${classes.posts}`}>
+                    {posts
+                      .slice(
+                        postPage * 3,
+                        Math.min(posts.length, postPage * 3 + 3)
+                      )
+                      .map((post, idx) => (
+                        <Post post={post} key={post._id} />
+                      ))}
+                  </div>
+                )}
+                <div>
+                  <Pagination
+                    count={
+                      posts.length % 3 === 0
+                        ? posts.length / 3
+                        : Math.floor(posts.length / 3) + 1
+                    }
+                    onChange={(e, page) => {
+                      setPostPage(page - 1);
+                    }}
+                    color='primary'
                   />
                 </div>
               </>

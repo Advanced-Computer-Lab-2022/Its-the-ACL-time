@@ -397,7 +397,7 @@ const CoursePage = () => {
               )}
 
               <button className={`${classes.addToCart}`}>
-                {isEnrolled ? (
+                {isEnrolled || isOwner ? (
                   <Link to={`/course/${courseId}/content`}>Go to course</Link>
                 ) : (
                   <Link to={``}>Buy Now</Link>

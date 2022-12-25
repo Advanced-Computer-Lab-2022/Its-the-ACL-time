@@ -4,7 +4,7 @@ const { verifyToken } = require('../utils');
 const authMiddleware = (req, res, next) => {
   console.log('header auth');
   const authHeader = req.headers.authorization;
-
+  console.log("auth header",authHeader);
   if (!authHeader || !authHeader.startsWith('Bearer')) {
     throw new UnauthorizedError('Authentication failed');
   } else {
