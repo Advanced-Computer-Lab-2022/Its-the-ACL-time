@@ -49,6 +49,7 @@ import HomeV2 from './components/homepage/HomeV2';
 import PromotionForm from './components/PromotionForm';
 import Profile from './pages/Profile';
 import Post from './components/Post';
+import InstructorRating from './components/InstructorRating';
 
 function App() {
   return (
@@ -82,6 +83,10 @@ function App() {
             <Route path='myCourses' element={<Instructor></Instructor>} />
             <Route path='/post' element={<Post></Post>} />
             <Route path='gg' element={<Setting></Setting>} />
+            <Route
+              path='/instructor-rating'
+              element={<InstructorRating></InstructorRating>}
+            />
             <Route
               element={
                 <>

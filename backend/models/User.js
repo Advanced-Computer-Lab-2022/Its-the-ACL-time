@@ -55,6 +55,12 @@ const UserSchema = mongoose.Schema({
       },
     },
   ],
+
+  ratings: [Number],
+  averageRating: {
+    type: Number,
+    default: 0,
+  },
 });
 
 UserSchema.pre('save', async function () {

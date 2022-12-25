@@ -4,21 +4,7 @@ import { Link, useParams } from 'react-router-dom';
 import axios from 'axios';
 import { useCourseContext } from '../context/Course/courseContext';
 import SubTitles from '../components/subtitle/SubTitles';
-import {
-  Box,
-  Button,
-  Dialog,
-  DialogActions,
-  DialogContent,
-  DialogTitle,
-  Divider,
-  Drawer,
-  List,
-  ListItem,
-  ListItemIcon,
-  ListItemText,
-  Typography,
-} from '@material-ui/core';
+import { Box, Typography } from '@material-ui/core';
 import Review from '../components/Review';
 import { CourseComponent, Loading } from '../components';
 import { AiOutlineCheck } from 'react-icons/ai';
@@ -33,6 +19,7 @@ import Footer from '../components/Footer';
 import PromotionForm from '../components/PromotionForm';
 import ExamForm from '../components/ExamForm';
 import SubtitleForm from '../components/subtitle/SubtitleForm';
+import InstructorRating from '../components/InstructorRating';
 
 const useStyles = makeStyles((theme) => ({
   main: {
@@ -61,9 +48,13 @@ const useStyles = makeStyles((theme) => ({
     flexDirection: 'column',
   },
   subtitle: {
-    marginLeft: '5rem',
-    width: '75%',
-    display: 'absolute',
+    marginLeft: '8%',
+    width: '80%',
+    display: 'flex',
+    flexDirection: 'column',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginTop: '5rem',
   },
   title: {
     display: 'flex',
@@ -267,6 +258,7 @@ const CoursePage = () => {
   useEffect(() => {
     function getCourse() {
       const course = courses.find((course) => course._id === courseId);
+      console.log(course);
       setCourse(course);
       if (course) {
         const promotion = course.promotion;
@@ -584,11 +576,26 @@ const CoursePage = () => {
             )}
 
             <section>
-              <h2 className={`${classes.title}`}>Content</h2>
               <div className={`${classes.subtitle}`}>
                 <SubTitles data={subtitles} />
                 <br />
                 <br />
+              </div>
+            </section>
+
+            <section>
+              <h2 className={`${classes.title}`}>Instructor</h2>
+              <div
+                style={{
+                  display: 'flex',
+                  flexDirection: 'row',
+                  justifyContent: 'center',
+                }}
+              >
+                <InstructorRating
+                  instructorId={course?.createdBy?._id}
+                  type={isEnrolled ? 'enrolled' : isOwner ? 'owner' : 'none'}
+                />
               </div>
             </section>
 
@@ -644,7 +651,7 @@ const CoursePage = () => {
             <br />
             <br />
           </div>
-          <div></div>
+
           <Footer />
         </main>
       )}
