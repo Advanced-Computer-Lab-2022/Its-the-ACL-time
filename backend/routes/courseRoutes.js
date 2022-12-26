@@ -8,6 +8,7 @@ const {
   getCoursesInstructor,
   courseEnroll,
   getEnrolledCourses,
+  buyWithWallet,
 } = require('../controllers/courseController');
 
 const {
@@ -27,6 +28,7 @@ router
 router.get('/instructor/:id', authMiddleware, getCoursesInstructor);
 router.get('/usersCourses', authMiddleware, getCoursesInstructor);
 router.get('/enrolledCourses', authMiddleware, getEnrolledCourses);
+router.get('/buyWithWallet/:courseId',authMiddleware,buyWithWallet)
 
 // SubTitle Routes
 

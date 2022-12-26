@@ -60,7 +60,16 @@ const getPaymentSession = async (req, res) => {
     CourseObject.stripePriceId = priceId;
   }
   await CourseObject.save();
-  const coupon = await stripe.coupons.create({ percent_off: parseInt(CourseObject.promotion) || 1, duration: 'once' });
+  let coupon = null;
+  if (parseInt(CourseObject.promotion.promotionPercentage) > 0) {
+    const promotion = CourseObject.promotion;
+    const currentDate = new Date();
+    const startDate = new Date(promotion.startDate);
+    const endDate = new Date(promotion.endDate);
+    if (currentDate >= startDate && currentDate <= endDate) {
+      coupon = await stripe.coupons.create({ percent_off: parseInt(CourseObject.promotion.promotionPercentage) || 1, duration: 'once' });
+    }
+  }
   const session = await stripe.checkout.sessions.create({
     success_url: 'http://localhost:3000/SuccessPayment?id={CHECKOUT_SESSION_ID}',
     cancel_url: 'http://localhost:3000/FailedPayment',
@@ -72,7 +81,7 @@ const getPaymentSession = async (req, res) => {
       quantity: 1
     }],
     discounts: [{
-      coupon: coupon.id,
+      coupon: coupon?.id,
     }],
   })
   res.json({

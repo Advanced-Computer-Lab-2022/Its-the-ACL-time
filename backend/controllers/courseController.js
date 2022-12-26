@@ -1,7 +1,30 @@
 const { StatusCodes } = require('http-status-codes');
-const { Course, User } = require('../models');
+const { Course, User, Wallet } = require('../models');
 const { UnauthorizedError, BadRequestError } = require('../Errors');
 const { verifyToken } = require('../utils/jwt');
+const { default: mongoose } = require('mongoose');
+
+
+
+const buyWithWallet = async (req, res) => {
+  const { userId } = req.user;
+  const { courseId } = req.params;
+  const user = await User.findOne({
+    _id: userId,
+  });
+  let CourseObject =await Course.findById(courseId);
+  let balance = await Wallet.findOne({ owner: mongoose.Types.ObjectId(userId) });
+  console.log("balance",balance);
+  console.log("course price",CourseObject.price);
+  if (balance.balance >= CourseObject.price) {
+    await Wallet.updateOne({ owner: userId }, { balance: balance.balance - CourseObject.price });
+    user.courses.push({ courseId: courseId, isCompleted: false });
+    await user.save();
+    res.status(200).send({ msg: "payment success" });
+  } else {
+    res.status(400).send({ msg: "payment failed" });
+  }
+}
 
 const createCourse = async (req, res) => {
   const {
@@ -142,6 +165,9 @@ const courseEnroll = async (req, res) => {
   res.status(200).json({ msg: 'You are enrolled in this course' });
 };
 
+
+
+
 const getEnrolledCourses = async (req, res) => {
   const userId = req.params.id;
   if (userId !== req.user.userId) {
@@ -160,4 +186,5 @@ module.exports = {
   getCoursesInstructor,
   courseEnroll,
   getEnrolledCourses,
+  buyWithWallet,
 };
