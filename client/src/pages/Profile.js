@@ -34,6 +34,7 @@ import Tab from '@material-ui/core/Tab';
 import Button from '@material-ui/core/Button';
 // import icon for performance
 import AssessmentIcon from '@material-ui/icons/Assessment';
+import CourseComponent from '../components/course/CourseComponent';
 
 const drawerWidth = 240;
 
@@ -416,7 +417,7 @@ export default function Profile() {
             />
             Nerd Academy
           </Link>
-          <Avatar>H</Avatar>
+          <Avatar>{user.username.toUpperCase().substring(0, 2)}</Avatar>
         </Toolbar>
       </AppBar>
       <Drawer
@@ -562,7 +563,30 @@ export default function Profile() {
           >
             <div className={classes.courses}>
               <h2>My Courses</h2>
-              <Courses courses={myCourses} page={page} />
+              {myCourses
+                .slice(page * 3, Math.min(page * 3 + 3, myCourses.length))
+                .map((course) => {
+                  return (
+                    <div
+                      style={{
+                        width: '100%',
+                      }}
+                    >
+                      <CourseComponent
+                        key={course?._id}
+                        title={course?.title}
+                        subject={course?.subject}
+                        description={course?.summary}
+                        instructor={course?.createdBy.username}
+                        price={course?.price}
+                        courseId={course?._id}
+                        horizontal={true}
+                        rating={course?.rating}
+                        progress={course?.progress}
+                      />
+                    </div>
+                  );
+                })}
             </div>
             {
               <div

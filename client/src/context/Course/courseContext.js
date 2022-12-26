@@ -1,4 +1,4 @@
-import React, { useContext, useReducer, useEffect } from 'react';
+import React, { useContext, useReducer, useEffect, useMemo } from 'react';
 import courseReducer from './courseReducer';
 import { CREATE_COURSE, GET_COURSES, GET_MY_COURSES } from './courseActions';
 import axios from 'axios';
