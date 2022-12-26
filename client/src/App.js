@@ -87,10 +87,6 @@ function App() {
             <Route path='/post' element={<Post></Post>} />
             <Route path='gg' element={<Setting></Setting>} />
             <Route
-              path='/instructor-rating'
-              element={<InstructorRating></InstructorRating>}
-            />
-            <Route
               element={
                 <>
                   <NavBar />

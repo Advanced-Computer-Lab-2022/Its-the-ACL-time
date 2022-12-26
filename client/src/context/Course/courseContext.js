@@ -84,7 +84,7 @@ const CourseProvider = ({ children }) => {
         type: CREATE_COURSE,
         payload: { course: response.data.course },
       });
-      console.log(response.data);
+      return response.data.course._id;
     } catch (error) {
       console.log(error);
     }

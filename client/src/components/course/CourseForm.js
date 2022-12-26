@@ -4,14 +4,25 @@ import Form from 'react-bootstrap/Form';
 import Row from 'react-bootstrap/Row';
 import Alert from '@material-ui/lab/Alert';
 import { makeStyles } from '@material-ui/core/styles';
-import { useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import { useAppContext } from '../../context/App/appContext';
 import { useCourseContext } from '../../context/Course/courseContext';
 import { FormControl, Select } from '@material-ui/core';
 import { useState } from 'react';
 import { useRef } from 'react';
+import Footer from '../Footer';
+import Loading from '../Loading';
+import axios from 'axios';
 
 const useStyles = makeStyles((theme) => ({
+  main: {
+    backgroundColor: '#f5f5f5',
+    width: '100%',
+    height: '100%',
+    display: 'flex',
+    flexDirection: 'column',
+    justifyContent: 'space-between',
+  },
   container: {
     width: '60vw',
     margin: '7rem 20rem',
@@ -111,20 +122,24 @@ function CourseForm({ addCourseFront }) {
   const { alert, setAlert, clearAlert, alertText, alertType } = useAppContext();
   const { createCourse, updateCourse } = useCourseContext();
   const [subtitles, setSubtitles] = useState(0);
-  const addCourseButtonRef = useRef();
+  const [disable, setDisable] = useState(true);
+  const [loading, setLoading] = useState(false);
+  const subtitlesRef = useRef();
+  const navigate = useNavigate();
 
   const addSubtitle = () => {
-    addCourseButtonRef.current.disabled = false;
+    setDisable(false);
     setSubtitles(subtitles + 1);
   };
 
   const removeSubtitle = () => {
-    if (subtitles === 1) addCourseButtonRef.current.disabled = true;
+    if (subtitles === 1) setDisable(true);
     setSubtitles(subtitles - 1);
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setLoading(true);
     console.log(e.target[0].value);
     const title = e.target[0].value;
     const subject = e.target[1].value;
@@ -144,11 +159,12 @@ function CourseForm({ addCourseFront }) {
       summary,
     };
 
+    let id = '';
     try {
       if (courseId) {
         await updateCourse(courseId, course);
       } else {
-        await createCourse(course);
+        id = await createCourse(course);
       }
       if (addCourseFront) {
         addCourseFront(course);
@@ -168,176 +184,191 @@ function CourseForm({ addCourseFront }) {
 
       clearAlert();
     }
+
+    let subtitlesContent = [];
+    for (let i = 0; i < subtitles; i++) {
+      const title =
+        subtitlesRef.current.children[i + 2].children[1].children[1].value;
+      const link =
+        subtitlesRef.current.children[i + 2].children[2].children[0].children[1]
+          .value;
+      const duration =
+        subtitlesRef.current.children[i + 2].children[2].children[1].children[1]
+          .value;
+
+      const description =
+        subtitlesRef.current.children[i + 2].children[3].children[1].value;
+
+      subtitlesContent.push({
+        title,
+        link,
+        duration,
+        description,
+      });
+    }
+
+    try {
+      const response = await axios.post(
+        `http://localhost:8080/api/v1/course/${id}/subtitle`,
+        subtitlesContent,
+        {
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${localStorage.getItem('token')}`,
+          },
+        }
+      );
+      console.log(response);
+    } catch (error) {
+      console.log(error);
+    }
+
+    setLoading(false);
+    navigate('/profile');
   };
 
-  //   try {
-  //     const response = await axios.request({
-  //       baseURL: courseId
-  //         ? `http://localhost:8080/api/v1/course/${courseId}`
-  //         : 'http://localhost:8080/api/v1/course/',
-  //       method: courseId ? 'PATCH' : 'POST',
-  //       data: course,
-  //       headers: {
-  //         'Content-Type': 'application/json',
-  //         Authorization: `Bearer ${localStorage.getItem('token')}`,
-  //       },
-  //     });
-
-  //     console.log(response);
-
-  //     setAlert(
-  //       'success',
-  //       `Course ${courseId ? 'Updated' : 'Created'} successfully`
-  //     );
-  //     clearAlert();
-  //   } catch (error) {
-  //     const { msg } = error.response.data;
-
-  //     console.log(error.response.data.msg);
-
-  //     setAlert('error', msg);
-
-  //     clearAlert();
-
-  //     console.log(error);
-  //   }
-  // };
-
   return (
-    <div className={`${classes.container}`}>
-      <h1 className={`${classes.title}`}>
-        {courseId ? 'Update' : 'Add'} Course
-      </h1>
+    <main className={classes.main}>
+      {loading && <Loading></Loading>}
 
-      {alert && (
-        <Alert variant='filled' severity={alertType} sx={{ width: 20 }}>
-          {alertText}
-        </Alert>
-      )}
-      <Form className={`${classes.form}`} onSubmit={handleSubmit}>
-        <Row className='mb-3'>
-          <Form.Group as={Col} controlId='formGridTitle'>
-            <Form.Label>Title</Form.Label>
-            <Form.Control type='text' placeholder='Enter course title' />
-          </Form.Group>
+      <div className={`${classes.container}`}>
+        <h1 className={`${classes.title}`}>
+          {courseId ? 'Update' : 'Add'} Course
+        </h1>
 
-          <Form.Group as={Col} controlId='formGridSubject'>
-            <FormControl variant='filled' className={classes.formControl}>
-              <Form.Label>Subject</Form.Label>
-
-              <Select
-                native
-                inputProps={{
-                  name: 'age',
-                  id: 'subject',
-                }}
-                className={classes.select}
-              >
-                <option aria-label='None' value='' />
-                {subjects.map((subject, i) => (
-                  <option value={subject} key={i}>
-                    {subject}
-                  </option>
-                ))}
-              </Select>
-            </FormControl>
-          </Form.Group>
-        </Row>
-        <Row className='mb-3'>
-          <Form.Group as={Col} controlId='formGridPrice'>
-            <Form.Label>Price</Form.Label>
-            <Form.Control type='number' placeholder='Enter course price' />
-          </Form.Group>
-
-          <Form.Group as={Col} controlId='formGridNumberOfHours'>
-            <Form.Label>Number Of Hours</Form.Label>
-            <Form.Control type='number' placeholder='Number Of Hours' />
-          </Form.Group>
-
-          <Form.Group as={Col} controlId='formGridPromotion'>
-            <Form.Label>Promotion</Form.Label>
-            <Form.Control type='number' placeholder='Promotion' />
-          </Form.Group>
-          <Form.Group as={Col} controlId='formGridPromotionDuration'>
-            <Form.Label>duration in days</Form.Label>
-            <Form.Control type='number' placeholder='duration' />
-          </Form.Group>
-        </Row>
-        <Form.Group className='mb-3' controlId='formGridPreviewLink'>
-          <Form.Label>Preview Link</Form.Label>
-          <Form.Control placeholder='Preview Link' />
-        </Form.Group>
-
-        <Form.Group className='mb-3' controlId='formGridSummary'>
-          <Form.Label>Summary</Form.Label>
-          <Form.Control as='textarea' placeholder='Summary' />
-        </Form.Group>
-
-        {subtitles > 0 && (
-          <div className={`${classes.subtitles}`}>
-            <div className={`${classes.line}`}></div>
-            <h3 className={`${classes.subtitleTitle}`}>Subtitles</h3>
-            {[...Array(subtitles)].map((e, i) => {
-              return (
-                <div className={`${classes.subtitle}`} key={i}>
-                  <h4>Subtitle {i + 1}</h4>
-                  <Form.Group className='mb-3' controlId='formGridTitle'>
-                    <Form.Label>Title</Form.Label>
-                    <Form.Control placeholder='Title' />
-                  </Form.Group>
-
-                  <Row className='mb-3'>
-                    <Form.Group as={Col} controlId='formGridLink'>
-                      <Form.Label>Link</Form.Label>
-                      <Form.Control type='text' placeholder='Link' />
-                    </Form.Group>
-
-                    <Form.Group as={Col} controlId='formGridDuration'>
-                      <Form.Label>Duration</Form.Label>
-                      <Form.Control type='number' placeholder='Duration' />
-                    </Form.Group>
-                  </Row>
-
-                  <Form.Group className='mb-3' controlId='formGridDescription'>
-                    <Form.Label>Description</Form.Label>
-                    <Form.Control as='textarea' placeholder='Description' />
-                  </Form.Group>
-                </div>
-              );
-            })}
-          </div>
+        {alert && (
+          <Alert variant='filled' severity={alertType} sx={{ width: 20 }}>
+            {alertText}
+          </Alert>
         )}
+        <Form className={`${classes.form}`} onSubmit={handleSubmit}>
+          <Row className='mb-3'>
+            <Form.Group as={Col} controlId='formGridTitle'>
+              <Form.Label>Title</Form.Label>
+              <Form.Control type='text' placeholder='Enter course title' />
+            </Form.Group>
 
-        <div className={`${classes.buttons}`}>
-          <Button
-            variant='secondary'
-            onClick={addSubtitle}
-            className={`${classes.addSubtitleButton}`}
-          >
-            Add Subtitle
-          </Button>
+            <Form.Group as={Col} controlId='formGridSubject'>
+              <FormControl variant='filled' className={classes.formControl}>
+                <Form.Label>Subject</Form.Label>
+
+                <Select
+                  native
+                  inputProps={{
+                    name: 'age',
+                    id: 'subject',
+                  }}
+                  className={classes.select}
+                >
+                  <option aria-label='None' value='' />
+                  {subjects.map((subject, i) => (
+                    <option value={subject} key={i}>
+                      {subject}
+                    </option>
+                  ))}
+                </Select>
+              </FormControl>
+            </Form.Group>
+          </Row>
+          <Row className='mb-3'>
+            <Form.Group as={Col} controlId='formGridPrice'>
+              <Form.Label>Price</Form.Label>
+              <Form.Control type='number' placeholder='Enter course price' />
+            </Form.Group>
+
+            <Form.Group as={Col} controlId='formGridNumberOfHours'>
+              <Form.Label>Number Of Hours</Form.Label>
+              <Form.Control type='number' placeholder='Number Of Hours' />
+            </Form.Group>
+
+            <Form.Group as={Col} controlId='formGridPromotion'>
+              <Form.Label>Promotion</Form.Label>
+              <Form.Control type='number' placeholder='Promotion' />
+            </Form.Group>
+            <Form.Group as={Col} controlId='formGridPromotionDuration'>
+              <Form.Label>duration in days</Form.Label>
+              <Form.Control type='number' placeholder='duration' />
+            </Form.Group>
+          </Row>
+          <Form.Group className='mb-3' controlId='formGridPreviewLink'>
+            <Form.Label>Preview Link</Form.Label>
+            <Form.Control placeholder='Preview Link' />
+          </Form.Group>
+
+          <Form.Group className='mb-3' controlId='formGridSummary'>
+            <Form.Label>Summary</Form.Label>
+            <Form.Control as='textarea' placeholder='Summary' />
+          </Form.Group>
+
           {subtitles > 0 && (
+            <div className={`${classes.subtitles}`} ref={subtitlesRef}>
+              <div className={`${classes.line}`}></div>
+              <h3 className={`${classes.subtitleTitle}`}>Subtitles</h3>
+              {[...Array(subtitles)].map((e, i) => {
+                return (
+                  <div className={`${classes.subtitle}`} key={i}>
+                    <h4>Subtitle {i + 1}</h4>
+                    <Form.Group className='mb-3' controlId='formGridTitle'>
+                      <Form.Label>Title</Form.Label>
+                      <Form.Control placeholder='Title' />
+                    </Form.Group>
+
+                    <Row className='mb-3'>
+                      <Form.Group as={Col} controlId='formGridLink'>
+                        <Form.Label>Link</Form.Label>
+                        <Form.Control type='text' placeholder='Link' />
+                      </Form.Group>
+
+                      <Form.Group as={Col} controlId='formGridDuration'>
+                        <Form.Label>Duration</Form.Label>
+                        <Form.Control type='number' placeholder='Duration' />
+                      </Form.Group>
+                    </Row>
+
+                    <Form.Group
+                      className='mb-3'
+                      controlId='formGridDescription'
+                    >
+                      <Form.Label>Description</Form.Label>
+                      <Form.Control as='textarea' placeholder='Description' />
+                    </Form.Group>
+                  </div>
+                );
+              })}
+            </div>
+          )}
+
+          <div className={`${classes.buttons}`}>
             <Button
               variant='secondary'
-              className={`${classes.removeSubtitleButton}`}
-              onClick={removeSubtitle}
+              onClick={addSubtitle}
+              className={`${classes.addSubtitleButton}`}
             >
-              Remove Subtitle
+              Add Subtitle
             </Button>
-          )}
-        </div>
-        <Button
-          variant='primary'
-          type='submit'
-          className={`${classes.addCourseButton}`}
-          ref={addCourseButtonRef}
-          id='addCourseButton'
-          disabled={!courseId}
-        >
-          {courseId ? 'Update' : 'Add'} Course
-        </Button>
-      </Form>
-    </div>
+            {subtitles > 0 && (
+              <Button
+                variant='secondary'
+                className={`${classes.removeSubtitleButton}`}
+                onClick={removeSubtitle}
+              >
+                Remove Subtitle
+              </Button>
+            )}
+          </div>
+          <Button
+            variant='primary'
+            type='submit'
+            className={`${classes.addCourseButton}`}
+            id='addCourseButton'
+            disabled={disable}
+          >
+            {courseId ? 'Update' : 'Add'} Course
+          </Button>
+        </Form>
+      </div>
+      <Footer />
+    </main>
   );
 }
 

@@ -260,7 +260,7 @@ const CoursePage = () => {
       const course = courses.find((course) => course._id === courseId);
       console.log(course);
       setCourse(course);
-      if (course) {
+      if (course && course.promotion) {
         const promotion = course.promotion;
         const currentDate = new Date();
         const startDate = new Date(promotion.startDate);

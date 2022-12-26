@@ -18,7 +18,7 @@ import SettingsIcon from '@material-ui/icons/Settings';
 import AccountBalanceWalletIcon from '@material-ui/icons/AccountBalanceWallet';
 import BookIcon from '@material-ui/icons/Book';
 import { Avatar, Paper, Tabs, TextField } from '@material-ui/core';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { useCourseContext } from '../context/Course/courseContext';
 import Footer from '../components/Footer';
 import engagingCourse from '../assets/images/engaging-course.jpg';
@@ -368,6 +368,7 @@ export default function Profile() {
   const { user } = useAppContext();
   const [page, setPage] = useState(0);
   const [value, setValue] = React.useState(0);
+  const navigate = useNavigate();
 
   const handleChange = (event, newValue) => {
     setValue(newValue);
@@ -540,6 +541,9 @@ export default function Profile() {
                 width: '20rem',
                 height: '3rem',
                 fontSize: '1.5rem',
+              }}
+              onClick={() => {
+                navigate('/addCourse');
               }}
             >
               Create a Course
