@@ -6,6 +6,14 @@ const ReportSchema = mongoose.Schema(
       type: String,
       required: [true, 'Please provide a report title'],
     },
+    commentsadmin: [{
+      type: String,
+      required: [true, 'Please provide a report comment'],
+    }],
+    commentsuser: [{
+      type: String,
+      required: [true, 'Please provide a report comment'],
+    }],
     type:{
         type: String,
         enum:["technical","financial","other"],
@@ -26,6 +34,7 @@ const ReportSchema = mongoose.Schema(
       required: [true, 'Please provide the course '],
       ref: 'Course',
     },
+
   }
 );
 
