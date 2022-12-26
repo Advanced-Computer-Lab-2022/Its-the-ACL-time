@@ -6,6 +6,9 @@ import { makeStyles } from '@material-ui/core/styles';
 import { useState } from 'react';
 import axios from 'axios';
 import { useParams } from 'react-router-dom';
+import { useAppContext } from '../../context/App/appContext';
+import { Alert } from '@material-ui/lab';
+import Loading from '../Loading';
 
 const useStyles = makeStyles((theme) => ({
   container: {
@@ -22,6 +25,19 @@ const useStyles = makeStyles((theme) => ({
     textAlign: 'center',
     fontSize: '2rem',
     paddingTop: '2rem',
+  },
+  btns: {
+    display: 'flex',
+    justifyContent: 'space-between',
+    flexDirection: 'column',
+    alignItems: 'center',
+  },
+
+  ARBtns: {
+    display: 'flex',
+    justifyContent: 'space-between',
+    flexDirection: 'row',
+    alignItems: 'center',
   },
 }));
 
@@ -57,9 +73,12 @@ function SubtitleForm() {
   const classes = useStyles();
   const [subtitles, setSubtitles] = useState(0);
   const { courseId } = useParams();
+  const [loading, setLoading] = useState(false);
+  const { alert, alertType, alertText, setAlert, clearAlert } = useAppContext();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setLoading(true);
     const numOfQuestions = e.target[0].value;
     if (subtitles === 0) setSubtitles(parseInt(numOfQuestions));
     else {
@@ -76,16 +95,35 @@ function SubtitleForm() {
       try {
         const response = await axios.post(
           `http://localhost:8080/api/v1/course/${courseId}/subtitle`,
-          subTitle
+          subTitle,
+          {
+            headers: {
+              'Content-Type': 'application/json',
+              Authorization: `Bearer ${localStorage.getItem('token')}`,
+            },
+          }
         );
         console.log(response);
+        setAlert('success', 'Subtitles Added Successfully');
       } catch (error) {
         console.log(error);
+        const msg = error.response.data.message;
+        setAlert('error', msg);
       }
     }
+    setTimeout(() => {
+      clearAlert();
+    }, 3000);
+    setLoading(false);
   };
   return (
     <div className={`${classes.container}`}>
+      {loading && <Loading></Loading>}
+      {alert && (
+        <Alert variant={'standard'} severity={alertType}>
+          {alertText}
+        </Alert>
+      )}
       <h1 className={`${classes.title}`}>Add SubTitle</h1>
 
       <Form className={`${classes.form}`} onSubmit={handleSubmit}>
@@ -98,15 +136,39 @@ function SubtitleForm() {
             </>
           );
         })}
-        {subtitles === 0 && (
-          <Form.Group className='mb-3' controlId='formGridNumberOfSubtitles'>
-            <Form.Label>Number Of Subtitles</Form.Label>
-            <Form.Control type='number' placeholder='Number Of Subtitles' />
-          </Form.Group>
-        )}
-        <Button variant='primary' type='submit'>
-          Submit
-        </Button>
+        <div className={classes.btns}>
+          <div className={classes.ARBtns}>
+            <Button
+              type='button'
+              onClick={() => setSubtitles(subtitles + 1)}
+              variant='primary'
+              style={{ marginRight: '1rem' }}
+            >
+              Add Subtitle
+            </Button>
+            <Button
+              type='button'
+              variant='default'
+              style={{ color: 'white', backgroundColor: '#f44336' }}
+              disabled={subtitles === 0}
+              onClick={() => setSubtitles(subtitles - 1)}
+            >
+              Remove Subtitle
+            </Button>
+          </div>
+          <Button
+            type='submit'
+            disabled={loading || subtitles === 0}
+            variant='default'
+            style={{
+              marginTop: '1rem',
+              color: 'white',
+              backgroundColor: '#4caf50',
+            }}
+          >
+            Submit
+          </Button>
+        </div>
       </Form>
     </div>
   );

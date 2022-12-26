@@ -20,6 +20,10 @@ import PromotionForm from '../components/PromotionForm';
 import ExamForm from '../components/ExamForm';
 import SubtitleForm from '../components/subtitle/SubtitleForm';
 import InstructorRating from '../components/InstructorRating';
+import { Rating } from '@material-ui/lab';
+import { BsClock } from 'react-icons/bs';
+import { BsPeople } from 'react-icons/bs';
+import StarBorderIcon from '@material-ui/icons/StarBorder';
 
 const useStyles = makeStyles((theme) => ({
   main: {
@@ -257,10 +261,12 @@ const CoursePage = () => {
 
   useEffect(() => {
     function getCourse() {
-      const course = courses.find((course) => course._id === courseId);
+      const course = courses.find(
+        (course) => course._id.toString() === courseId.toString()
+      );
       console.log(course);
       setCourse(course);
-      if (course) {
+      if (course && course.promotion) {
         const promotion = course.promotion;
         const currentDate = new Date();
         const startDate = new Date(promotion.startDate);
@@ -357,6 +363,42 @@ const CoursePage = () => {
                 {course?.subject}
               </h2>
               <p>{course && course?.summary?.slice(0, 50)}</p>
+              <div
+                style={{
+                  display: 'flex',
+                  flexDirection: 'column',
+                  justifyContent: 'space-between',
+                  alignItems: 'flex-start',
+                }}
+              >
+                {course && (
+                  <>
+                    <div
+                      style={{
+                        marginRight: '1rem',
+                      }}
+                    >
+                      <BsClock /> {course?.numberOfHours} hours
+                      <Rating
+                        name='customized-empty'
+                        disabled
+                        defaultValue={1}
+                        value={course?.rating}
+                        precision={0.2}
+                        emptyIcon={
+                          <StarBorderIcon
+                            fontSize='inherit'
+                            style={{ color: 'white' }}
+                          />
+                        }
+                      />
+                    </div>
+                    <div>
+                      <BsPeople /> {course?.numberOfStudents} students
+                    </div>
+                  </>
+                )}
+              </div>
             </div>
             <AlertDialog
               handleAgree={() => requestRefundHandler()}

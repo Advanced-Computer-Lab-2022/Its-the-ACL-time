@@ -9,6 +9,8 @@ import { useParams } from 'react-router-dom';
 import { useAppContext } from '../context/App/appContext';
 import { useState } from 'react';
 import { useRef } from 'react';
+import Loading from './Loading';
+import { useCourseContext } from '../context/Course/courseContext';
 
 const useStyles = makeStyles((theme) => ({
   container: {
@@ -111,6 +113,7 @@ function ExamForm() {
   const [questions, setQuestions] = useState(0);
   const [disableAddExamButton, setDisableAddExamButton] = useState(true);
   const addExamButtonRef = useRef();
+  const [loading, setLoading] = useState(false);
   const hoursRef = useRef();
   const minutesRef = useRef();
   const secondsRef = useRef();
@@ -160,6 +163,7 @@ function ExamForm() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setLoading(true);
     const exam = await getExamData();
 
     try {
@@ -170,22 +174,25 @@ function ExamForm() {
         },
       });
       console.log(res);
-      setAlert(res.data.message, 'success');
+      setAlert('success', "Exam's been created successfully");
       setTimeout(() => {
         clearAlert();
       }, 3000);
     } catch (error) {
-      setAlert(error.response.data.message, 'error');
+      setAlert('error', "Exam's not been created successfully");
       setTimeout(() => {
         clearAlert();
       }, 3000);
     }
+    setQuestions(0);
+    setLoading(false);
   };
 
   return (
     <div className={`${classes.container}`}>
       <h1 className={`${classes.title}`}>Create Exam</h1>
 
+      {loading && <Loading></Loading>}
       {alert && (
         <Alert variant='filled' severity={alertType} sx={{ width: 20 }}>
           {alertText}

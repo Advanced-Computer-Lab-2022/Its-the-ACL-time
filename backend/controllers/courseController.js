@@ -33,6 +33,11 @@ const createCourse = async (req, res) => {
   }
   req.body.createdBy = userId;
   const course = await Course.create(req.body);
+  const user = await User.findOne({
+    _id: userId,
+  });
+  user.courses.push({ courseId: course._id });
+  await user.save();
   res.status(StatusCodes.CREATED).json({ course });
 };
 

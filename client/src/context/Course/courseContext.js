@@ -1,4 +1,10 @@
-import React, { useContext, useReducer, useEffect } from 'react';
+import React, {
+  useContext,
+  useReducer,
+  useEffect,
+  useMemo,
+  useState,
+} from 'react';
 import courseReducer from './courseReducer';
 import { CREATE_COURSE, GET_COURSES, GET_MY_COURSES } from './courseActions';
 import axios from 'axios';
@@ -11,7 +17,8 @@ const initialState = {
 
 const CourseContext = React.createContext();
 const CourseProvider = ({ children }) => {
-  const [state, dispatch] = useReducer(courseReducer, initialState);
+  // const [state, dispatch] = useReducer(courseReducer, initialState);
+  const [state, setState] = useState(initialState);
 
   const { token } = useAppContext();
 
@@ -29,12 +36,17 @@ const CourseProvider = ({ children }) => {
       axios
         .get('http://localhost:8080/api/v1/course')
         .then(({ data }) => {
-          dispatch({
-            type: GET_COURSES,
-            payload: {
-              courses: data.courses,
-            },
+          setState({
+            ...state,
+            courses: data.courses,
           });
+          // dispatch({
+
+          //   type: GET_COURSES,
+          //   payload: {
+          //     courses: data.courses,
+          //   },
+          // });
         })
         .catch((error) => console.log(error));
 
@@ -52,12 +64,18 @@ const CourseProvider = ({ children }) => {
             },
           }
         );
-        dispatch({
-          type: GET_MY_COURSES,
-          payload: {
-            courses: formMyCourses(response.data.courses),
-          },
+
+        setState({
+          ...state,
+          myCourses: formMyCourses(response.data.courses),
         });
+
+        // dispatch({
+        //   type: GET_MY_COURSES,
+        //   payload: {
+        //     courses: formMyCourses(response.data.courses),
+        //   },
+        // });
       } catch (error) {
         console.warn(error);
       }
@@ -80,11 +98,20 @@ const CourseProvider = ({ children }) => {
           },
         }
       );
-      dispatch({
-        type: CREATE_COURSE,
-        payload: { course: response.data.course },
+
+      setState({
+        ...state,
+        myCourses: [...state.myCourses, response.data.course],
+        courses: [...state.courses, response.data.course],
       });
-      console.log(response.data);
+
+      // dispatch({
+      //   type: CREATE_COURSE,
+      //   payload: {
+      //     course: response.data.course,
+      //   },
+      // });
+      return response.data.course._id;
     } catch (error) {
       console.log(error);
     }
@@ -101,6 +128,21 @@ const CourseProvider = ({ children }) => {
           },
         }
       );
+
+      setState({
+        ...state,
+        myCourses: state.myCourses.map((c) =>
+          c._id.toString() === courseId.toString()
+            ? response.data.updatedCourse
+            : c
+        ),
+        courses: state.courses.map((c) =>
+          c._id.toString() === courseId.toString()
+            ? response.data.updatedCourse
+            : c
+        ),
+      });
+
       // dispatch({
       //   type: UPDATE_COURSE,
       //   payload: { course: response.data.updatedCourse },

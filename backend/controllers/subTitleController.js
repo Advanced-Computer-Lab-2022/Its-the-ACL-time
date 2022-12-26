@@ -4,27 +4,17 @@ const { Course } = require('../models');
 const SubTitle = require('../models/SubTitle');
 
 const createSubTitle = async (req, res) => {
-  // const { type, userId } = req.user;
-
-  // if (type !== 'Instructor') {
-  //   throw new UnauthorizedError('You are not allowed to add subtitle');
-  // }
-
-  // const course = await Course.findOne({ _id: courseId });
-
-  // if (course.createdBy.toString() !== userId.toString()) {
-  //   throw new UnauthorizedError('You are not allowed to add subtitle');
-  //}
   const { courseId } = req.params;
 
   const subTitles = req.body;
+  console.log(subTitles);
 
   subTitles.map(async (item) => {
     const { title, link, duration, description } = item;
     const newSubtitle = new SubTitle({
       title,
       link,
-      duration,
+      duration: Number(duration),
       description,
       course: courseId,
     });
