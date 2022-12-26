@@ -62,7 +62,7 @@ export default function GetCourse() {
   const[course,setcourse]=useState([])
   const[selectcourse,setselect]=useState([]);
   const[promotion,setpromtion]=useState(0);
-  const [open, setOpen] = React.useState(false);
+  const [open, setOpen] = React.useState(true);
   let rows = [
   ];
  useEffect(()=>{
@@ -70,6 +70,7 @@ export default function GetCourse() {
     axios.get("http://localhost:8080/api/v1/admin/courses").then(res=>{
    // console.log(res.data);
     setcourse(res.data);
+    setOpen(false)
     console.log(res.data)
    })
    .catch(err=>

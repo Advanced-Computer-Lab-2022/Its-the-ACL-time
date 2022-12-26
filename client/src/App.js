@@ -24,6 +24,7 @@ import {
   Report,
   DataGridDemo,
   CourseRequest,
+  RefundRequest,Accessrequest,
 } from './components/admin';
 
 import SubtitleForm from './components/subtitle/SubtitleForm';
@@ -61,6 +62,8 @@ function App() {
               <Route path='' element={<UserforAdmin />} />
               <Route path='users' element={<UserforAdmin />} />
               <Route path='Report' element={<Report></Report>} />
+              <Route path='Access Request' element={<Accessrequest/>} />
+              <Route path='Refund' element={<RefundRequest/>} />
               <Route
                 path='courserequest'
                 element={<CourseRequest></CourseRequest>}
