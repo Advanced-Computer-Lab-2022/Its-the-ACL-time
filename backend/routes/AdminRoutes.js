@@ -25,6 +25,8 @@ router.patch('/grantcourse',AdminController.updatecourserequest)
 //set promotion for course
 router.patch('/setpromotion',AdminController.setpromtion)
 router.patch('/setcomment',AdminController.setcomment)
+router.patch('/usersetcomment',AdminController.usersetcomment)
+
 
 
 

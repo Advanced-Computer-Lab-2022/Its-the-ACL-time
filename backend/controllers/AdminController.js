@@ -153,6 +153,17 @@ module.exports.setpromtion = async (req, res) => {
     report.save();
     res.status(StatusCodes.OK).json( report );
   };
+  module.exports.usersetcomment = async (req, res) => {
+    const { reportId,comment} = req.body;
+    console.log(req.body);
+    const report= await Report.findOne({_id:reportId }).populate("createdBy","username").populate("course","title");
+   // console.log(report)
+    report.commentsuser.push(comment);
+    report.save();
+    console.log(report)
+    res.status(StatusCodes.OK).json( report );
+  };
+
 
 
    
