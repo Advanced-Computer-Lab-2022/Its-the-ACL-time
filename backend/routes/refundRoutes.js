@@ -5,6 +5,6 @@ const { getRefunds, postRefund } = require('../controllers/RefundController');
 const { authAdmin, authMiddleware } = require('../middlewares/auth');
 
 router.post('/', authMiddleware, postRefund);
-router.get('/', authAdmin, getRefunds);
+router.get('/', getRefunds);
 
 module.exports = router;

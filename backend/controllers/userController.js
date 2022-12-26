@@ -165,7 +165,7 @@ const getreport = async (req, res) => {
   const report=await Report.find({
     createdBy:userId,
     course:req.query.id
-  }).populate("User")
+  }).populate("createdBy","username")
   res.status(200).json(report);
 };
 
