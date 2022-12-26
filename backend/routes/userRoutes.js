@@ -29,6 +29,7 @@ const {
   updateUserProgress,
   getUser,
   updateUserInfo,
+  getUserInfo,
 } = require('../controllers/userController');
 
 const { authOwner, authAdmin, authMiddleware } = require('../middlewares');
@@ -66,6 +67,7 @@ router.post('/courserequest', updateEmail);
 
 router.get('/GetBio', GetBio);
 router.patch('/', authMiddleware, updateUserInfo);
+router.get('/:userId', authMiddleware, getUserInfo);
 
 // update course progress
 router.get('/progress/:id', authMiddleware, getUser);

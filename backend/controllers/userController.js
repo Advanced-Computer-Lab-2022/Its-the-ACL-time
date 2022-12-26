@@ -63,9 +63,16 @@ const updateUserProgress = async (req, res) => {
 
 const updateUserInfo = async (req, res) => {
   const { userId } = req.user;
-  console.log(req.body);
-  const { username, oldPassword, newPassword, email, biography, country } =
-    req.body;
+  const {
+    instructorId,
+    username,
+    oldPassword,
+    newPassword,
+    email,
+    biography,
+    country,
+    rating,
+  } = req.body;
 
   const user = await User.findOne({ _id: userId });
 
@@ -79,8 +86,29 @@ const updateUserInfo = async (req, res) => {
     if (!isMatch) throw new UnauthorizedError('Invalid credentials');
     user.password = newPassword;
   }
-  console.log(biography);
-  await user.save();
+
+  let instructor;
+  if (rating && instructorId) {
+    instructor = await User.findOne({ _id: instructorId });
+    instructor.ratings.push(rating);
+    const sum = instructor.ratings.reduce((a, b) => a + b, 0);
+    const avg = sum / instructor.ratings.length || 0;
+    instructor.averageRating = avg;
+  }
+
+  if (instructorId) {
+    await instructor.save();
+  } else {
+    await user.save();
+  }
+  res.status(200).json(instructor ? instructor : user);
+};
+
+const getUserInfo = async (req, res) => {
+  const { userId } = req.params;
+  const user = await User.findOne({
+    _id: userId,
+  });
   res.status(200).json(user);
 };
 
@@ -152,4 +180,5 @@ module.exports = {
   createreport,
   getreport,
   updateUserInfo,
+  getUserInfo,
 };
