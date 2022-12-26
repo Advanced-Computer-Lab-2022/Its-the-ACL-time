@@ -2,7 +2,12 @@
 
 ##Table of Contents
 Unordered Lists:
-Projet Description
-2Tools and Frameworks
-3Features 
-4
+*Projet Description
+*Tools and Frameworks
+*Features 
+          *Admin Functionalities
+                          *User/Guest Functionalities
+
+*API References
+                *Admin Router
+                                       * User Router
