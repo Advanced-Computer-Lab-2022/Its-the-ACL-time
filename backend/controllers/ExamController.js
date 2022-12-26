@@ -48,7 +48,10 @@ const createExam = async (req, res) => {
     return res.status(400).json({ error: 'Only Instructor can create exams' });
   }
 
-  if (user.courses.find((c) => c.courseId == courseId) === undefined) {
+  if (
+    !user.courses.find((c) => c.courseId.toString() === courseId.toString())
+  ) {
+    console.log('Instructor is not assigned to this course');
     return res
       .status(400)
       .json({ error: 'Instructor is not assigned to this course' });

@@ -112,7 +112,6 @@ function PromotionForm() {
   const endDateRef = useRef();
   const promotionPercentageRef = useRef();
   const [loading, setLoading] = useState(false);
-  // get courseId from the params
   const { courseId } = useParams();
   console.log();
 
@@ -162,54 +161,56 @@ function PromotionForm() {
   };
 
   return (
-    <div className={classes.root}>
-      <div className={`${classes.container}`}>
-        <h1 className={`${classes.title}`}>Add Promotion</h1>
-        {loading && <Loading type='spin' color='white' />}
-        {alert && <SnackBar content={alert} />}
-        <Form className={`${classes.form}`} onSubmit={handleSubmit}>
-          <Row className='mb-3'>
-            <Form.Group as={Col} controlId='formGridNumberOfHours'>
-              <Form.Label>Promotion Percentage</Form.Label>
-              <Form.Control
-                type='number'
-                placeholder='Enter promotion percentage'
-                ref={promotionPercentageRef}
-              />
-            </Form.Group>
-          </Row>
-          <Row className='mb-3'>
-            <Form.Group as={Col} controlId='formGridPrice'>
-              <Form.Label>Start Date</Form.Label>
-              <Form.Control
-                type='date'
-                placeholder='Enter course start date'
-                ref={startDateRef}
-              />
-            </Form.Group>
+    <>
+      <div className={classes.root}>
+        <div className={`${classes.container}`}>
+          <h1 className={`${classes.title}`}>Add Promotion</h1>
+          {loading && <Loading type='spin' color='white' />}
+          {alert && <SnackBar content={alert} />}
+          <Form className={`${classes.form}`} onSubmit={handleSubmit}>
+            <Row className='mb-3'>
+              <Form.Group as={Col} controlId='formGridNumberOfHours'>
+                <Form.Label>Promotion Percentage</Form.Label>
+                <Form.Control
+                  type='number'
+                  placeholder='Enter promotion percentage'
+                  ref={promotionPercentageRef}
+                />
+              </Form.Group>
+            </Row>
+            <Row className='mb-3'>
+              <Form.Group as={Col} controlId='formGridPrice'>
+                <Form.Label>Start Date</Form.Label>
+                <Form.Control
+                  type='date'
+                  placeholder='Enter course start date'
+                  ref={startDateRef}
+                />
+              </Form.Group>
 
-            <Form.Group as={Col} controlId='formGridNumberOfHours'>
-              <Form.Label>End Date</Form.Label>
-              {/* make the type of the form.control date */}
-              <Form.Control
-                type='date'
-                placeholder='Enter course end date'
-                ref={endDateRef}
-              />
-            </Form.Group>
-          </Row>
+              <Form.Group as={Col} controlId='formGridNumberOfHours'>
+                <Form.Label>End Date</Form.Label>
+                {/* make the type of the form.control date */}
+                <Form.Control
+                  type='date'
+                  placeholder='Enter course end date'
+                  ref={endDateRef}
+                />
+              </Form.Group>
+            </Row>
 
-          <Button
-            variant='primary'
-            type='submit'
-            className={`${classes.addCourseButton}`}
-            id='addCourseButton'
-          >
-            Add Promotion Code
-          </Button>
-        </Form>
+            <Button
+              variant='primary'
+              type='submit'
+              className={`${classes.addCourseButton}`}
+              id='addCourseButton'
+            >
+              Add Promotion Code
+            </Button>
+          </Form>
+        </div>
       </div>
-    </div>
+    </>
   );
 }
 

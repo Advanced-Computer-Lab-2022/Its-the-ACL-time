@@ -285,10 +285,6 @@ function CourseForm({ addCourseFront }) {
               <Form.Label>Promotion</Form.Label>
               <Form.Control type='number' placeholder='Promotion' />
             </Form.Group>
-            <Form.Group as={Col} controlId='formGridPromotionDuration'>
-              <Form.Label>duration in days</Form.Label>
-              <Form.Control type='number' placeholder='duration' />
-            </Form.Group>
           </Row>
           <Form.Group className='mb-3' controlId='formGridPreviewLink'>
             <Form.Label>Preview Link</Form.Label>

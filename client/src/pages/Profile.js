@@ -1,4 +1,4 @@
-import React, { useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import clsx from 'clsx';
 import { makeStyles, useTheme } from '@material-ui/core/styles';
 import Drawer from '@material-ui/core/Drawer';
@@ -35,6 +35,7 @@ import Button from '@material-ui/core/Button';
 // import icon for performance
 import AssessmentIcon from '@material-ui/icons/Assessment';
 import CourseComponent from '../components/course/CourseComponent';
+import Loading from '../components/Loading';
 
 const drawerWidth = 240;
 
@@ -370,6 +371,15 @@ export default function Profile() {
   const [page, setPage] = useState(0);
   const [value, setValue] = React.useState(0);
   const navigate = useNavigate();
+  const [loading, setLoading] = useState(true);
+  const [courses, setCourses] = useState([]);
+
+  useEffect(() => {
+    if (myCourses) {
+      setCourses(myCourses);
+      setLoading(false);
+    }
+  }, [myCourses]);
 
   const handleChange = (event, newValue) => {
     setValue(newValue);
@@ -385,6 +395,7 @@ export default function Profile() {
 
   return (
     <div className={classes.root}>
+      {loading && <Loading />}
       <CssBaseline />
       <AppBar
         position='fixed'
@@ -470,108 +481,104 @@ export default function Profile() {
           <ListItemText primary={'Settings'} />
         </ListItem>
       </Drawer>
-      <main className={classes.content}>
-        <div className={classes.biography}>
-          <Avatar
-            style={{
-              width: '8rem',
-              height: '8rem',
-              fontSize: '2rem',
-              backgroundColor: '#e0e0e0',
-              color: 'black',
-              marginBottom: '1rem',
-            }}
-          >
-            {user.username.toUpperCase().substring(0, 2)}
-          </Avatar>
-          <p>{user?.biography || 'User Biography'}</p>
-        </div>
-        {component === 'My Courses' && myCourses.length === 0 && (
-          <div
-            style={{
-              display: 'flex',
-              flexDirection: 'column',
-              alignItems: 'center',
-              justifyContent: 'center',
-              width: '80%',
-            }}
-          >
-            <Card
-              image={engagingCourse}
-              title='Create an Engaging Course'
-              text={
-                'Whether you have been teaching for years or are teaching for the first time, you can make an engaging course. We have compiled resources and best practices to help you get to the next level, no matter where you are starting.'
-              }
-            />
+      {!loading && (
+        <main className={classes.content}>
+          <div className={classes.biography}>
+            <Avatar
+              style={{
+                width: '8rem',
+                height: '8rem',
+                fontSize: '2rem',
+                backgroundColor: '#e0e0e0',
+                color: 'black',
+                marginBottom: '1rem',
+              }}
+            >
+              {user.username.toUpperCase().substring(0, 2)}
+            </Avatar>
+            <p>{user?.biography || 'User Biography'}</p>
+          </div>
+          {component === 'My Courses' && courses.length === 0 && (
             <div
               style={{
                 display: 'flex',
-                flexDirection: 'row',
-                justifyContent: 'center',
+                flexDirection: 'column',
                 alignItems: 'center',
-                marginTop: '2rem',
+                justifyContent: 'center',
+                width: '80%',
               }}
             >
+              <Card
+                image={engagingCourse}
+                title='Create an Engaging Course'
+                text={
+                  'Whether you have been teaching for years or are teaching for the first time, you can make an engaging course. We have compiled resources and best practices to help you get to the next level, no matter where you are starting.'
+                }
+              />
               <div
                 style={{
-                  marginRight: '2rem',
+                  display: 'flex',
+                  flexDirection: 'row',
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                  marginTop: '2rem',
                 }}
               >
-                <Card
-                  title={'Build Your Audience'}
-                  text={
-                    'Set your course up for success by building your audience.'
-                  }
-                  image={buildAudience}
-                />
+                <div
+                  style={{
+                    marginRight: '2rem',
+                  }}
+                >
+                  <Card
+                    title={'Build Your Audience'}
+                    text={
+                      'Set your course up for success by building your audience.'
+                    }
+                    image={buildAudience}
+                  />
+                </div>
+                <div>
+                  <Card
+                    title={'Get Started with Video'}
+                    text={
+                      'Quality video lectures can set your course apart. Use our resources to learn the basics.'
+                    }
+                    image={videoCreating}
+                  />
+                </div>
               </div>
-              <div>
-                <Card
-                  title={'Get Started with Video'}
-                  text={
-                    'Quality video lectures can set your course apart. Use our resources to learn the basics.'
-                  }
-                  image={videoCreating}
-                />
-              </div>
+              <button
+                className='btn btn-primary'
+                style={{
+                  marginTop: '2rem',
+                  width: '20rem',
+                  height: '3rem',
+                  fontSize: '1.5rem',
+                }}
+                onClick={() => {
+                  navigate('/addCourse');
+                }}
+              >
+                Create a Course
+              </button>
             </div>
-            <button
-              className='btn btn-primary'
+          )}
+          {component === 'My Courses' && courses.length !== 0 && (
+            <div
               style={{
-                marginTop: '2rem',
-                width: '20rem',
-                height: '3rem',
-                fontSize: '1.5rem',
-              }}
-              onClick={() => {
-                navigate('/addCourse');
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                justifyContent: 'center',
+                width: '80%',
               }}
             >
-              Create a Course
-            </button>
-          </div>
-        )}
-        {component === 'My Courses' && myCourses.length !== 0 && (
-          <div
-            style={{
-              display: 'flex',
-              flexDirection: 'column',
-              alignItems: 'center',
-              justifyContent: 'center',
-              width: '80%',
-            }}
-          >
-            <div className={classes.courses}>
-              <h2>My Courses</h2>
-              {myCourses
-                .slice(page * 3, Math.min(page * 3 + 3, myCourses.length))
-                .map((course) => {
-                  return (
-                    <div
-                      style={{
-                        width: '100%',
-                      }}
-                    >
+              <div className={classes.courses}>
+                <h2>My Courses</h2>
+                {courses
+                  ?.slice(page * 3, Math.min(page * 3 + 3, courses.length))
+                  .map((course) => {
+                    return (
                       <CourseComponent
                         key={course?._id}
                         title={course?.title}
@@ -584,11 +591,9 @@ export default function Profile() {
                         rating={course?.rating}
                         progress={course?.progress}
                       />
-                    </div>
-                  );
-                })}
-            </div>
-            {
+                    );
+                  })}
+              </div>
               <div
                 style={{
                   display: 'flex',
@@ -598,70 +603,70 @@ export default function Profile() {
                 }}
               >
                 <Pagination
-                  count={Math.ceil(myCourses.length / 3)}
+                  count={Math.ceil(courses.length / 3)}
                   onChange={(e, value) => setPage(value - 1)}
                   color='primary'
                 />
               </div>
-            }
-            <br />
-            <br />
-            <p>
-              Have questions? Here are our most popular instructor resources.
-            </p>
-            <br />
-            <br />
-            <div
-              style={{
-                display: 'flex',
-                flexDirection: 'row',
-                justifyContent: 'center',
-                alignItems: 'center',
-                marginTop: '2rem',
-              }}
-            >
-              <div className={classes.supportCard}>
-                <VideoLibraryIcon
-                  style={{
-                    fontSize: '3rem',
-                    marginBottom: '1rem',
-                  }}
-                />
-                <h3>Test Video</h3>
-                <p>Send us a sample video and get expert feedback</p>
-              </div>
-              <div className={classes.supportCard}>
-                <ChatIcon
-                  style={{
-                    fontSize: '3rem',
-                    marginBottom: '1rem',
-                  }}
-                />
-                <h3>Instructor Community</h3>
-                <p>
-                  Connect with experienced instructors. Ask questions, browse
-                  discussions, and more.
-                </p>
-              </div>
-              <div className={classes.supportCard}>
-                <HelpIcon
-                  style={{
-                    fontSize: '3rem',
-                    marginBottom: '1rem',
-                  }}
-                />
-                <h3>Help and Support</h3>
-                <p>Browse our Help Center or contact our support team.</p>
+              <br />
+              <br />
+              <p>
+                Have questions? Here are our most popular instructor resources.
+              </p>
+              <br />
+              <br />
+              <div
+                style={{
+                  display: 'flex',
+                  flexDirection: 'row',
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                  marginTop: '2rem',
+                }}
+              >
+                <div className={classes.supportCard}>
+                  <VideoLibraryIcon
+                    style={{
+                      fontSize: '3rem',
+                      marginBottom: '1rem',
+                    }}
+                  />
+                  <h3>Test Video</h3>
+                  <p>Send us a sample video and get expert feedback</p>
+                </div>
+                <div className={classes.supportCard}>
+                  <ChatIcon
+                    style={{
+                      fontSize: '3rem',
+                      marginBottom: '1rem',
+                    }}
+                  />
+                  <h3>Instructor Community</h3>
+                  <p>
+                    Connect with experienced instructors. Ask questions, browse
+                    discussions, and more.
+                  </p>
+                </div>
+                <div className={classes.supportCard}>
+                  <HelpIcon
+                    style={{
+                      fontSize: '3rem',
+                      marginBottom: '1rem',
+                    }}
+                  />
+                  <h3>Help and Support</h3>
+                  <p>Browse our Help Center or contact our support team.</p>
+                </div>
               </div>
             </div>
-          </div>
-        )}
-        {component === 'Settings' && <Settings />}
+          )}
+          {component === 'Settings' && <Settings />}
 
-        <br />
-        <br />
-        <Footer />
-      </main>
+          <br />
+          <br />
+          <Footer />
+        </main>
+      )}
     </div>
   );
 }
