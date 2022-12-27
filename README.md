@@ -3,7 +3,7 @@
 ## Table of Contents
 - [Project Description](#project-description)
 - [Tools and Frameworks](#tools-and-frameworks)
-- [Coding Style](#coding style)
+- [Coding Style](#coding-style)
 - [Installation] (#installation)
 - [Features](#features)
   * [Admin Functionalities](#administrator)
