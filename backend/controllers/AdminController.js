@@ -1,5 +1,5 @@
 const { StatusCodes } = require('http-status-codes');
-const { Course, User,Report,CourseRequest,Question} = require('../models');
+const { Course, User,Report,CourseRequest,Question,Wallet} = require('../models');
 const { UnauthorizedError, BadRequestError } = require('../Errors');
 const { json } = require('express');
 
@@ -90,8 +90,6 @@ module.exports.createUser = async (req, res) => {
     if (courserequest!=null){
     courserequest.state="accepted"
     courserequest.save();}
-    
-
 
     res.status(200).json(courserequest);
   };
@@ -102,26 +100,32 @@ module.exports.createUser = async (req, res) => {
      res.status(200).json(courses);
    };
 
-  /*
+  
   module.exports.udaterefund = async (req, res) => {
-    const { id } = req.params.id;
-    const{amount,owner}=req.body;
-    if (!mongoose.Types.ObjectId.isValid(id)) {
-      return req.status(404).json({ error: 'No such report' });
-    }
-    const report = await User.findOneAndUpdate(
-      { _id: id ,owner:owner},
-      {
-        state: state
-      }
+    const { id } = req.body;
+    const{courseid,RefundId}=req.body;
+    const user = await User.findOne(
+      { _id: id },
     );
-    if (!report) {
-      return res.status(400).json({ error: 'No such report' });
-    }
-    res.status(200).json(report);
+   const course = await Course.findOne(
+      { _id: courseid },
+    );
+    const wallet = await Wallet.findOne(
+      { owner: id },
+    );
+    const refund = await RefundId.findOne(
+      { _id: RefundId },
+    );
+    wallet.balance+=course.price;
+    wallet.save();
+    refund.state=true;
+    refund.save();
+    user.courses=user.courses.filter((x)=>x._id!==courseid)
+    user.save();
+    res.status(200).json(refund);
   };
 
-*/
+
 module.exports.setpromtion = async (req, res) => {
     const { coursesId ,promotion} = req.body;
     console.log(coursesId);
@@ -140,6 +144,26 @@ module.exports.setpromtion = async (req, res) => {
     
     res.status(StatusCodes.OK).json( course );
   };
+  module.exports.setcomment = async (req, res) => {
+    const { reportId,comment} = req.body;
+    console.log(req.body);
+    const report= await Report.findOne({_id:reportId }).populate("createdBy","username").populate("course","title");
+    console.log(report)
+    report.commentsadmin.push(comment);
+    report.save();
+    res.status(StatusCodes.OK).json( report );
+  };
+  module.exports.usersetcomment = async (req, res) => {
+    const { reportId,comment} = req.body;
+    console.log(req.body);
+    const report= await Report.findOne({_id:reportId }).populate("createdBy","username").populate("course","title");
+   // console.log(report)
+    report.commentsuser.push(comment);
+    report.save();
+    console.log(report)
+    res.status(StatusCodes.OK).json( report );
+  };
+
 
 
    

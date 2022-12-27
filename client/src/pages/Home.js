@@ -149,6 +149,7 @@ const Home = () => {
   const [page, setPage] = useState(0);
 
   useEffect(() => {
+    console.log(user);
     const inprogress = myCourses.filter((course) => {
       return course.progress !== 100;
     });

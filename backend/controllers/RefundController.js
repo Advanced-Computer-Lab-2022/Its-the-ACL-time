@@ -38,15 +38,12 @@ const postRefund = async (req, res) => {
 };
 
 const getRefunds = async (req, res) => {
-  const { type, userId } = req.user;
+  
 
-  if (type !== 'admin') {
-    const refunds = await Refund.find({ user: userId });
+
+    const refunds = await Refund.find().populate('course',"title").populate("user",'username');
     res.status(200).json(refunds);
-  } else {
-    const refunds = await Refund.find();
-    res.status(200).json(refunds);
-  }
+
 };
 
 module.exports = {

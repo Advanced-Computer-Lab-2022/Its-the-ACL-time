@@ -64,6 +64,7 @@ export default function Login() {
     alertText,
     alertType,
     isLoading,
+    setAppState,
   } = useAppContext();
 
   const email = useRef();
@@ -79,14 +80,29 @@ export default function Login() {
       endPoint: 'login',
     };
     if (!user.email || !user.password) {
-      setAlert('error', 'Please Provide all values');
-      setTimeout(() => clearAlert(), 3000);
+      setAppState((prevState) => {
+        return {
+          ...prevState,
+          alert: true,
+          alertText: 'Please fill in all fields',
+          alertType: 'error',
+        };
+      });
+
+      setTimeout(
+        () =>
+          setAppState((prevState) => {
+            return {
+              ...prevState,
+              alert: false,
+              alertText: '',
+              alertType: '',
+            };
+          }),
+        3000
+      );
     } else {
-      const status = await setup(user);
-      if (status) {
-        console.log('Login Success' + status);
-        setTimeout(() => navigate('/'), 3000);
-      }
+      await setup(user);
     }
   };
 
