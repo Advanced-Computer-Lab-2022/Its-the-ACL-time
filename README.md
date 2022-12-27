@@ -3,6 +3,8 @@
 ## Table of Contents
 - [Project Description](#project-description)
 - [Tools and Frameworks](#tools-and-frameworks)
+- [Coding Style](#coding style)
+- [Installation] (#installation)
 - [Features](#features)
   * [Admin Functionalities](#administrator)
   * [User/Guest Functionalities](#user)
@@ -66,14 +68,28 @@ If your application stores any data (user profiles, content, comments, uploads, 
 
 That’s where MongoDB comes in: JSON documents created in your React.js front end can be sent to the Express.js server, where they can be processed and (assuming they’re valid) stored directly in MongoDB for later retrieval. Again, if you’re building in the cloud, you’ll want to look at Atlas. If you’re looking to set up your own MERN stack, read on!
 
-## Features 
+## Coding Style 
+This project is divided into two main parts, frontend and backend. Our backend is divide into routes that act as a middle point between the client and the database.
 
+## Installation
+In order to run our project, you should have the following installed in your machine:
+ - [Node JS](https://nodejs.org/en/)
+ - [NPM](https://www.npmjs.com/)
+ - [React JS](https://react-cn.github.io/react/downloads.html) or you can use `NPM`
+ - And you can choose any text editor.
+ - [MongoDB](https://docs.mongodb.com/manual/installation/) either locally or on a cloud.
+You have to create `.env` with the dbconnectionString.
+     
+
+## Features 
 We have 2 main users in our website:
 - Adminstrator
 -  Guest can join AS 
    * Instructor
    * Individual trainee 
    * Corporate trainee
+   
+   
 ### Administrator
 - Log in using his email and password.
 - add another administrator with a set username and password.
@@ -83,10 +99,13 @@ We have 2 main users in our website:
 
 
 ### Guest 
-- can sign up, log in, log out, select gender and country, view and accept the website payment policy.
+- select gender and country, view and accept the website payment policy.
 - can view all courses with their total hours, price and rating.
 - can filter the courses based on price, subject, or rating.
 - can search for specific course based on instructor or subject and can see a preview video for this course 
 - can view the most popular courses.
 #### As an Instructor 
+-  can sign up, log in, log out, change his mail, password or biography, receive an email for changing forgetten password
+-  view and accept the contract with the website 
+-  
 -  
