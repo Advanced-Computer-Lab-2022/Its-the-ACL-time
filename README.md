@@ -13,7 +13,7 @@
 ## Project Description
 
 ### Course 
-Advanced Computer Lab (CSEN 704/ DMET 706), Winter 2021
+Advanced Computer Lab (CSEN 704/ DMET 706), Winter 2022
 
 ### Theme
 The theme of the project, is to create a complete Online learning platform. a learning platform is a web application through which Instructors can provide their courses online and individuals can join these courses.
@@ -30,7 +30,7 @@ the software.
 - Learn the process of following a given set of System Requirements to develop a
 software.
 - Learn to research and master the use of the MERN Stack.
-- Learn how to work together as a team on GitHub and to handle conflicts.
+- Learn how to work together as a team on GitHub and to handle conflicts. :sweat_smile:
 
 
 ## Tools and Frameworks
@@ -65,3 +65,28 @@ By making XML HTTP Requests (XHRs) or GETs or POSTs from your React.js front-end
 If your application stores any data (user profiles, content, comments, uploads, events, etc.), then you’re going to want a database that’s just as easy to work with as React, Express, and Node.
 
 That’s where MongoDB comes in: JSON documents created in your React.js front end can be sent to the Express.js server, where they can be processed and (assuming they’re valid) stored directly in MongoDB for later retrieval. Again, if you’re building in the cloud, you’ll want to look at Atlas. If you’re looking to set up your own MERN stack, read on!
+
+## Features 
+
+We have 2 main users in our website:
+- Adminstrator
+-  Guest can join AS 
+   * Instructor
+   * Individual trainee 
+   * Corporate trainee
+### Administrator
+- Log in using his email and password.
+- add another administrator with a set username and password.
+- add instructor or corporate trainees and create their usernames and passwords.
+- view course requests from corporate trainees.
+- can set promotion for specific course, number of courses or all courses.
+
+
+### Guest 
+- can sign up, log in, log out, select gender and country, view and accept the website payment policy.
+- can view all courses with their total hours, price and rating.
+- can filter the courses based on price, subject, or rating.
+- can search for specific course based on instructor or subject and can see a preview video for this course 
+- can view the most popular courses.
+#### As an Instructor 
+-  
