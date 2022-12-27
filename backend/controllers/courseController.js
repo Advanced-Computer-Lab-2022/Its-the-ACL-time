@@ -102,6 +102,10 @@ const updateCourse = async (req, res) => {
     { ...req.body },
     { new: true }
   );
+  updatedCourse.rating =
+    updatedCourse.reviews.reduce((acc, review) => acc + review.rate, 0) /
+    updatedCourse.reviews.length;
+  await updatedCourse.save();
 
   res.status(StatusCodes.OK).json({ updatedCourse });
 };
