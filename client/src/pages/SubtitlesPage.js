@@ -345,6 +345,8 @@ const SubtitlesPage = () => {
   const [posts, setPosts] = useState([]);
   const [writePost, setWritePost] = useState(false);
   const [postPage, setPostPage] = useState(0);
+  const { setAppState } = useAppContext();
+  const { setCoursesState, myCourses } = useCourseContext();
 
   const downloadNotes = () => {
     const doc = new jsPDF();
@@ -498,7 +500,7 @@ const SubtitlesPage = () => {
       console.log('fetch posts');
       fetchPosts();
     }
-  }, [searchParams, user._id, token, videoInfo, courseId]);
+  }, [searchParams, token, videoInfo, courseId]);
 
   const computeProgress = () => {
     if (!state.checkedSubtitles && !state.checkedExams) return 0;
@@ -516,13 +518,14 @@ const SubtitlesPage = () => {
     console.log('subtitles ' + subtitles.length);
     console.log('exams ' + exams.length);
     console.log('-----------------------------------------------------');
+    const progress = computeProgress();
     try {
       await axios.patch(
         `http://localhost:8080/api/v1/user/progress/${courseId}`,
         {
           completedSubtitles: checkedSubtitles,
           completedExams: checkedExams,
-          progress: computeProgress(),
+          progress,
         },
         {
           headers: {
@@ -530,6 +533,43 @@ const SubtitlesPage = () => {
           },
         }
       );
+
+      const myCourseIndex = myCourses.findIndex(
+        (course) => course._id.toString() === courseId.toString()
+      );
+
+      const newUpdate = {
+        ...myCourses[myCourseIndex],
+        completedSubtitles: checkedSubtitles,
+        completedExams: checkedExams,
+        progress,
+      };
+
+      setCoursesState((prevState) => {
+        return {
+          ...prevState,
+          myCourses: [
+            ...prevState.myCourses.slice(0, myCourseIndex),
+            newUpdate,
+            ...prevState.myCourses.slice(myCourseIndex + 1),
+          ],
+        };
+      });
+
+      const user = JSON.parse(localStorage.getItem('user'));
+      const courseIndex = user.courses.findIndex(
+        (course) => course.courseId.toString() === courseId.toString()
+      );
+      user.courses[courseIndex] = {
+        ...user.courses[courseIndex],
+        completedSubtitles: checkedSubtitles,
+        completedExams: checkedExams,
+        progress,
+      };
+      localStorage.setItem('user', JSON.stringify(user));
+      console.log(user);
+      // TODO: update user in app state
+      // setAppState(() => user);
     } catch (error) {
       console.log(error);
     }

@@ -1,12 +1,4 @@
-import React, {
-  useContext,
-  useReducer,
-  useEffect,
-  useMemo,
-  useState,
-} from 'react';
-import courseReducer from './courseReducer';
-import { CREATE_COURSE, GET_COURSES, GET_MY_COURSES } from './courseActions';
+import React, { useContext, useEffect, useState } from 'react';
 import axios from 'axios';
 import { useAppContext } from '../App/appContext';
 
@@ -16,18 +8,22 @@ const initialState = {
 };
 
 const CourseContext = React.createContext();
+
 const CourseProvider = ({ children }) => {
-  // const [state, dispatch] = useReducer(courseReducer, initialState);
   const [state, setState] = useState(initialState);
 
   const { token } = useAppContext();
 
   const formMyCourses = (courses) => {
+    console.log('formMyCourses');
+    console.log(courses);
     let tmpCourses = [];
     courses.forEach((course) => {
       const totalInfo = state.courses.find((c) => c._id === course.courseId);
       tmpCourses.push({ ...course, ...totalInfo });
     });
+    console.log('tmpCourses');
+    console.log(tmpCourses);
     return tmpCourses;
   };
 
@@ -40,13 +36,6 @@ const CourseProvider = ({ children }) => {
             ...state,
             courses: data.courses,
           });
-          // dispatch({
-
-          //   type: GET_COURSES,
-          //   payload: {
-          //     courses: data.courses,
-          //   },
-          // });
         })
         .catch((error) => console.log(error));
 
@@ -69,13 +58,6 @@ const CourseProvider = ({ children }) => {
           ...state,
           myCourses: formMyCourses(response.data.courses),
         });
-
-        // dispatch({
-        //   type: GET_MY_COURSES,
-        //   payload: {
-        //     courses: formMyCourses(response.data.courses),
-        //   },
-        // });
       } catch (error) {
         console.warn(error);
       }
@@ -105,59 +87,42 @@ const CourseProvider = ({ children }) => {
         courses: [...state.courses, response.data.course],
       });
 
-      // dispatch({
-      //   type: CREATE_COURSE,
-      //   payload: {
-      //     course: response.data.course,
-      //   },
-      // });
       return response.data.course._id;
     } catch (error) {
       console.log(error);
     }
   };
 
-  const updateCourse = async (courseId, course) => {
-    try {
-      const response = await axios.patch(
-        `http://localhost:8080/api/v1/course/${courseId}`,
-        course,
-        {
-          headers: {
-            authorization: `Bearer ${token}`,
-          },
-        }
-      );
+  const updateCourse = async (course) => {
+    console.log('updateCourse ');
+    console.log(course);
+    // try {
+    //   const response = await axios.patch(
+    //     `http://localhost:8080/api/v1/course/${courseId}`,
+    //     course,
+    //     {
+    //       headers: {
+    //         authorization: `Bearer ${token}`,
+    //       },
+    //     }
+    //   );
 
-      setState({
-        ...state,
-        myCourses: state.myCourses.map((c) =>
-          c._id.toString() === courseId.toString()
-            ? response.data.updatedCourse
-            : c
-        ),
-        courses: state.courses.map((c) =>
-          c._id.toString() === courseId.toString()
-            ? response.data.updatedCourse
-            : c
-        ),
-      });
-
-      // dispatch({
-      //   type: UPDATE_COURSE,
-      //   payload: { course: response.data.updatedCourse },
-      // });
-      console.log(response.data.updatedCourse);
-      return response.data.updatedCourse;
-    } catch (error) {
-      console.log(error);
-    }
+    setState({
+      ...state,
+      myCourses: state.myCourses.map((c) =>
+        c._id.toString() === course._id.toString() ? course : c
+      ),
+      courses: state.courses.map((c) =>
+        c._id.toString() === course._id.toString() ? course : c
+      ),
+    });
   };
 
   return (
     <CourseContext.Provider
       value={{
         ...state,
+        setCoursesState: setState,
         createCourse,
         updateCourse,
       }}

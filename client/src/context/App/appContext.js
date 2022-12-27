@@ -1,16 +1,7 @@
-import React, { useContext, useEffect, useReducer } from 'react';
-import appReducer from './appReducer';
-import {
-  USER_SETUP_BEGIN,
-  USER_SETUP_SUCCESS,
-  USER_SETUP_ERROR,
-  SET_ALERT,
-  CLEAR_ALERT,
-  USER_RESET,
-  UPDATE_USER,
-} from './appActions';
+import React, { useContext, useState } from 'react';
 import axios from 'axios';
 import { backendApi } from '../../projectConfig';
+import { useEffect } from 'react';
 
 const userFromLocalStorage = localStorage.getItem('user');
 const tokenFromLocalStorage = localStorage.getItem('token');
@@ -27,21 +18,45 @@ const initialState = {
 const AppContext = React.createContext();
 
 const AppProvider = ({ children }) => {
-  const [state, dispatch] = useReducer(appReducer, initialState);
+  const [state, setState] = useState(() => initialState);
+
+  useEffect(() => {
+    const fetchState = async () => {
+      const userFromLocalStorage = localStorage.getItem('user');
+      const tokenFromLocalStorage = localStorage.getItem('token');
+
+      setState({
+        ...state,
+        user: JSON.parse(userFromLocalStorage),
+        token: tokenFromLocalStorage,
+      });
+    };
+    fetchState();
+  }, []);
 
   const setAlert = (type, text) => {
-    dispatch({
-      type: SET_ALERT,
-      payload: {
-        text,
-        type,
-      },
+    setState({
+      ...state,
+      alert: true,
+      alertText: text,
+      alertType: type,
     });
   };
 
-  const clearAlert = () => {
-    setTimeout(() => dispatch({ type: CLEAR_ALERT }), 3000);
-  };
+  function clearAlert() {
+    setTimeout(
+      () =>
+        setState((prevState) => {
+          return {
+            ...prevState,
+            alert: false,
+            alertText: '',
+            alertType: '',
+          };
+        }),
+      3000
+    );
+  }
 
   const addToLocalStorage = ({ user, token }) => {
     localStorage.setItem('user', JSON.stringify(user));
@@ -56,7 +71,13 @@ const AppProvider = ({ children }) => {
     type,
     endPoint,
   }) => {
-    dispatch({ type: USER_SETUP_BEGIN });
+    setState((prevState) => {
+      return {
+        ...prevState,
+        isLoading: true,
+      };
+    });
+
     const url = `http://localhost:8080/api/v1/auth/${endPoint}`;
 
     try {
@@ -78,34 +99,66 @@ const AppProvider = ({ children }) => {
       const { data } = response;
       const { token, user } = data;
 
-      dispatch({
-        type: USER_SETUP_SUCCESS,
-        payload: {
-          token,
+      addToLocalStorage({ user, token });
+      setState((prevState) => {
+        return {
+          ...prevState,
+          isLoading: false,
+          alert: true,
+          alertText: 'Successfully! Redirecting to home page...',
+          alertType: 'success',
           user,
-        },
+          token,
+        };
       });
 
-      addToLocalStorage({ user, token });
-      return true;
+      setTimeout(() => {
+        window.location.href = '/';
+        setState((prevState) => {
+          return {
+            ...prevState,
+            alert: false,
+            alertText: '',
+            alertType: '',
+          };
+        });
+      }, 3000);
     } catch (error) {
       console.log(error.response.data.msg);
-      dispatch({
-        type: USER_SETUP_ERROR,
-        payload: { msg: error.response.data.msg },
+      setState((prevState) => {
+        return {
+          ...prevState,
+          isLoading: false,
+          alert: true,
+          alertText: error.response.data.msg,
+          alertType: 'error',
+        };
       });
-      clearAlert();
-      return false;
+
+      setTimeout(() => {
+        setState((prevState) => {
+          return {
+            ...prevState,
+            alert: false,
+            alertText: '',
+            alertType: '',
+          };
+        });
+      }, 3000);
     }
   };
+
   const resetUser = () => {
     localStorage.removeItem('user');
     localStorage.removeItem('token');
-    dispatch({ type: USER_RESET });
+    setState({
+      ...state,
+      user: null,
+      token: null,
+    });
   };
 
   const updateUser = async (user) => {
-    console.log(user);
     try {
       const response = await axios.patch(
         'http://localhost:8080/api/v1/user/',
@@ -118,33 +171,28 @@ const AppProvider = ({ children }) => {
           },
         }
       );
-
       const { data } = response;
-
-      dispatch({
-        type: UPDATE_USER,
-        payload: {
+      setState((prevState) => {
+        return {
+          ...prevState,
           user: data,
-        },
+        };
       });
       addToLocalStorage({ user: data, token: tokenFromLocalStorage });
       setAlert('success', 'User updated successfully');
-      setTimeout(() => {
-        clearAlert();
-      }, 3000);
     } catch (error) {
       setAlert('error', error.response.data.msg);
-      setTimeout(() => {
-        clearAlert();
-      }, 3000);
     }
+    setTimeout(() => {
+      clearAlert();
+    }, 1000);
   };
 
   return (
     <AppContext.Provider
       value={{
         ...state,
-        dispatch,
+        setAppState: setState,
         setAlert,
         clearAlert,
         setup,
