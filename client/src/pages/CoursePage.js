@@ -1,3 +1,4 @@
+import RequestCourse from '../components/RequestCourse';
 import React, { useEffect, useRef, useState } from 'react';
 import { makeStyles } from '@material-ui/core/styles';
 import { Link, useParams } from 'react-router-dom';
@@ -24,6 +25,7 @@ import { Rating } from '@material-ui/lab';
 import { BsClock } from 'react-icons/bs';
 import { BsPeople } from 'react-icons/bs';
 import StarBorderIcon from '@material-ui/icons/StarBorder';
+import BuyCourse from '../components/BuyCourse';
 
 const useStyles = makeStyles((theme) => ({
   main: {
@@ -430,13 +432,14 @@ const CoursePage = () => {
                 </div>
               )}
 
-              <button className={`${classes.addToCart}`}>
-                {isEnrolled || isOwner ? (
-                  <Link to={`/course/${courseId}/content`}>Go to course</Link>
-                ) : (
-                  <Link to={``}>Buy Now</Link>
-                )}
-              </button>
+
+              {isEnrolled || isOwner ? (
+                <button className={`${classes.addToCart}`}><Link to={`/course/${courseId}/content`}>Go to course</Link>
+                </button>
+
+              ) : (
+                (user.type === "Individual trainee") ? <BuyCourse courseId={courseId} coursePrice={course?.price}></BuyCourse> : <RequestCourse></RequestCourse>
+              )}
               <p>
                 <AiOutlineCheck /> 30-Day Money-Back Guarantee
               </p>
@@ -444,15 +447,15 @@ const CoursePage = () => {
                 <AiOutlineCheck />
                 Full Lifetime Access
               </p>
-              {!applyCoupon && (
+              {/* {!applyCoupon && (
                 <button
                   className={classes.coupon}
                   onClick={() => setApplyCoupon(true)}
                 >
                   {isEnrolled ? <>Request Refund</> : <>Apply Coupon</>}
                 </button>
-              )}
-              {applyCoupon && (
+              )} */}
+              {/* {applyCoupon && (
                 <>
                   <hr className={`${classes.line}`} />
                   <div className={`{${classes.applyCoupon}}`}>
@@ -478,7 +481,7 @@ const CoursePage = () => {
                     </button>
                   </div>
                 </>
-              )}
+              )} */}
             </Box>
             {/* frame for youtube video here  */}
             {/* <iframe
@@ -693,7 +696,6 @@ const CoursePage = () => {
             <br />
             <br />
           </div>
-
           <Footer />
         </main>
       )}
