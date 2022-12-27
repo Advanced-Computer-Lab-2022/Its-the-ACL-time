@@ -36,6 +36,9 @@ import AssessmentIcon from '@material-ui/icons/Assessment';
 import CourseComponent from '../components/course/CourseComponent';
 import Loading from '../components/Loading';
 import MessageIcon from '@material-ui/icons/Message';
+// import money icon
+import RefundIcon from '@material-ui/icons/AttachMoney';
+import axios from 'axios';
 
 const drawerWidth = 240;
 
@@ -58,31 +61,31 @@ const InstructorSideBar = [
   },
 ];
 
-// const CorporateSideBar = [
-//   {
-//     title: 'Refund',
-//     icon: <RefundIcon />,
-//   },
-//   {
-//     title: 'Wallet',
-//     icon: <AccountBalanceWalletIcon />,
-//   },
-//   {
-//     title: 'Messages',
-//     icon: <MessageIcon />,
-//   },
-// ];
+const CorporateSideBar = [
+  {
+    title: 'Wallet',
+    icon: <AccountBalanceWalletIcon />,
+  },
+  {
+    title: 'Messages',
+    icon: <MessageIcon />,
+  },
+];
 
-// const IndividualSideBar = [
-//   {
-//     title: 'Wallet',
-//     icon: <AccountBalanceWalletIcon />,
-//   },
-//   {
-//     title: 'Messages',
-//     icon: <MessageIcon />,
-//   },
-// ];
+const IndividualSideBar = [
+  {
+    title: 'Refund',
+    icon: <RefundIcon />,
+  },
+  {
+    title: 'Wallet',
+    icon: <AccountBalanceWalletIcon />,
+  },
+  {
+    title: 'Messages',
+    icon: <MessageIcon />,
+  },
+];
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -261,6 +264,35 @@ const Card = ({ image, title, text }) => {
         <h1>{title}</h1>
         <p>{text}</p>
       </div>
+    </div>
+  );
+};
+
+const Refund = ({ refundMoney, state, course }) => {
+  return (
+    <div
+      style={{
+        display: 'flex',
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'center',
+        marginTop: '2rem',
+        backgroundColor: '#e0e0e0',
+        padding: '1rem',
+        borderRadius: '15px',
+        '&:hover': {
+          backgroundColor: '#bdbdbd',
+        },
+      }}
+    >
+      {`You have requested a refund of $${refundMoney} for the course ${course}. Your request is currently`}
+      {state === 'pending' ? (
+        <span style={{ color: 'orange' }}> pending</span>
+      ) : state === 'approved' ? (
+        <span style={{ color: 'green' }}> approved</span>
+      ) : (
+        <span style={{ color: 'red' }}> denied</span>
+      )}
     </div>
   );
 };
@@ -565,13 +597,24 @@ export default function Profile() {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
   const [courses, setCourses] = useState([]);
+  const [refunds, setRefunds] = useState([]);
 
   useEffect(() => {
-    if (myCourses) {
+    async function getRefund() {
+      const res = await axios.get('http://localhost:8080/api/v1/refund/');
+      console.log(res.data);
+      setRefunds(res.data);
+    }
+
+    if (component === 'My Courses' && myCourses) {
       setCourses(myCourses);
       setLoading(false);
     }
-  }, [myCourses]);
+
+    if (component === 'Refund') {
+      getRefund();
+    }
+  }, [myCourses, component]);
 
   const handleChange = (event, newValue) => {
     setValue(newValue);
@@ -647,18 +690,48 @@ export default function Profile() {
         </div>
         <Divider />
         <List>
-          {InstructorSideBar.map((item, index) => (
-            <ListItem
-              button
-              key={index}
-              onClick={() => {
-                setComponent(item.title);
-              }}
-            >
-              <ListItemIcon>{item.icon}</ListItemIcon>
-              <ListItemText primary={item.title} />
-            </ListItem>
-          ))}
+          {
+            // choose which sidebar to render based on user role
+            user.type === 'Instructor' &&
+              InstructorSideBar.map((item, index) => (
+                <ListItem
+                  button
+                  key={index}
+                  onClick={() => {
+                    setComponent(item.title);
+                  }}
+                >
+                  <ListItemIcon>{item.icon}</ListItemIcon>
+                  <ListItemText primary={item.title} />
+                </ListItem>
+              ))
+          }
+          {user.type === 'Corporate trainee' &&
+            CorporateSideBar.map((item, index) => (
+              <ListItem
+                button
+                key={index}
+                onClick={() => {
+                  setComponent(item.title);
+                }}
+              >
+                <ListItemIcon>{item.icon}</ListItemIcon>
+                <ListItemText primary={item.title} />
+              </ListItem>
+            ))}
+          {user.type === 'Individual trainee' &&
+            IndividualSideBar.map((item, index) => (
+              <ListItem
+                button
+                key={index}
+                onClick={() => {
+                  setComponent(item.title);
+                }}
+              >
+                <ListItemIcon>{item.icon}</ListItemIcon>
+                <ListItemText primary={item.title} />
+              </ListItem>
+            ))}
         </List>
         <Divider />
         <ListItem
@@ -692,6 +765,22 @@ export default function Profile() {
           </div>
           {component === 'My Courses' && user.type === 'Instructor' && (
             <InstructorProfile courses={courses}></InstructorProfile>
+          )}
+          {component === 'Refund' && (
+            <>
+              <h1>Your refund requests</h1>
+              {refunds.map((refund) => (
+                <Refund
+                  key={refund._id}
+                  refundMoney={refund.refundMoney}
+                  courseName={
+                    courses.find((course) => course._id === refund.course)
+                      ?.title
+                  }
+                  state={refund.state}
+                />
+              ))}
+            </>
           )}
           {component === 'Settings' && <Settings />}
 
