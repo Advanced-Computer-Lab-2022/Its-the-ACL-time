@@ -8,6 +8,11 @@ import axios from 'axios';
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { AiOutlinePlusCircle } from 'react-icons/ai';
 import AlertDialog from '../components/AlertDialog';
+import Dialog from '@mui/material/Dialog';
+import Button from '@mui/material/Button';
+import DialogActions from '@mui/material/DialogActions';
+import DialogContent from '@mui/material/DialogContent';
+import DialogContentText from '@mui/material/DialogContentText';
 import Exam from '../components/Exam';
 import { useAppContext } from '../context/App/appContext';
 import { jsPDF } from 'jspdf';
@@ -19,6 +24,13 @@ import { Loading } from '../components';
 import Post from '../components/Post';
 import { Pagination } from '@material-ui/lab';
 import Footer from '../components/Footer';
+import Reportform from '../components/Reportform';
+import Accordion from '@mui/material/Accordion';
+import AccordionSummary from '@mui/material/AccordionSummary';
+import AccordionDetails from '@mui/material/AccordionDetails';
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+
+
 
 const useStyles = makeStyles((theme) => ({
   main: {
@@ -345,7 +357,50 @@ const SubtitlesPage = () => {
   const [posts, setPosts] = useState([]);
   const [writePost, setWritePost] = useState(false);
   const [postPage, setPostPage] = useState(0);
+  const[report,setreport]=useState([]);
+  const [open, setOpen] = React.useState(false);
 
+  const [reportid,setid]=useState("");
+
+  const [comment,setcomment]=useState("");
+
+
+  const handleClickOpen = (reportid) => {
+    console.log(reportid);
+    setid(reportid);
+        setOpen(true);
+      };
+      const handleClose = () => {
+        setOpen(false);
+      };
+      const addcomment =()=>{
+      
+        // id.preventDefault();
+        console.log(reportid,comment);
+         axios.patch(`http://localhost:8080/api/v1/admin/usersetcomment`,{reportId:reportid,comment:comment}).then(res=>{
+           console.log(res.data);
+         
+      
+      
+           setreport((old)=> old.map((report)=>{
+            if (report._id==reportid){
+              return res.data
+            }
+            else{
+              return report
+            }
+          
+           }));
+           console.log(report);
+          })
+          .catch(err=>
+           {console.log(err)
+           
+          
+          }
+          );
+        }
+    
   const downloadNotes = () => {
     const doc = new jsPDF();
     doc.text('Notes', 100, 10);
@@ -499,6 +554,27 @@ const SubtitlesPage = () => {
       fetchPosts();
     }
   }, [searchParams, user._id, token, videoInfo, courseId]);
+  
+  const handlersubmit = async (e) => {
+
+    e.preventDefault();
+    setVideoInfo(4);
+    
+    await axios.get(
+      `  http://localhost:8080/api/v1/user/getrport/?id=635f73a23569cc0d7e43d80e`, {
+      headers: {
+        authorization: `Bearer ${token}`,
+      },
+    })
+      .then(res => {
+        setreport(res.data)
+        console.log(res.data);
+       
+      }).catch((err) => {
+        console.log(err);
+      })
+  };
+  
 
   const computeProgress = () => {
     if (!state.checkedSubtitles && !state.checkedExams) return 0;
@@ -777,6 +853,21 @@ const SubtitlesPage = () => {
             >
               Q&A
             </button>
+           
+            <button
+              className={`${classes.button}`}
+              onClick={handlersubmit}
+              style={{ color: videoInfo === 4 ? 'black' : '#666f73' }}
+            >
+              Previos Reports
+            </button>
+            <Reportform 
+            courseid={courseId}
+              className={`${classes.button}`}
+              style={{ color: videoInfo === 3 ? 'black' : '#666f73' }}
+            >
+              Report
+            </Reportform>
           </div>
           <div className={`${classes.line}`}></div>
 
@@ -798,6 +889,84 @@ const SubtitlesPage = () => {
                     {showMoreDescription ? 'Show Less' : 'Show More'}
                   </span>
                 </p>
+              </Box>
+            )}
+            {videoInfo === 4 && (
+              <Box className={`${classes.overview}`}>
+                <Typography variant='h6' gutterBottom>
+                  Previous Reports
+                </Typography>
+                <table class="table  table-hover bg-light border border-success ">
+
+              <thead>
+                <tr>
+              <th>Dscription</th>
+              <th>Status</th>
+              <th>Type</th>
+
+              <th>Message send to Admin </th>
+              <th>Message form Admin</th>
+
+              <th></th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                  
+                  {report.map(x=>
+                <tr key={x._id}>
+                  <td>{x.title}</td>
+                  <td>{x.status}</td>
+                  <td>{x.type}</td>
+                  <td>{
+          <Accordion>
+        <AccordionSummary
+          expandIcon={<ExpandMoreIcon />}
+       //   aria-controls="panel1a-content"
+          id="panel1a-header"
+        >
+          <Typography>commets</Typography>
+        </AccordionSummary>
+        <AccordionDetails>
+          <Typography>
+           <ul> {x.commentsuser.map(comment=>
+            <li>{comment}</li>
+          )} </ul>   
+         
+          </Typography>
+        </AccordionDetails>
+      </Accordion>
+        }
+        </td>
+        <td>{
+          <Accordion>
+        <AccordionSummary
+          expandIcon={<ExpandMoreIcon />}
+       //   aria-controls="panel1a-content"
+          id="panel1a-header"
+        >
+          <Typography>commets</Typography>
+        </AccordionSummary>
+        <AccordionDetails>
+          <Typography>
+          
+           <ul> {x.commentsadmin.map(comment=>
+            <li>{comment}</li>
+          )} </ul>   
+         
+          </Typography>
+        </AccordionDetails>
+      </Accordion>
+        }
+        </td>
+        <td> {report.status!=="resolved" && <button type="button" class="btn btn-primary"onClick={()=>{handleClickOpen(x._id)}}>add comment</button>}</td> 
+
+
+
+      </tr>)
+    }
+                    
+                  </tbody>
+                  </table>
               </Box>
             )}
             {(videoInfo === 1 && writeNote && (
@@ -946,6 +1115,7 @@ const SubtitlesPage = () => {
                 </div>
               </>
             )}
+            
 
             {videoInfo === 3 && writePost && (
               <form
@@ -1056,6 +1226,26 @@ const SubtitlesPage = () => {
               </>
             )}
           </div>
+          <Dialog open={open} onClose={handleClose}  fullWidth={'true'} maxWidth={'sm'}>
+
+   <DialogContent>
+     <DialogContentText>
+     Comment  
+     </DialogContentText>
+     <div class="mb-3">
+
+
+</div>
+<div className="mb-3">
+<label for="exampleFormControlTextarea1" className="form-label">Comment</label>
+<textarea className="form-control" id="exampleFormControlTextarea1" rows="3" onChange={(e)=>{setcomment(e.target.value)}}></textarea>
+</div>
+   </DialogContent>
+   <DialogActions>
+     <Button onClick={handleClose}>Cancel</Button>
+     <Button onClick={addcomment}>add comment</Button>
+   </DialogActions>
+ </Dialog>
         </div>
       </section>
     </main>

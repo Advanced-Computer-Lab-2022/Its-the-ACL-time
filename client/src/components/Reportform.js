@@ -17,7 +17,7 @@ import CircularProgress from '@mui/material/CircularProgress';
 const Alert = React.forwardRef(function Alert(props, ref) {
   return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
 });
-export default function Reportform() {
+export default function Reportform({courseid}) {
   const [open, setOpen] = React.useState(false);
   const[type,settype]=useState("");
   const[decsription,setdes]=useState("");
@@ -26,6 +26,7 @@ export default function Reportform() {
   const[message,setmessage]=useState("");
   const[typemessage,settypemessage]=useState("");
   const[oenncircule,setcir]=useState(false)
+  console.log(courseid);
 
 
 
@@ -40,8 +41,8 @@ export default function Reportform() {
     setcir(true)
 
     e.preventDefault();
-    await axios.post(
-      ` http://localhost:8080/api/v1/user/reportproblem/`, {title:decsription,type:type,course:"635f73a23569cc0d7e43d80e"}, {
+    await axios.post( 
+      ` http://localhost:8080/api/v1/user/reportproblem/`,{title:decsription,type:type,course:courseid}, {
       headers: {
         authorization: `Bearer ${token}`,
       },
