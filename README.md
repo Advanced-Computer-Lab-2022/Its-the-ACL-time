@@ -4,7 +4,7 @@
 - [Project Description](#project-description)
 - [Tools and Frameworks](#tools-and-frameworks)
 - [Coding Style](#coding-style)
-- [Installation] (#installation)
+- [Installation](#installation)
 - [Features](#features)
   * [Admin Functionalities](#administrator)
   * [User/Guest Functionalities](#user)
@@ -76,9 +76,9 @@ In order to run our project, you should have the following installed in your mac
  - [Node JS](https://nodejs.org/en/)
  - [NPM](https://www.npmjs.com/)
  - [React JS](https://react-cn.github.io/react/downloads.html) or you can use `NPM`
- - And you can choose any text editor.
  - [MongoDB](https://docs.mongodb.com/manual/installation/) either locally or on a cloud.
 You have to create `.env` with the dbconnectionString.
+- And you can choose any text editor.
      
 
 ## Features 
