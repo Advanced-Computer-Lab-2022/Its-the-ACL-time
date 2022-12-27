@@ -27,26 +27,31 @@ const deleteCertification = (req, res) => {
 const createCertification = async (req, res) => {
   const { email, username, course } = req.body;
 
-  if (!email || !username || !course)
+  if (!email || !username || !course) {
+    console.log('please provide all values');
     throw new BadRequestError('please provide all values');
-
-  const pdf = await generatePDF(username, course);
-  await sendEmail({
-    email,
-    subject: 'Certificate',
-    text: 'Congratulations, you have completed the course',
-    html: '<h1>Congratulations, you have completed the course</h1>',
-    attachments: [
-      {
-        filename: `${username}-certificate.pdf`,
-        content: pdf,
-        contentType: 'application/pdf',
-      },
-    ],
-  });
-  res.status(StatusCodes.OK).json({
-    msg: 'Certificate sent',
-  });
+  }
+  try {
+    const pdf = await generatePDF(username, course);
+    await sendEmail({
+      email,
+      subject: 'Certificate',
+      text: 'Congratulations, you have completed the course',
+      html: '<h1>Congratulations, you have completed the course</h1>',
+      attachments: [
+        {
+          filename: `${username}-certificate.pdf`,
+          content: pdf,
+          contentType: 'application/pdf',
+        },
+      ],
+    });
+  } catch (error) {
+    console.log('error');
+  }
+  // res.status(StatusCodes.OK).json({
+  //   msg: 'Certificate sent',
+  // });
 };
 
 module.exports = {

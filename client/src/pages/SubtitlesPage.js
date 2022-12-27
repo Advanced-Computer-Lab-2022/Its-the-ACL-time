@@ -512,6 +512,27 @@ const SubtitlesPage = () => {
     );
   };
 
+  const sendCertificate = async () => {
+    try {
+      const response = await axios.post(
+        'http://localhost:8080/api/v1/user/certification',
+        {
+          email: user.email,
+          username: user.username,
+          course: "course's name",
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem('token')}`,
+          },
+        }
+      );
+      console.log(response.data.msg);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
   const updateProgress = async (checkedSubtitles, checkedExams) => {
     console.log('checkedSubtitles: ' + checkedSubtitles.length);
     console.log('checkedExams ' + checkedExams.length);
@@ -568,6 +589,10 @@ const SubtitlesPage = () => {
       };
       localStorage.setItem('user', JSON.stringify(user));
       console.log(user);
+
+      if (progress === 100) {
+        sendCertificate();
+      }
       // TODO: update user in app state
       // setAppState(() => user);
     } catch (error) {

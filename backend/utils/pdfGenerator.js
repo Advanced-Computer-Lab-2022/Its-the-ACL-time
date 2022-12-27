@@ -18,6 +18,7 @@ const generatePDF = async (username, course) => {
     console.log(pdf);
     return pdf;
   } catch (error) {
+    console.log('error in generating pdf');
     console.log(error);
   }
 };
