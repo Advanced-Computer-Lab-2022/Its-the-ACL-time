@@ -94,6 +94,7 @@ const updateCourse = async (req, res) => {
     user.courses.find((course) => course.courseId.toString() === courseId);
 
   if (!isOwner) {
+    console.log('You are not the owner of that course');
     throw new UnauthorizedError('You are not the owner of that course');
   }
 
@@ -102,6 +103,12 @@ const updateCourse = async (req, res) => {
     { ...req.body },
     { new: true }
   );
+  if (updatedCourse.rating) {
+    updatedCourse.rating =
+      updatedCourse.reviews.reduce((acc, review) => acc + review.rate, 0) /
+      updatedCourse.reviews.length;
+    await updatedCourse.save();
+  }
 
   res.status(StatusCodes.OK).json({ updatedCourse });
 };

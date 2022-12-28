@@ -114,19 +114,60 @@ const CourseProvider = ({ children }) => {
     setState({
       ...state,
       myCourses: state.myCourses.map((c) =>
-        c._id.toString() === course._id.toString() ? course : c
+        c._id.toString() === courseId.toString()
+          ? {
+              ...c,
+              ...course,
+            }
+          : c
       ),
       courses: state.courses.map((c) =>
-        c._id.toString() === course._id.toString() ? course : c
+        c._id.toString() === courseId.toString()
+          ? {
+              ...c,
+              ...course,
+            }
+          : c
       ),
     });
+  };
+
+  const updateCourseProgress = async (courseId, newUpdate) => {
+    setState((prevState) => {
+      return {
+        ...prevState,
+        myCourses: [
+          ...prevState.myCourses.map((course) =>
+            course._id.toString() === courseId.toString()
+              ? {
+                  ...course,
+                  ...newUpdate,
+                }
+              : course
+          ),
+        ],
+      };
+    });
+
+    const user = JSON.parse(localStorage.getItem('user'));
+    const courseIndex = user.courses.findIndex(
+      (course) => course.courseId.toString() === courseId.toString()
+    );
+    user.courses[courseIndex] = {
+      ...user.courses[courseIndex],
+      completedSubtitles: newUpdate.checkedSubtitles,
+      completedExams: newUpdate.checkedExams,
+      progress: newUpdate.progress,
+    };
+    localStorage.setItem('user', JSON.stringify(user));
   };
 
   return (
     <CourseContext.Provider
       value={{
         ...state,
-        setCoursesState: setState,
+        coursesState: state,
+        updateCourseProgress,
         createCourse,
         updateCourse,
       }}

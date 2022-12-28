@@ -76,36 +76,6 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-const subtitles = [
-  {
-    title: 'English',
-    link: 'https://www.youtube.com/watch?v=1Q8fG0TtVAY',
-    description:
-      'Lorem ipsum dolor sit amet consectetur adipisicing elit. Suscipit similique libero aliquam voluptatibus voluptatem quibusdam dolor optio inventore et eius laboriosam architecto magnam placeat ipsum veniam facilis cum, nemo necessitatibus.',
-  },
-  {
-    title: 'English',
-    link: 'https://www.youtube.com/watch?v=1Q8fG0TtVAY',
-    description: 'English',
-  },
-
-  {
-    title: 'English',
-    link: 'https://www.youtube.com/watch?v=1Q8fG0TtVAY',
-    description: 'English',
-  },
-  {
-    title: 'English',
-    link: 'https://www.youtube.com/watch?v=1Q8fG0TtVAY',
-    description: 'English',
-  },
-  {
-    title: 'English',
-    link: 'https://www.youtube.com/watch?v=1Q8fG0TtVAY',
-    description: 'English',
-  },
-];
-
 const SubTitles = ({ data }) => {
   const classes = useStyles();
   const [showContent, setShowContent] = useState(true);
@@ -134,8 +104,9 @@ const SubTitles = ({ data }) => {
       </Box>
       {showContent && (
         <div className={`${classes.list}`}>
-          {data
-            .map((subtitle, idx) => {
+          {data &&
+            data.length > 0 &&
+            data.slice(0, showMore ? data.length : 3).map((subtitle, idx) => {
               return (
                 <div className={`${classes.listItem}`} key={idx}>
                   <span className={`${classes.iconWithTitle}`}>
@@ -161,8 +132,7 @@ const SubTitles = ({ data }) => {
                   </p>
                 </div>
               );
-            })
-            .slice(0, showMore ? subtitles.length : 3)}
+            })}
           <button
             className={`${classes.showMore}`}
             onClick={() => setShowMore(!showMore)}

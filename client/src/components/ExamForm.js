@@ -105,7 +105,7 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-function ExamForm() {
+function ExamForm({ submitted }) {
   const classes = useStyles();
 
   const { courseId } = useParams();
@@ -177,14 +177,15 @@ function ExamForm() {
       setAlert('success', "Exam's been created successfully");
       setTimeout(() => {
         clearAlert();
+        submitted();
       }, 3000);
     } catch (error) {
       setAlert('error', "Exam's not been created successfully");
       setTimeout(() => {
         clearAlert();
+        submitted();
       }, 3000);
     }
-    setQuestions(0);
     setLoading(false);
   };
 
