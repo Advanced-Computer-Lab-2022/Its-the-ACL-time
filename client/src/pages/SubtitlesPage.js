@@ -345,7 +345,7 @@ const SubtitlesPage = () => {
   const [writePost, setWritePost] = useState(false);
   const [postPage, setPostPage] = useState(0);
   const [reviewsPage, setReviewsPage] = useState(0);
-  const { setCoursesState, myCourses } = useCourseContext();
+  const { myCourses, updateCourseProgress } = useCourseContext();
 
   const downloadNotes = () => {
     const doc = new jsPDF();
@@ -565,35 +565,35 @@ const SubtitlesPage = () => {
         progress,
       };
 
-      setCoursesState((prevState) => {
-        return {
-          ...prevState,
-          myCourses: [
-            ...prevState.myCourses.slice(0, myCourseIndex),
-            newUpdate,
-            ...prevState.myCourses.slice(myCourseIndex + 1),
-          ],
-        };
-      });
+      updateCourseProgress(courseId, newUpdate);
 
-      const user = JSON.parse(localStorage.getItem('user'));
-      const courseIndex = user.courses.findIndex(
-        (course) => course.courseId.toString() === courseId.toString()
-      );
-      user.courses[courseIndex] = {
-        ...user.courses[courseIndex],
-        completedSubtitles: checkedSubtitles,
-        completedExams: checkedExams,
-        progress,
-      };
-      localStorage.setItem('user', JSON.stringify(user));
-      console.log(user);
+      // setCoursesState((prevState) => {
+      //   return {
+      //     ...prevState,
+      //     myCourses: [
+      //       ...prevState.myCourses.slice(0, myCourseIndex),
+      //       newUpdate,
+      //       ...prevState.myCourses.slice(myCourseIndex + 1),
+      //     ],
+      //   };
+      // });
+
+      // const user = JSON.parse(localStorage.getItem('user'));
+      // const courseIndex = user.courses.findIndex(
+      //   (course) => course.courseId.toString() === courseId.toString()
+      // );
+      // user.courses[courseIndex] = {
+      //   ...user.courses[courseIndex],
+      //   completedSubtitles: checkedSubtitles,
+      //   completedExams: checkedExams,
+      //   progress,
+      // };
+      // localStorage.setItem('user', JSON.stringify(user));
+      // console.log(user);
 
       if (progress === 100) {
         sendCertificate();
       }
-      // TODO: update user in app state
-      // setAppState(() => user);
     } catch (error) {
       console.log(error);
     }
