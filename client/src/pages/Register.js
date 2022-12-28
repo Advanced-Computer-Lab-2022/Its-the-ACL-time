@@ -14,7 +14,7 @@ import {
   Container,
   MenuItem,
 } from '@material-ui/core';
-import { Loading, CountrySelector } from '../components';
+import { CountrySelector, Loading } from '../components';
 import Alert from '@material-ui/lab/Alert';
 import LockOutlinedIcon from '@material-ui/icons/LockOutlined';
 import { makeStyles } from '@material-ui/core/styles';
@@ -58,15 +58,7 @@ const useStyles = makeStyles((theme) => ({
 
 export default function Register() {
   const classes = useStyles();
-  const {
-    setup,
-    setAlert,
-    clearAlert,
-    alert,
-    alertText,
-    alertType,
-    isLoading,
-  } = useAppContext();
+  const { setup } = useAppContext();
 
   const password = useRef(null);
   const username = useRef(null);
@@ -76,6 +68,9 @@ export default function Register() {
   const [showCompanyPolicy, setShowCompanyPolicy] = useState(false);
   const [disable, setDisable] = useState(false);
   const [termsAndConditions, setTermsAndConditions] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [alert, setAlert] = useState(null);
+  const [alertType, setAlertType] = useState(null);
   const navigate = useNavigate();
 
   const downloadContract = () => {
@@ -90,7 +85,7 @@ export default function Register() {
 
   const handleRegister = async (e) => {
     e.preventDefault();
-    // get the values from the form
+    setLoading(true);
     const user = {
       username: username.current.value,
       password: password.current.value,
@@ -108,11 +103,33 @@ export default function Register() {
       !user.country
     ) {
       console.log('error');
-      setAlert('error', 'Please Provide all values');
-      setTimeout(() => clearAlert(), 3000);
+      setAlert('Please fill in all the fields');
+      setAlertType('error');
+
+      setTimeout(() => {
+        setAlert(null);
+        setAlertType(null);
+      }, 3000);
     } else {
-      await setup(user);
+      const result = await setup(user);
+      if (result.type) {
+        setAlert(result.msg);
+        setAlertType('success');
+        setTimeout(() => {
+          setAlert(null);
+          setAlertType(null);
+          navigate('/login');
+        }, 3000);
+      } else {
+        setAlert(result.msg);
+        setAlertType('error');
+        setTimeout(() => {
+          setAlert(null);
+          setAlertType(null);
+        }, 3000);
+      }
     }
+    setLoading(false);
   };
 
   const handleCompanyPolicy = (value) => {
@@ -130,11 +147,11 @@ export default function Register() {
         <Typography component='h1' variant='h5'>
           Sign Up
         </Typography>
-        {isLoading && <Loading type='String' color='red' />}
+        {loading && <Loading></Loading>}
 
         {alert && (
           <Alert variant='filled' severity={alertType}>
-            {alertText}
+            {alert}
           </Alert>
         )}
 

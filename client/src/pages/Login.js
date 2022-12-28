@@ -1,4 +1,4 @@
-import React, { useRef } from 'react';
+import React, { useRef, useState } from 'react';
 import {
   Avatar,
   Button,
@@ -56,54 +56,50 @@ const useStyles = makeStyles((theme) => ({
 export default function Login() {
   const classes = useStyles();
 
-  const {
-    setup,
-    setAlert,
-    clearAlert,
-    alert,
-    alertText,
-    alertType,
-    isLoading,
-    setAppState,
-  } = useAppContext();
+  const { setup } = useAppContext();
 
   const email = useRef();
   const password = useRef();
   const navigate = useNavigate();
+  const [alert, setAlert] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const [alertType, setAlertType] = useState(null);
 
   const handleLogin = async (e) => {
     e.preventDefault();
-
+    setLoading(true);
     const user = {
       email: email.current.value,
       password: password.current.value,
       endPoint: 'login',
     };
     if (!user.email || !user.password) {
-      setAppState((prevState) => {
-        return {
-          ...prevState,
-          alert: true,
-          alertText: 'Please fill in all fields',
-          alertType: 'error',
-        };
-      });
-
-      setTimeout(
-        () =>
-          setAppState((prevState) => {
-            return {
-              ...prevState,
-              alert: false,
-              alertText: '',
-              alertType: '',
-            };
-          }),
-        3000
-      );
+      setAlert('Please fill in all fields');
+      setAlertType('error');
+      setTimeout(() => {
+        setAlert(null);
+        setAlertType(null);
+      }, 3000);
     } else {
-      await setup(user);
+      const result = await setup(user);
+      if (result.type) {
+        setAlert(result.msg);
+        setAlertType('success');
+        setTimeout(() => {
+          setAlert(null);
+          setAlertType(null);
+          navigate('/');
+        }, 3000);
+      } else {
+        setAlert(result.msg);
+        setAlertType('error');
+        setTimeout(() => {
+          setAlert(null);
+          setAlertType(null);
+        }, 3000);
+      }
     }
+    setLoading(false);
   };
 
   return (
@@ -116,10 +112,10 @@ export default function Login() {
         <Typography component='h1' variant='h5'>
           Sign in
         </Typography>
-        {isLoading && <Loading type='spinningBubbles' color='red' />}
+        {loading && <Loading type='spinningBubbles' color='red' />}
         {alert && (
           <Alert variant='filled' severity={alertType}>
-            {alertText}
+            {alert}
           </Alert>
         )}
         <form className={classes.form} noValidate>

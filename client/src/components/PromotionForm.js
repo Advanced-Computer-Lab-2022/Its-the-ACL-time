@@ -105,7 +105,7 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-function PromotionForm() {
+function PromotionForm({ submitted }) {
   const classes = useStyles();
   const [alert, setAlert] = useState(null);
   const startDateRef = useRef();
@@ -129,32 +129,21 @@ function PromotionForm() {
       return;
     }
     setLoading(true);
-    try {
-      const res = await axios.patch(
-        `http://localhost:8080/api/v1/course/${courseId}`,
-        {
-          promotion: {
-            promotionPercentage,
-            startDate,
-            endDate,
-          },
-        },
-        {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem('token')}`,
-          },
-        }
-      );
-      console.log(res.data.updatedCourse);
-      updateCourse(res.data.updatedCourse);
-      setAlert('Promotion code added successfully');
-    } catch (err) {
-      console.log(err);
-      setAlert("Can't add promotion code");
-    }
+    setAlert('Promotion code added successfully');
+
+    updateCourse(courseId, {
+      promotion: {
+        promotionPercentage,
+        startDate,
+        endDate,
+      },
+    });
+
     setTimeout(() => {
       setAlert(null);
+      submitted();
     }, 3000);
+
     setLoading(false);
   };
 

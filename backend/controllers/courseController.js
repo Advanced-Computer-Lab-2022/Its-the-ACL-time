@@ -54,6 +54,12 @@ const createCourse = async (req, res) => {
   ) {
     throw new BadRequestError('Please provide all course values');
   }
+
+  const match = await Course.findOne({ title });
+
+  if (match)
+    throw new BadRequestError('Choose another title, as this one is taken');
+
   req.body.createdBy = userId;
   const course = await Course.create(req.body);
   const user = await User.findOne({
@@ -117,6 +123,7 @@ const updateCourse = async (req, res) => {
     user.courses.find((course) => course.courseId.toString() === courseId);
 
   if (!isOwner) {
+    console.log('You are not the owner of that course');
     throw new UnauthorizedError('You are not the owner of that course');
   }
 
@@ -125,6 +132,12 @@ const updateCourse = async (req, res) => {
     { ...req.body },
     { new: true }
   );
+  if (updatedCourse.rating) {
+    updatedCourse.rating =
+      updatedCourse.reviews.reduce((acc, review) => acc + review.rate, 0) /
+      updatedCourse.reviews.length;
+    await updatedCourse.save();
+  }
 
   res.status(StatusCodes.OK).json({ updatedCourse });
 };

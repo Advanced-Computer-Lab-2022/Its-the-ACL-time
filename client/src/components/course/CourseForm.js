@@ -159,6 +159,13 @@ function CourseForm({ addCourseFront }) {
       summary,
     };
 
+    if (!title || !subject || !price || !numberOfHours || !summary) {
+      setAlert('error', 'Please fill all the fields');
+      clearAlert();
+      setLoading(false);
+      return;
+    }
+
     let id = '';
     try {
       if (courseId) {
@@ -169,10 +176,7 @@ function CourseForm({ addCourseFront }) {
       if (addCourseFront) {
         addCourseFront(course);
       }
-      setAlert(
-        'success',
-        `Course ${courseId ? 'Updated' : 'Created'} successfully`
-      );
+      setAlert('success', `${title} Course Created successfully`);
       clearAlert();
     } catch (error) {
       console.log('error' + error);
@@ -185,46 +189,61 @@ function CourseForm({ addCourseFront }) {
       clearAlert();
     }
 
-    let subtitlesContent = [];
-    for (let i = 0; i < subtitles; i++) {
-      const title =
-        subtitlesRef.current.children[i + 2].children[1].children[1].value;
-      const link =
-        subtitlesRef.current.children[i + 2].children[2].children[0].children[1]
-          .value;
-      const duration =
-        subtitlesRef.current.children[i + 2].children[2].children[1].children[1]
-          .value;
+    if (id) {
+      let subtitlesContent = [];
+      for (let i = 0; i < subtitles; i++) {
+        const title =
+          subtitlesRef.current.children[i + 2].children[1].children[1].value;
+        const link =
+          subtitlesRef.current.children[i + 2].children[2].children[0]
+            .children[1].value;
+        const duration =
+          subtitlesRef.current.children[i + 2].children[2].children[1]
+            .children[1].value;
 
-      const description =
-        subtitlesRef.current.children[i + 2].children[3].children[1].value;
+        const description =
+          subtitlesRef.current.children[i + 2].children[3].children[1].value;
 
-      subtitlesContent.push({
-        title,
-        link,
-        duration,
-        description,
-      });
-    }
-
-    try {
-      const response = await axios.post(
-        `http://localhost:8080/api/v1/course/${id}/subtitle`,
-        subtitlesContent,
-        {
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${localStorage.getItem('token')}`,
-          },
+        if (!title || !link || !duration || !description) {
+          setAlert('error', 'Please fill all fields');
+          clearAlert();
+          setLoading(false);
+          return;
         }
+
+        subtitlesContent.push({
+          title,
+          link,
+          duration,
+          description,
+        });
+      }
+
+      try {
+        const response = await axios.post(
+          `http://localhost:8080/api/v1/course/${id}/subtitle`,
+          subtitlesContent,
+          {
+            headers: {
+              'Content-Type': 'application/json',
+              Authorization: `Bearer ${localStorage.getItem('token')}`,
+            },
+          }
+        );
+        console.log(response);
+        navigate('/profile');
+      } catch (error) {
+        console.log(error);
+      }
+    } else {
+      setAlert(
+        'error',
+        'Choose a different title as this one is already taken'
       );
-      console.log(response);
-    } catch (error) {
-      console.log(error);
+      clearAlert();
     }
 
     setLoading(false);
-    navigate('/profile');
   };
 
   return (
@@ -359,7 +378,7 @@ function CourseForm({ addCourseFront }) {
             id='addCourseButton'
             disabled={disable}
           >
-            {courseId ? 'Update' : 'Add'} Course
+            Add Course
           </Button>
         </Form>
       </div>

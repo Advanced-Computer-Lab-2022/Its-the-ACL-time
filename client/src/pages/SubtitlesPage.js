@@ -8,6 +8,11 @@ import axios from 'axios';
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { AiOutlinePlusCircle } from 'react-icons/ai';
 import AlertDialog from '../components/AlertDialog';
+import Dialog from '@mui/material/Dialog';
+import Button from '@mui/material/Button';
+import DialogActions from '@mui/material/DialogActions';
+import DialogContent from '@mui/material/DialogContent';
+import DialogContentText from '@mui/material/DialogContentText';
 import Exam from '../components/Exam';
 import { useAppContext } from '../context/App/appContext';
 import { jsPDF } from 'jspdf';
@@ -19,6 +24,13 @@ import { Loading } from '../components';
 import Post from '../components/Post';
 import { Pagination } from '@material-ui/lab';
 import Footer from '../components/Footer';
+import Reportform from '../components/Reportform';
+import Accordion from '@mui/material/Accordion';
+import AccordionSummary from '@mui/material/AccordionSummary';
+import AccordionDetails from '@mui/material/AccordionDetails';
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+
+
 
 const useStyles = makeStyles((theme) => ({
   main: {
@@ -26,9 +38,10 @@ const useStyles = makeStyles((theme) => ({
     justifyContent: 'space-between',
     alignItems: 'flex-start',
     width: '100%',
-    // height: '95vh',
+    height: '95vh',
     padding: '2rem 1rem',
     marginTop: '2rem',
+    marginBottom: '40rem',
   },
   subtitles: {
     width: '30%',
@@ -344,9 +357,50 @@ const SubtitlesPage = () => {
   const [posts, setPosts] = useState([]);
   const [writePost, setWritePost] = useState(false);
   const [postPage, setPostPage] = useState(0);
-  const [reviewsPage, setReviewsPage] = useState(0);
-  const { setCoursesState, myCourses } = useCourseContext();
+  const[report,setreport]=useState([]);
+  const [open, setOpen] = React.useState(false);
 
+  const [reportid,setid]=useState("");
+
+  const [comment,setcomment]=useState("");
+
+
+  const handleClickOpen = (reportid) => {
+    console.log(reportid);
+    setid(reportid);
+        setOpen(true);
+      };
+      const handleClose = () => {
+        setOpen(false);
+      };
+      const addcomment =()=>{
+      
+        // id.preventDefault();
+        console.log(reportid,comment);
+         axios.patch(`http://localhost:8080/api/v1/admin/usersetcomment`,{reportId:reportid,comment:comment}).then(res=>{
+           console.log(res.data);
+         
+      
+      
+           setreport((old)=> old.map((report)=>{
+            if (report._id==reportid){
+              return res.data
+            }
+            else{
+              return report
+            }
+          
+           }));
+           console.log(report);
+          })
+          .catch(err=>
+           {console.log(err)
+           
+          
+          }
+          );
+        }
+    
   const downloadNotes = () => {
     const doc = new jsPDF();
     doc.text('Notes', 100, 10);
@@ -499,7 +553,28 @@ const SubtitlesPage = () => {
       console.log('fetch posts');
       fetchPosts();
     }
-  }, [searchParams, token, videoInfo, courseId]);
+  }, [searchParams, user._id, token, videoInfo, courseId]);
+  
+  const handlersubmit = async (e) => {
+
+    e.preventDefault();
+    setVideoInfo(4);
+    
+    await axios.get(
+      `  http://localhost:8080/api/v1/user/getrport/?id=${courseId}`, {
+      headers: {
+        authorization: `Bearer ${token}`,
+      },
+    })
+      .then(res => {
+        setreport(res.data)
+        console.log(res.data);
+       
+      }).catch((err) => {
+        console.log(err);
+      })
+  };
+  
 
   const computeProgress = () => {
     if (!state.checkedSubtitles && !state.checkedExams) return 0;
@@ -511,41 +586,19 @@ const SubtitlesPage = () => {
     );
   };
 
-  const sendCertificate = async () => {
-    try {
-      const response = await axios.post(
-        'http://localhost:8080/api/v1/user/certification',
-        {
-          email: user.email,
-          username: user.username,
-          course: "course's name",
-        },
-        {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem('token')}`,
-          },
-        }
-      );
-      console.log(response.data.msg);
-    } catch (error) {
-      console.log(error);
-    }
-  };
-
   const updateProgress = async (checkedSubtitles, checkedExams) => {
     console.log('checkedSubtitles: ' + checkedSubtitles.length);
     console.log('checkedExams ' + checkedExams.length);
     console.log('subtitles ' + subtitles.length);
     console.log('exams ' + exams.length);
     console.log('-----------------------------------------------------');
-    const progress = computeProgress();
     try {
       await axios.patch(
         `http://localhost:8080/api/v1/user/progress/${courseId}`,
         {
           completedSubtitles: checkedSubtitles,
           completedExams: checkedExams,
-          progress,
+          progress: computeProgress(),
         },
         {
           headers: {
@@ -553,47 +606,6 @@ const SubtitlesPage = () => {
           },
         }
       );
-
-      const myCourseIndex = myCourses.findIndex(
-        (course) => course._id.toString() === courseId.toString()
-      );
-
-      const newUpdate = {
-        ...myCourses[myCourseIndex],
-        completedSubtitles: checkedSubtitles,
-        completedExams: checkedExams,
-        progress,
-      };
-
-      setCoursesState((prevState) => {
-        return {
-          ...prevState,
-          myCourses: [
-            ...prevState.myCourses.slice(0, myCourseIndex),
-            newUpdate,
-            ...prevState.myCourses.slice(myCourseIndex + 1),
-          ],
-        };
-      });
-
-      const user = JSON.parse(localStorage.getItem('user'));
-      const courseIndex = user.courses.findIndex(
-        (course) => course.courseId.toString() === courseId.toString()
-      );
-      user.courses[courseIndex] = {
-        ...user.courses[courseIndex],
-        completedSubtitles: checkedSubtitles,
-        completedExams: checkedExams,
-        progress,
-      };
-      localStorage.setItem('user', JSON.stringify(user));
-      console.log(user);
-
-      if (progress === 100) {
-        sendCertificate();
-      }
-      // TODO: update user in app state
-      // setAppState(() => user);
     } catch (error) {
       console.log(error);
     }
@@ -639,6 +651,8 @@ const SubtitlesPage = () => {
     e.preventDefault();
     const title = e.target.children[1].value;
     const text = e.target.children[3].value;
+    console.log(user.username);
+    console.log(courseId);
     setWritePost(false);
     setLoading(true);
     try {
@@ -721,102 +735,82 @@ const SubtitlesPage = () => {
   };
 
   return (
-    <div
-      style={{
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
-        width: '100%',
-        justifyContent: 'space-between',
-      }}
-    >
-      <main className={`${classes.main}`}>
-        {loading && <Loading />}
-        <section className={`${classes.subtitles}`}>
-          <LinearProgressBar value={computeProgress()} />
-          <Box
-            className={`${classes.courseContent}`}
-            onClick={() => setShowList(!showList)}
-          >
-            <h3>Course Content</h3>
-            <AiFillCloseCircle />
-          </Box>
-          {showList &&
-            !loading &&
-            subtitles
-              .map((subtitle, idx) => (
-                <FilterField
-                  title={`Lecture ${idx + 1}`}
-                  options={[...Array(subtitle.title)]}
-                  key={idx}
-                  onFilter={handleChecked}
-                  optionOnClick={() => {
-                    window.scrollTo(0, 0);
-                    navigate(`?subtitleId=${subtitle._id}`);
-                  }}
-                  titleStyle={{
-                    fontSize: '1rem',
-                    fontWeight: '500',
-                  }}
-                  checkedOptions={state.checkedSubtitles?.reduce(
-                    (acc, item) => {
-                      acc[item] = true;
-                      return acc;
-                    },
-                    {}
-                  )}
-                />
-              ))
-              .slice(0, showMore ? subtitles.length : 2)}
-          {!loading &&
-            exams.map((exam, idx) => (
+    <main className={`${classes.main}`}>
+      {loading && <Loading />}
+      <section className={`${classes.subtitles}`}>
+        <LinearProgressBar value={computeProgress()} />
+        <Box
+          className={`${classes.courseContent}`}
+          onClick={() => setShowList(!showList)}
+        >
+          <h3>Course Content</h3>
+          <AiFillCloseCircle />
+        </Box>
+        {showList &&
+          !loading &&
+          subtitles
+            .map((subtitle, idx) => (
               <FilterField
-                title={`Exam ${idx + 1}`}
-                options={[...Array(`Let's take the exam ${idx + 1}`)]}
+                title={`Lecture ${idx + 1}`}
+                options={[...Array(subtitle.title)]}
                 key={idx}
-                onFilter={handleCheckedExam}
-                optionOnClick={() => {
-                  window.scrollTo(0, 0);
-                  navigate(`?examId=${exam._id}`);
-                }}
+                onFilter={handleChecked}
+                optionOnClick={() => navigate(`?subtitleId=${subtitle._id}`)}
                 titleStyle={{
                   fontSize: '1rem',
                   fontWeight: '500',
                 }}
-                checkedOptions={state.checkedExams?.reduce((acc, item) => {
+                checkedOptions={state.checkedSubtitles?.reduce((acc, item) => {
                   acc[item] = true;
                   return acc;
                 }, {})}
               />
-            ))}
-          {subtitles.length > 2 && (
-            <button
-              className={`${classes.showMore}`}
-              onClick={() => setShowMore(!showMore)}
-            >
-              {showMore ? 'Show Less' : 'Show More'}
-            </button>
-          )}
-        </section>
-        <section className={`${classes.rightSection}`}>
-          <div
-            className={
-              searchParams.get('examId') ? classes.exam : classes.video
-            }
+            ))
+            .slice(0, showMore ? subtitles.length : 2)}
+        {!loading &&
+          exams.map((exam, idx) => (
+            <FilterField
+              title={`Exam ${idx + 1}`}
+              options={[...Array(`Let's take the exam ${idx + 1}`)]}
+              key={idx}
+              onFilter={handleCheckedExam}
+              optionOnClick={() => navigate(`?examId=${exam._id}`)}
+              titleStyle={{
+                fontSize: '1rem',
+                fontWeight: '500',
+              }}
+              checkedOptions={state.checkedExams?.reduce((acc, item) => {
+                acc[item] = true;
+                return acc;
+              }, {})}
+            />
+          ))}
+        {subtitles.length > 2 && (
+          <button
+            className={`${classes.showMore}`}
+            onClick={() => setShowMore(!showMore)}
           >
-            {exam && searchParams.get('examId') ? (
-              <Exam
-                questions={exam?.questions}
-                title={"Let's take the exam"}
-                duration={exam?.duration}
-              ></Exam>
-            ) : (
-              <></>
-            )}
+            {showMore ? 'Show Less' : 'Show More'}
+          </button>
+        )}
+      </section>
+      <section className={`${classes.rightSection}`}>
+        <div
+          className={searchParams.get('examId') ? classes.exam : classes.video}
+        >
+          {exam && searchParams.get('examId') ? (
+            <Exam
+              questions={exam?.questions}
+              title={"Let's take the exam"}
+              duration={exam?.duration}
+            ></Exam>
+          ) : (
+            <></>
+          )}
 
-            {!exam && (
-              <div className={`${classes.video}`}>
-                {/* <iframe
+          {!exam && (
+            <div className={`${classes.video}`}>
+              {/* <iframe
                 width='911'
                 height='480'
                 src='https://www.youtube.com/embed/1v_TEnpqHXE'
@@ -825,360 +819,436 @@ const SubtitlesPage = () => {
                 allow='accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture'
                 allowfullscreen
               ></iframe> */}
-              </div>
-            )}
-          </div>
-          <div className={`${classes.videoInfo}`}>
-            <div className={`${classes.line}`}></div>
-            <div className={`${classes.videoInfoHeader}`}>
-              <button
-                className={`${classes.button}`}
-                onClick={() => setVideoInfo(0)}
-                style={{ color: videoInfo === 0 ? 'black' : '#666f73' }}
-              >
-                Overview
-              </button>
-              <button
-                className={`${classes.button}`}
-                onClick={() => setVideoInfo(1)}
-                style={{ color: videoInfo === 1 ? 'black' : '#666f73' }}
-              >
-                Notes
-              </button>
-              <button
-                className={`${classes.button}`}
-                onClick={() => setVideoInfo(2)}
-                style={{ color: videoInfo === 2 ? 'black' : '#666f73' }}
-              >
-                Reviews
-              </button>
-              <button
-                className={`${classes.button}`}
-                onClick={() => setVideoInfo(3)}
-                style={{ color: videoInfo === 3 ? 'black' : '#666f73' }}
-              >
-                Q&A
-              </button>
             </div>
-            <div className={`${classes.line}`}></div>
+          )}
+        </div>
+        <div className={`${classes.videoInfo}`}>
+          <div className={`${classes.line}`}></div>
+          <div className={`${classes.videoInfoHeader}`}>
+            <button
+              className={`${classes.button}`}
+              onClick={() => setVideoInfo(0)}
+              style={{ color: videoInfo === 0 ? 'black' : '#666f73' }}
+            >
+              Overview
+            </button>
+            <button
+              className={`${classes.button}`}
+              onClick={() => setVideoInfo(1)}
+              style={{ color: videoInfo === 1 ? 'black' : '#666f73' }}
+            >
+              Notes
+            </button>
+            <button
+              className={`${classes.button}`}
+              onClick={() => setVideoInfo(2)}
+              style={{ color: videoInfo === 2 ? 'black' : '#666f73' }}
+            >
+              Reviews
+            </button>
+            <button
+              className={`${classes.button}`}
+              onClick={() => setVideoInfo(3)}
+              style={{ color: videoInfo === 3 ? 'black' : '#666f73' }}
+            >
+              Q&A
+            </button>
+           
+            <button
+              className={`${classes.button}`}
+              onClick={handlersubmit}
+              style={{ color: videoInfo === 4 ? 'black' : '#666f73' }}
+            >
+              Previos Reports
+            </button>
+            <Reportform 
+            courseid={courseId}
+              className={`${classes.button}`}
+              style={{ color: videoInfo === 3 ? 'black' : '#666f73' }}
+            >
+              Report
+            </Reportform>
+          </div>
+          <div className={`${classes.line}`}></div>
 
-            <div className={`${classes.videoInfoBody}`}>
-              {videoInfo === 0 && (
-                <Box className={`${classes.overview}`}>
-                  <Typography variant='h6' gutterBottom>
-                    Course Description
-                  </Typography>
-                  <p>
-                    Lorem ipsum dolor sit amet consectetur adipisicing elit.
-                    Sint saepe porro laborum quas perspiciatis eos minus,
-                    numquam maiores, optio temporibus enim quis id aliquid
-                    accusamus eligendi vel, libero ea quidem.
-                    <span
-                      className={`${classes.showMoreDescription}`}
-                      onClick={() =>
-                        setShowMoreDescription(!showMoreDescription)
-                      }
-                    >
-                      {showMoreDescription ? 'Show Less' : 'Show More'}
-                    </span>
-                  </p>
-                </Box>
-              )}
-              {(videoInfo === 1 && writeNote && (
-                <div className={`${classes.writeNote}`}>
-                  <TextareaAutosize
-                    ref={noteContent}
-                    minRows={3}
-                    aria-label='maximum height'
-                    placeholder='Write your note here'
-                    className={`${classes.textarea}`}
-                  />
-                  <div className={`${classes.buttons}`}>
-                    <button
-                      className={`${classes.cancel}`}
-                      onClick={() => setWriteNote(false)}
-                    >
-                      Cancel
-                    </button>
-                    <button className={`${classes.save}`} onClick={addNote}>
-                      save
-                    </button>
-                  </div>
-                </div>
-              )) ||
-                (videoInfo === 1 && !writeNote && (
+          <div className={`${classes.videoInfoBody}`}>
+            {videoInfo === 0 && (
+              <Box className={`${classes.overview}`}>
+                <Typography variant='h6' gutterBottom>
+                  Course Description
+                </Typography>
+                <p>
+                  Lorem ipsum dolor sit amet consectetur adipisicing elit. Sint
+                  saepe porro laborum quas perspiciatis eos minus, numquam
+                  maiores, optio temporibus enim quis id aliquid accusamus
+                  eligendi vel, libero ea quidem.
+                  <span
+                    className={`${classes.showMoreDescription}`}
+                    onClick={() => setShowMoreDescription(!showMoreDescription)}
+                  >
+                    {showMoreDescription ? 'Show Less' : 'Show More'}
+                  </span>
+                </p>
+              </Box>
+            )}
+            {videoInfo === 4 && (
+              <Box className={`${classes.overview}`}>
+                <Typography variant='h6' gutterBottom>
+                  Previous Reports
+                </Typography>
+                <table class="table  table-hover bg-light border border-success ">
+
+              <thead>
+                <tr>
+              <th>Dscription</th>
+              <th>Status</th>
+              <th>Type</th>
+
+              <th>Message send to Admin </th>
+              <th>Message form Admin</th>
+
+              <th></th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                  
+                  {report.map(x=>
+                <tr key={x._id}>
+                  <td>{x.title}</td>
+                  <td>{x.status}</td>
+                  <td>{x.type}</td>
+                  <td>{
+          <Accordion>
+        <AccordionSummary
+          expandIcon={<ExpandMoreIcon />}
+       //   aria-controls="panel1a-content"
+          id="panel1a-header"
+        >
+          <Typography>commets</Typography>
+        </AccordionSummary>
+        <AccordionDetails>
+          <Typography>
+           <ul> {x.commentsuser.map(comment=>
+            <li>{comment}</li>
+          )} </ul>   
+         
+          </Typography>
+        </AccordionDetails>
+      </Accordion>
+        }
+        </td>
+        <td>{
+          <Accordion>
+        <AccordionSummary
+          expandIcon={<ExpandMoreIcon />}
+       //   aria-controls="panel1a-content"
+          id="panel1a-header"
+        >
+          <Typography>commets</Typography>
+        </AccordionSummary>
+        <AccordionDetails>
+          <Typography>
+          
+           <ul> {x.commentsadmin.map(comment=>
+            <li>{comment}</li>
+          )} </ul>   
+         
+          </Typography>
+        </AccordionDetails>
+      </Accordion>
+        }
+        </td>
+        <td> {report.status!=="resolved" && <button type="button" class="btn btn-primary"onClick={()=>{handleClickOpen(x._id)}}>add comment</button>}</td> 
+
+
+
+      </tr>)
+    }
+                    
+                  </tbody>
+                  </table>
+              </Box>
+            )}
+            {(videoInfo === 1 && writeNote && (
+              <div className={`${classes.writeNote}`}>
+                <TextareaAutosize
+                  ref={noteContent}
+                  minRows={3}
+                  aria-label='maximum height'
+                  placeholder='Write your note here'
+                  className={`${classes.textarea}`}
+                />
+                <div className={`${classes.buttons}`}>
                   <button
-                    onClick={() => setWriteNote(true)}
-                    className={`${classes.addNote}`}
-                    disabled={
-                      !(
-                        searchParams.get('examId') ||
-                        searchParams.get('subtitleId')
-                      )
-                    }
+                    className={`${classes.cancel}`}
+                    onClick={() => setWriteNote(false)}
                   >
-                    Create a note for this lecture
-                    <span>
-                      <AiOutlinePlusCircle />
-                    </span>
+                    Cancel
                   </button>
-                ))}
-              <div className={`${classes.hr}`}></div>
-
-              {videoInfo === 1 && (
-                <div className={`${classes.notes}`}>
-                  {notes.map((note, idx) => (
-                    <div key={note.id} style={{ width: '100%' }}>
-                      <Box className={`${classes.note}`}>
-                        <div className={`${classes.noteHeader}`}>
-                          <Typography
-                            variant='h6'
-                            gutterBottom
-                            className={`${classes.noteTitle}`}
-                          >
-                            Note {idx + 1}
-                          </Typography>
-                          <div className={`${classes.editIcons}`}>
-                            <AiFillEdit className={`${classes.noteIcons}`} />
-                            <AiFillDelete
-                              className={`${classes.noteIcons}`}
-                              onClick={() => {
-                                setDialog(note.id);
-                              }}
-                            />
-                          </div>
-                        </div>
-                        <div className={`${classes.noteContent}`}>
-                          <p>{note?.description}</p>
-                        </div>
-                      </Box>
-                      <div className={`${classes.hr}`}></div>
-                    </div>
-                  ))}
-                  <div
-                    style={{
-                      width: '100%',
-                      display: 'flex',
-                      justifyContent: 'flex-end',
-                      alignItems: 'center',
-                    }}
-                  >
-                    {notes.length !== 0 && (
-                      <button
-                        onClick={() => downloadNotes()}
-                        className={`${classes.downloadNotes}`}
-                      >
-                        Download notes
-                      </button>
-                    )}
-                  </div>
+                  <button className={`${classes.save}`} onClick={addNote}>
+                    save
+                  </button>
                 </div>
-              )}
-              <AlertDialog
-                title={'Delete Note'}
-                content={'Are you sure you want to delete this note ?'}
-                open={dialog !== -1}
-                handleAgree={() => {
-                  deleteNote(dialog);
-                  setDialog(-1);
-                  console.log('agree');
-                }}
-                handleDisagree={() => {
-                  setDialog(-1);
-                  console.log('disagree');
-                }}
-              />
-              {videoInfo === 2 && (
-                <>
-                  <div
-                    style={{
-                      width: '100%',
-                      alignItems: 'center',
-                      marginTop: '1rem',
-                    }}
-                  >
-                    {reviews
-                      ?.slice(
-                        reviewsPage * 3,
-                        Math.min(reviews.length, reviewsPage * 3 + 3)
-                      )
-                      .map((review, idx) => (
-                        <div
-                          key={idx}
-                          style={{
-                            marginBottom: '1rem',
-                          }}
+              </div>
+            )) ||
+              (videoInfo === 1 && !writeNote && (
+                <button
+                  onClick={() => setWriteNote(true)}
+                  className={`${classes.addNote}`}
+                >
+                  Create a note for this lecture
+                  <span>
+                    <AiOutlinePlusCircle />
+                  </span>
+                </button>
+              ))}
+            <div className={`${classes.hr}`}></div>
+
+            {videoInfo === 1 && (
+              <div className={`${classes.notes}`}>
+                {notes.map((note, idx) => (
+                  <div key={note.id} style={{ width: '100%' }}>
+                    <Box className={`${classes.note}`}>
+                      <div className={`${classes.noteHeader}`}>
+                        <Typography
+                          variant='h6'
+                          gutterBottom
+                          className={`${classes.noteTitle}`}
                         >
-                          <Review
-                            username={review?.username}
-                            reviewText={review?.review}
-                            rate={review?.rate}
+                          Note {idx + 1}
+                        </Typography>
+                        <div className={`${classes.editIcons}`}>
+                          <AiFillEdit className={`${classes.noteIcons}`} />
+                          <AiFillDelete
+                            className={`${classes.noteIcons}`}
+                            onClick={() => {
+                              setDialog(note.id);
+                            }}
                           />
                         </div>
-                      ))}
-                    <div
-                      style={{
-                        width: '100%',
-                        display: 'flex',
-                        justifyContent: 'center',
-                        alignItems: 'center',
-                      }}
-                    >
-                      <Pagination
-                        count={Math.ceil(reviews.length / 3)}
-                        page={reviewsPage + 1}
-                        onChange={(e, page) => {
-                          setReviewsPage(page - 1);
-                        }}
-                        color='primary'
-                        size='large'
-                        showFirstButton
-                        showLastButton
-                        classes={{
-                          ul: classes.pagination,
-                        }}
-                      />
-                    </div>
+                      </div>
+                      <div className={`${classes.noteContent}`}>
+                        <p>{note?.description}</p>
+                      </div>
+                    </Box>
+                    <div className={`${classes.hr}`}></div>
                   </div>
-                  <div>
-                    <RatingForm
-                      buttonText={'Rate this course'}
-                      title={'Course'}
-                      textArea={
-                        'Tell us, what do you think about this course ?'
-                      }
-                      buttonStyle={{
-                        height: '3rem',
-                        borderRadius: '0.5rem',
-                        backgroundColor: 'rgb(74, 73, 73)',
-                        color: 'white',
-                        border: 'none',
-                        fontSize: '1.2rem',
-                        cursor: 'pointer',
-                        '&:hover': {
-                          backgroundColor: 'black',
-                        },
-                      }}
-                      onSubmit={postReview}
-                    />
-                  </div>
-                </>
-              )}
-
-              {videoInfo === 3 && writePost && (
-                <form
-                  action=''
-                  className={`${classes.writeNote}`}
-                  onSubmit={addPost}
+                ))}
+                <div
+                  style={{
+                    width: '100%',
+                    display: 'flex',
+                    justifyContent: 'flex-end',
+                    alignItems: 'center',
+                  }}
                 >
-                  <div
-                    style={{
-                      width: '100%',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'flex-start',
-                    }}
-                  >
-                    <label
-                      htmlFor='title'
-                      style={{
-                        fontSize: '1.2rem',
-                        fontWeight: '600',
-                        marginRight: '1rem',
-                      }}
-                    >
-                      Title
-                    </label>
-                  </div>
-                  <input
-                    type='text'
-                    id='title'
-                    className={`${classes.postTitle}`}
-                  />
-                  <div
-                    style={{
-                      width: '100%',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'flex-start',
-                    }}
-                  >
-                    <label
-                      htmlFor='details'
-                      style={{
-                        fontSize: '1.2rem',
-                        fontWeight: '600',
-                        marginRight: '1rem',
-                      }}
-                    >
-                      Details
-                    </label>
-                  </div>
-                  <TextareaAutosize
-                    ref={noteContent}
-                    minRows={3}
-                    aria-label='maximum height'
-                    placeholder='Write your post here'
-                    className={`${classes.textarea}`}
-                  />
-                  <div className={`${classes.buttons}`}>
+                  {notes.length !== 0 && (
                     <button
-                      className={`${classes.cancel}`}
-                      onClick={() => setWritePost(false)}
+                      onClick={() => downloadNotes()}
+                      className={`${classes.downloadNotes}`}
                     >
-                      Cancel
+                      Download notes
                     </button>
-                    <button className={`${classes.save}`} type='submit'>
-                      Post
-                    </button>
-                  </div>
-                </form>
-              )}
-
-              {videoInfo === 3 && !writePost && (
-                <>
-                  <button
-                    onClick={() => setWritePost(true)}
-                    className={`${classes.addNote}`}
-                  >
-                    Create a post
-                    <span>
-                      <AiOutlinePlusCircle />
-                    </span>
-                  </button>
-                  {posts.length !== 0 && (
-                    <div className={`${classes.posts}`}>
-                      {posts
-                        .slice(
-                          postPage * 3,
-                          Math.min(posts.length, postPage * 3 + 3)
-                        )
-                        .map((post, idx) => (
-                          <Post post={post} key={post._id} />
-                        ))}
-                    </div>
                   )}
-                  <div>
-                    <Pagination
-                      count={
-                        posts.length % 3 === 0
-                          ? posts.length / 3
-                          : Math.floor(posts.length / 3) + 1
-                      }
-                      onChange={(e, page) => {
-                        setPostPage(page - 1);
-                      }}
-                      color='primary'
-                    />
+                </div>
+              </div>
+            )}
+            <AlertDialog
+              title={'Delete Note'}
+              content={'Are you sure you want to delete this note ?'}
+              open={dialog !== -1}
+              handleAgree={() => {
+                deleteNote(dialog);
+                setDialog(-1);
+                console.log('agree');
+              }}
+              handleDisagree={() => {
+                setDialog(-1);
+                console.log('disagree');
+              }}
+            />
+            {videoInfo === 2 && (
+              <>
+                <div
+                  style={{
+                    width: '100%',
+                    alignItems: 'center',
+                    marginTop: '1rem',
+                  }}
+                >
+                  {reviews
+                    ?.map((review, idx) => (
+                      <div
+                        key={idx}
+                        style={{
+                          marginBottom: '1rem',
+                        }}
+                      >
+                        <Review
+                          username={review?.username}
+                          reviewText={review?.review}
+                          rate={review?.rate}
+                        />
+                      </div>
+                    ))
+                    .slice(0, 3)}
+                </div>
+                <div>
+                  <RatingForm
+                    buttonText={'Rate this course'}
+                    title={'Course'}
+                    textArea={'Tell us, what do you think about this course ?'}
+                    buttonStyle={{
+                      height: '3rem',
+                      borderRadius: '0.5rem',
+                      backgroundColor: 'rgb(74, 73, 73)',
+                      color: 'white',
+                      border: 'none',
+                      fontSize: '1.2rem',
+                      cursor: 'pointer',
+                      '&:hover': {
+                        backgroundColor: 'black',
+                      },
+                    }}
+                    onSubmit={postReview}
+                  />
+                </div>
+              </>
+            )}
+            
+
+            {videoInfo === 3 && writePost && (
+              <form
+                action=''
+                className={`${classes.writeNote}`}
+                onSubmit={addPost}
+              >
+                <div
+                  style={{
+                    width: '100%',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'flex-start',
+                  }}
+                >
+                  <label
+                    htmlFor='title'
+                    style={{
+                      fontSize: '1.2rem',
+                      fontWeight: '600',
+                      marginRight: '1rem',
+                    }}
+                  >
+                    Title
+                  </label>
+                </div>
+                <input
+                  type='text'
+                  id='title'
+                  className={`${classes.postTitle}`}
+                />
+                <div
+                  style={{
+                    width: '100%',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'flex-start',
+                  }}
+                >
+                  <label
+                    htmlFor='details'
+                    style={{
+                      fontSize: '1.2rem',
+                      fontWeight: '600',
+                      marginRight: '1rem',
+                    }}
+                  >
+                    Details
+                  </label>
+                </div>
+                <TextareaAutosize
+                  ref={noteContent}
+                  minRows={3}
+                  aria-label='maximum height'
+                  placeholder='Write your post here'
+                  className={`${classes.textarea}`}
+                />
+                <div className={`${classes.buttons}`}>
+                  <button
+                    className={`${classes.cancel}`}
+                    onClick={() => setWritePost(false)}
+                  >
+                    Cancel
+                  </button>
+                  <button className={`${classes.save}`} type='submit'>
+                    Post
+                  </button>
+                </div>
+              </form>
+            )}
+
+            {videoInfo === 3 && !writePost && (
+              <>
+                <button
+                  onClick={() => setWritePost(true)}
+                  className={`${classes.addNote}`}
+                >
+                  Create a post
+                  <span>
+                    <AiOutlinePlusCircle />
+                  </span>
+                </button>
+                {posts.length !== 0 && (
+                  <div className={`${classes.posts}`}>
+                    {posts
+                      .slice(
+                        postPage * 3,
+                        Math.min(posts.length, postPage * 3 + 3)
+                      )
+                      .map((post, idx) => (
+                        <Post post={post} key={post._id} />
+                      ))}
                   </div>
-                </>
-              )}
-            </div>
+                )}
+                <div>
+                  <Pagination
+                    count={
+                      posts.length % 3 === 0
+                        ? posts.length / 3
+                        : Math.floor(posts.length / 3) + 1
+                    }
+                    onChange={(e, page) => {
+                      setPostPage(page - 1);
+                    }}
+                    color='primary'
+                  />
+                </div>
+              </>
+            )}
           </div>
-        </section>
-      </main>
-      <Footer></Footer>
-    </div>
+          <Dialog open={open} onClose={handleClose}  fullWidth={'true'} maxWidth={'sm'}>
+
+   <DialogContent>
+     <DialogContentText>
+     Comment  
+     </DialogContentText>
+     <div class="mb-3">
+
+
+</div>
+<div className="mb-3">
+<label for="exampleFormControlTextarea1" className="form-label">Comment</label>
+<textarea className="form-control" id="exampleFormControlTextarea1" rows="3" onChange={(e)=>{setcomment(e.target.value)}}></textarea>
+</div>
+   </DialogContent>
+   <DialogActions>
+     <Button onClick={handleClose}>Cancel</Button>
+     <Button onClick={addcomment}>add comment</Button>
+   </DialogActions>
+ </Dialog>
+        </div>
+      </section>
+    </main>
   );
 };
 

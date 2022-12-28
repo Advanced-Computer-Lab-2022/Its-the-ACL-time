@@ -1,5 +1,5 @@
 import RequestCourse from '../components/RequestCourse';
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { makeStyles } from '@material-ui/core/styles';
 import { Link, useParams } from 'react-router-dom';
 import axios from 'axios';
@@ -261,12 +261,15 @@ const CoursePage = () => {
   const [showPromotionForm, setShowPromotionForm] = useState(false);
   const inputRef = useRef();
 
+  const updateSubtitles = (newSubtitles) => {
+    setSubtitles([...subtitles, ...newSubtitles]);
+  };
+
   useEffect(() => {
     function getCourse() {
       const course = courses.find(
         (course) => course._id.toString() === courseId.toString()
       );
-      console.log(course);
       setCourse(course);
       if (course && course.promotion) {
         const promotion = course.promotion;
@@ -327,7 +330,7 @@ const CoursePage = () => {
           },
         }
       );
-      console.log(response);
+      setRequestRefund(false);
       setAlert("You've requested a refund successfully");
     } catch (error) {
       console.log(error);
@@ -594,7 +597,7 @@ const CoursePage = () => {
                   alignItems: 'center',
                 }}
               >
-                <PromotionForm />
+                <PromotionForm submitted={() => setShowPromotionForm(false)} />
               </div>
             )}
 
@@ -606,7 +609,7 @@ const CoursePage = () => {
                   alignItems: 'center',
                 }}
               >
-                <ExamForm />
+                <ExamForm submitted={() => setShowExamForm(false)} />
               </div>
             )}
 
@@ -618,13 +621,18 @@ const CoursePage = () => {
                   alignItems: 'center',
                 }}
               >
-                <SubtitleForm />
+                <SubtitleForm
+                  callBack={updateSubtitles}
+                  submitted={() => setShowSubtitleForm(false)}
+                />
               </div>
             )}
 
             <section>
               <div className={`${classes.subtitle}`}>
-                <SubTitles data={subtitles} />
+                {subtitles && subtitles.length > 0 && (
+                  <SubTitles data={subtitles} />
+                )}
                 <br />
                 <br />
               </div>

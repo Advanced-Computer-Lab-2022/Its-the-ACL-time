@@ -400,6 +400,7 @@ function InstructorProfile({ courses }) {
                 );
               })}
           </div>
+
           <div
             style={{
               display: 'flex',
@@ -414,6 +415,20 @@ function InstructorProfile({ courses }) {
               color='primary'
             />
           </div>
+          <button
+            className='btn btn-primary'
+            style={{
+              marginTop: '2rem',
+              width: '20rem',
+              height: '3rem',
+              fontSize: '1.5rem',
+            }}
+            onClick={() => {
+              navigate('/addCourse');
+            }}
+          >
+            Create a Course
+          </button>
           <br />
           <br />
           <p>Have questions? Here are our most popular instructor resources.</p>
@@ -471,14 +486,24 @@ function InstructorProfile({ courses }) {
 const Settings = () => {
   const classes = useStyles();
   const [value, setValue] = useState(0);
-  const { setAlert, clearAlert, updateUser, alert, alertText, alertType } =
-    useAppContext();
+  const { updateUser } = useAppContext();
+  const [alert, setAlert] = useState(null);
+  const [alertType, setAlertType] = useState(null);
+
+  const cleanForm = () => {
+    document.getElementById('username').value = '';
+    document.getElementById('email').value = '';
+    document.getElementById('oldPassword').value = '';
+    document.getElementById('newPassword').value = '';
+    document.getElementById('bio').value = '';
+    document.getElementById('country').value = '';
+  };
 
   const handleChange = (event, newValue) => {
     setValue(newValue);
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     const username = document.getElementById('username').value;
     const email = document.getElementById('email').value;
@@ -496,13 +521,17 @@ const Settings = () => {
       !country
     ) {
       console.log('no fields filled');
-      setAlert('error', 'Please fill in at least one field');
+      setAlert('Please fill in at least one field');
+      setAlertType('error');
+
       setTimeout(() => {
-        clearAlert();
-      }, 1000);
+        setAlert(null);
+        setAlertType(null);
+      }, 2000);
       return;
     }
-    updateUser({
+
+    const result = await updateUser({
       username,
       email,
       oldPassword,
@@ -510,11 +539,29 @@ const Settings = () => {
       biography,
       country,
     });
+
+    if (result.type) {
+      setAlert(result.msg);
+      setAlertType('success');
+      setTimeout(() => {
+        setAlert(null);
+        setAlertType(null);
+        cleanForm();
+      }, 2000);
+    } else {
+      setAlert(result.msg);
+      setAlertType('error');
+      setTimeout(() => {
+        setAlert(null);
+        setAlertType(null);
+        cleanForm();
+      }, 2000);
+    }
   };
 
   return (
     <div>
-      {alert && <Alert severity={alertType}>{alertText}</Alert>}
+      {alert && <Alert severity={alertType}>{alert}</Alert>}
       <h1>Profile Settings</h1>
       <Paper className={classes.tabs}>
         <Tabs
@@ -594,7 +641,6 @@ export default function Profile() {
   const { myCourses } = useCourseContext();
   const { user } = useAppContext();
   const [value, setValue] = React.useState(0);
-  const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
   const [courses, setCourses] = useState([]);
   const [refunds, setRefunds] = useState([]);
