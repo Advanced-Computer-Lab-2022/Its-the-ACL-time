@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { CourseComponent, Courses, PageHeader } from '../components';
+import { CourseComponent, Courses, Loading, PageHeader } from '../components';
 import { makeStyles } from '@material-ui/core/styles';
 import Paper from '@material-ui/core/Paper';
 import Tabs from '@material-ui/core/Tabs';
@@ -141,133 +141,145 @@ function CenteredTabs({ changeTab }) {
 const Home = () => {
   const classes = useStyles();
   const [tab, setTab] = useState(0);
-  const { user } = useAppContext();
   const { courses, myCourses } = useCourseContext();
   const [sortedCourses, setSortedCourses] = useState([]);
   const [inProgress, setInprogress] = useState([]);
   const [completed, setCompleted] = useState([]);
   const [page, setPage] = useState(0);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const inprogress = myCourses.filter((course) => {
-      return course.progress !== 100;
-    });
-    const completed = myCourses.filter((course) => course.progress === 100);
-    courses.sort((a, b) => {
-      return b.rating - a.rating;
-    });
-    setSortedCourses(courses);
-    setInprogress(inprogress);
-    setCompleted(completed);
+    setLoading(true);
+    if (myCourses && courses && courses.length > 0) {
+      const inprogress = myCourses.filter((course) => {
+        return course.progress !== 100;
+      });
+      const completed = myCourses.filter((course) => course.progress === 100);
+      courses.sort((a, b) => {
+        return b.rating - a.rating;
+      });
+      setSortedCourses(courses);
+      setInprogress(inprogress);
+      setCompleted(completed);
+      setLoading(false);
+    }
   }, [myCourses, courses]);
 
   return (
-    <main className={`${classes.main}`}>
-      <PageHeader />
-      <CenteredTabs changeTab={(tab) => setTab(tab)} />
-      <div className={classes.courses}>
-        {tab === 0 && <Courses courses={courses} page={page} />}
-        {tab === 1 && <Courses courses={inProgress} page={page} />}
-        {tab === 2 && <Courses courses={completed} page={page} />}
-      </div>
-      {(tab === 0 && courses.length !== 0) ||
-      (tab === 1 && inProgress.length !== 0) ||
-      (tab === 2 && completed.length !== 0) ? (
-        <div
-          style={{
-            display: 'flex',
-            justifyContent: 'center',
-            width: '100%',
-            marginTop: '2rem',
-          }}
-        >
-          <Pagination
-            count={
-              tab === 0
-                ? Math.ceil(courses.length / 3)
-                : tab === 1
-                ? Math.ceil(inProgress.length / 3)
-                : Math.ceil(completed.length / 3)
-            }
-            onChange={(e, value) => setPage(value - 1)}
-            color='primary'
-          />
-        </div>
-      ) : (
-        <EmptyCard />
-      )}
-      <div className={classes.dottedLine}></div>
-      <div className={classes.ourPartners}>
-        <h3>
-          Top companies offer our courses to their employees to develop their
-          skills
-        </h3>
-        <p>
-          These courses were selected for our collection of top-rated courses
-          trusted by businesses worldwide.
-        </p>
-        <div className={classes.ourPartnersItems}>
-          <img
-            alt='Nasdaq'
-            height='38'
-            width='115'
-            src='https://s.udemycdn.com/partner-logos/v4/nasdaq-dark.svg'
-          />
-
-          <img
-            alt='Box'
-            height='38'
-            width='67'
-            src='https://s.udemycdn.com/partner-logos/v4/box-dark.svg'
-          />
-          <img
-            alt='Eventbrite'
-            height='38'
-            width='115'
-            src='https://s.udemycdn.com/partner-logos/v4/eventbrite-dark.svg'
-          ></img>
-          <img
-            alt='NetApp'
-            height='38'
-            width='115'
-            src='https://s.udemycdn.com/partner-logos/v4/netapp-dark.svg'
-          />
-        </div>
-      </div>
-      <div className={classes.topRated}>
-        <h2
-          style={{
-            fontSize: '2rem',
-            fontWeight: 'bold',
-            color: '#333',
-            marginLeft: '1rem',
-          }}
-        >
-          Top Rated Courses
-        </h2>
-        <div className={classes.topRatedCourses}>
-          {sortedCourses.slice(0, Math.min(9, courses.length)).map((course) => {
-            return (
-              <CourseComponent
-                key={course._id}
-                title={course.title}
-                description={course.description}
-                rating={course.rating}
-                image={course.image}
-                price={course.price}
-                courseId={course._id}
-                horizontal={false}
-                instructor={course.instructor}
+    <>
+      {loading && <Loading />}
+      {!loading && (
+        <main className={`${classes.main}`}>
+          <PageHeader />
+          <CenteredTabs changeTab={(tab) => setTab(tab)} />
+          <div className={classes.courses}>
+            {tab === 0 && <Courses courses={courses} page={page} />}
+            {tab === 1 && <Courses courses={inProgress} page={page} />}
+            {tab === 2 && <Courses courses={completed} page={page} />}
+          </div>
+          {(tab === 0 && courses.length !== 0) ||
+          (tab === 1 && inProgress.length !== 0) ||
+          (tab === 2 && completed.length !== 0) ? (
+            <div
+              style={{
+                display: 'flex',
+                justifyContent: 'center',
+                width: '100%',
+                marginTop: '2rem',
+              }}
+            >
+              <Pagination
+                count={
+                  tab === 0
+                    ? Math.ceil(courses.length / 3)
+                    : tab === 1
+                    ? Math.ceil(inProgress.length / 3)
+                    : Math.ceil(completed.length / 3)
+                }
+                onChange={(e, value) => setPage(value - 1)}
+                color='primary'
               />
-            );
-          })}
-        </div>
-      </div>
+            </div>
+          ) : (
+            <EmptyCard />
+          )}
+          <div className={classes.dottedLine}></div>
+          <div className={classes.ourPartners}>
+            <h3>
+              Top companies offer our courses to their employees to develop
+              their skills
+            </h3>
+            <p>
+              These courses were selected for our collection of top-rated
+              courses trusted by businesses worldwide.
+            </p>
+            <div className={classes.ourPartnersItems}>
+              <img
+                alt='Nasdaq'
+                height='38'
+                width='115'
+                src='https://s.udemycdn.com/partner-logos/v4/nasdaq-dark.svg'
+              />
 
-      <br />
-      <br />
-      <Footer />
-    </main>
+              <img
+                alt='Box'
+                height='38'
+                width='67'
+                src='https://s.udemycdn.com/partner-logos/v4/box-dark.svg'
+              />
+              <img
+                alt='Eventbrite'
+                height='38'
+                width='115'
+                src='https://s.udemycdn.com/partner-logos/v4/eventbrite-dark.svg'
+              ></img>
+              <img
+                alt='NetApp'
+                height='38'
+                width='115'
+                src='https://s.udemycdn.com/partner-logos/v4/netapp-dark.svg'
+              />
+            </div>
+          </div>
+          <div className={classes.topRated}>
+            <h2
+              style={{
+                fontSize: '2rem',
+                fontWeight: 'bold',
+                color: '#333',
+                marginLeft: '1rem',
+              }}
+            >
+              Top Rated Courses
+            </h2>
+            <div className={classes.topRatedCourses}>
+              {sortedCourses
+                .slice(0, Math.min(9, courses.length))
+                .map((course) => {
+                  return (
+                    <CourseComponent
+                      key={course?._id}
+                      title={course?.title}
+                      description={course?.summary}
+                      rating={course?.rating}
+                      image={course?.image}
+                      price={course?.price}
+                      courseId={course?._id}
+                      horizontal={false}
+                      subject={course?.subject}
+                      numOfHours={course?.numOfHours}
+                    />
+                  );
+                })}
+            </div>
+          </div>
+
+          <br />
+          <br />
+          <Footer />
+        </main>
+      )}
+    </>
   );
 };
 

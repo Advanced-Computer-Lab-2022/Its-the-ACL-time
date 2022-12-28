@@ -7,8 +7,8 @@ const Test = () => {
       const response = await axios.post(
         'http://localhost:8080/api/v1/user/certification',
         {
-          email: 'ahmedelbltagy125@gmail.com',
-          username: 'amr',
+          email: 'amir@amirammar.me',
+          username: 'amir',
           course: 'React Course',
         },
         {

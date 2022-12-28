@@ -113,7 +113,7 @@ function PromotionForm() {
   const promotionPercentageRef = useRef();
   const [loading, setLoading] = useState(false);
   const { courseId } = useParams();
-  console.log();
+  const { updateCourse } = useCourseContext();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -145,18 +145,16 @@ function PromotionForm() {
           },
         }
       );
-      console.log(res.data);
+      console.log(res.data.updatedCourse);
+      updateCourse(res.data.updatedCourse);
       setAlert('Promotion code added successfully');
-      setTimeout(() => {
-        setAlert(null);
-      }, 3000);
     } catch (err) {
       console.log(err);
       setAlert("Can't add promotion code");
-      setTimeout(() => {
-        setAlert(null);
-      }, 3000);
     }
+    setTimeout(() => {
+      setAlert(null);
+    }, 3000);
     setLoading(false);
   };
 

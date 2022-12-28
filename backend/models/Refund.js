@@ -10,7 +10,8 @@ const refundSchema = mongoose.Schema({
     ref: 'User',
   },
   state: {
-    type: Boolean,
+    type: String,
+    enum: ['pending', 'approved', 'rejected'],
   },
   refundMoney: {
     type: Number,

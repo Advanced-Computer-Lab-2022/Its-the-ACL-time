@@ -1,5 +1,5 @@
 const User = require('../models/User');
-const {Report}=require('../models');
+const { Report } = require('../models');
 
 const changePassword = async (req, res) => {
   const { userId } = req.user;
@@ -101,6 +101,7 @@ const updateUserInfo = async (req, res) => {
   } else {
     await user.save();
   }
+  console.log(user);
   res.status(200).json(instructor ? instructor : user);
 };
 
@@ -128,47 +129,42 @@ const getUser = async (req, res) => {
     return;
   }
 };
-// create problem 
+// create problem
 const createreport = async (req, res) => {
-  const { title, type,course} = req.body;
-  console.log(req.body)
+  const { title, type, course } = req.body;
+  console.log(req.body);
   const { userId } = req.user;
-  console.log(req.user)
+  console.log(req.user);
   // console.log('req.body ' + username,email,password,type);
-   if (
-     !title ||
-     !type 
-     
-   ) {
-     throw new BadRequestError('Please provide all report values');
-   }
-   //req.body.createdBy = userId;
- 
-   const report = await Report.create({
+  if (!title || !type) {
+    throw new BadRequestError('Please provide all report values');
+  }
+  //req.body.createdBy = userId;
+
+  const report = await Report.create({
     course: course,
     title,
-    status:"unseen",
+    status: 'unseen',
     type,
-    createdBy:userId
-  })
+    createdBy: userId,
+  });
   res.status(200).json({ report });
 };
 ///get specific report
 const getreport = async (req, res) => {
-  const { course} = req.query.id;
+  const { course } = req.query.id;
   const { userId } = req.user;
-  console.log(req.body,req.query.id)
+  console.log(req.body, req.query.id);
   // console.log('req.body ' + username,email,password,type);
 
-   //req.body.createdBy = userId;
- 
-  const report=await Report.find({
-    createdBy:userId,
-    course:req.query.id
-  }).populate("createdBy","username")
+  //req.body.createdBy = userId;
+
+  const report = await Report.find({
+    createdBy: userId,
+    course: req.query.id,
+  }).populate('User');
   res.status(200).json(report);
 };
-
 
 module.exports = {
   changePassword,

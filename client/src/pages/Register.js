@@ -111,10 +111,7 @@ export default function Register() {
       setAlert('error', 'Please Provide all values');
       setTimeout(() => clearAlert(), 3000);
     } else {
-      const status = await setup(user);
-      if (status) {
-        setTimeout(() => navigate('/'), 3000);
-      }
+      await setup(user);
     }
   };
 

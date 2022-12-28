@@ -38,10 +38,9 @@ const useStyles = makeStyles((theme) => ({
     justifyContent: 'space-between',
     alignItems: 'flex-start',
     width: '100%',
-    height: '95vh',
+    // height: '95vh',
     padding: '2rem 1rem',
     marginTop: '2rem',
-    marginBottom: '40rem',
   },
   subtitles: {
     width: '30%',
@@ -364,6 +363,8 @@ const SubtitlesPage = () => {
 
   const [comment,setcomment]=useState("");
 
+  const [reviewsPage, setReviewsPage] = useState(0);
+  const { setCoursesState, myCourses } = useCourseContext();
 
   const handleClickOpen = (reportid) => {
     console.log(reportid);
@@ -575,6 +576,7 @@ const SubtitlesPage = () => {
       })
   };
   
+  }, [searchParams, token, videoInfo, courseId]);
 
   const computeProgress = () => {
     if (!state.checkedSubtitles && !state.checkedExams) return 0;
@@ -586,19 +588,41 @@ const SubtitlesPage = () => {
     );
   };
 
+  const sendCertificate = async () => {
+    try {
+      const response = await axios.post(
+        'http://localhost:8080/api/v1/user/certification',
+        {
+          email: user.email,
+          username: user.username,
+          course: "course's name",
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem('token')}`,
+          },
+        }
+      );
+      console.log(response.data.msg);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
   const updateProgress = async (checkedSubtitles, checkedExams) => {
     console.log('checkedSubtitles: ' + checkedSubtitles.length);
     console.log('checkedExams ' + checkedExams.length);
     console.log('subtitles ' + subtitles.length);
     console.log('exams ' + exams.length);
     console.log('-----------------------------------------------------');
+    const progress = computeProgress();
     try {
       await axios.patch(
         `http://localhost:8080/api/v1/user/progress/${courseId}`,
         {
           completedSubtitles: checkedSubtitles,
           completedExams: checkedExams,
-          progress: computeProgress(),
+          progress,
         },
         {
           headers: {
@@ -606,6 +630,47 @@ const SubtitlesPage = () => {
           },
         }
       );
+
+      const myCourseIndex = myCourses.findIndex(
+        (course) => course._id.toString() === courseId.toString()
+      );
+
+      const newUpdate = {
+        ...myCourses[myCourseIndex],
+        completedSubtitles: checkedSubtitles,
+        completedExams: checkedExams,
+        progress,
+      };
+
+      setCoursesState((prevState) => {
+        return {
+          ...prevState,
+          myCourses: [
+            ...prevState.myCourses.slice(0, myCourseIndex),
+            newUpdate,
+            ...prevState.myCourses.slice(myCourseIndex + 1),
+          ],
+        };
+      });
+
+      const user = JSON.parse(localStorage.getItem('user'));
+      const courseIndex = user.courses.findIndex(
+        (course) => course.courseId.toString() === courseId.toString()
+      );
+      user.courses[courseIndex] = {
+        ...user.courses[courseIndex],
+        completedSubtitles: checkedSubtitles,
+        completedExams: checkedExams,
+        progress,
+      };
+      localStorage.setItem('user', JSON.stringify(user));
+      console.log(user);
+
+      if (progress === 100) {
+        sendCertificate();
+      }
+      // TODO: update user in app state
+      // setAppState(() => user);
     } catch (error) {
       console.log(error);
     }
@@ -651,8 +716,6 @@ const SubtitlesPage = () => {
     e.preventDefault();
     const title = e.target.children[1].value;
     const text = e.target.children[3].value;
-    console.log(user.username);
-    console.log(courseId);
     setWritePost(false);
     setLoading(true);
     try {
@@ -735,82 +798,102 @@ const SubtitlesPage = () => {
   };
 
   return (
-    <main className={`${classes.main}`}>
-      {loading && <Loading />}
-      <section className={`${classes.subtitles}`}>
-        <LinearProgressBar value={computeProgress()} />
-        <Box
-          className={`${classes.courseContent}`}
-          onClick={() => setShowList(!showList)}
-        >
-          <h3>Course Content</h3>
-          <AiFillCloseCircle />
-        </Box>
-        {showList &&
-          !loading &&
-          subtitles
-            .map((subtitle, idx) => (
+    <div
+      style={{
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        width: '100%',
+        justifyContent: 'space-between',
+      }}
+    >
+      <main className={`${classes.main}`}>
+        {loading && <Loading />}
+        <section className={`${classes.subtitles}`}>
+          <LinearProgressBar value={computeProgress()} />
+          <Box
+            className={`${classes.courseContent}`}
+            onClick={() => setShowList(!showList)}
+          >
+            <h3>Course Content</h3>
+            <AiFillCloseCircle />
+          </Box>
+          {showList &&
+            !loading &&
+            subtitles
+              .map((subtitle, idx) => (
+                <FilterField
+                  title={`Lecture ${idx + 1}`}
+                  options={[...Array(subtitle.title)]}
+                  key={idx}
+                  onFilter={handleChecked}
+                  optionOnClick={() => {
+                    window.scrollTo(0, 0);
+                    navigate(`?subtitleId=${subtitle._id}`);
+                  }}
+                  titleStyle={{
+                    fontSize: '1rem',
+                    fontWeight: '500',
+                  }}
+                  checkedOptions={state.checkedSubtitles?.reduce(
+                    (acc, item) => {
+                      acc[item] = true;
+                      return acc;
+                    },
+                    {}
+                  )}
+                />
+              ))
+              .slice(0, showMore ? subtitles.length : 2)}
+          {!loading &&
+            exams.map((exam, idx) => (
               <FilterField
-                title={`Lecture ${idx + 1}`}
-                options={[...Array(subtitle.title)]}
+                title={`Exam ${idx + 1}`}
+                options={[...Array(`Let's take the exam ${idx + 1}`)]}
                 key={idx}
-                onFilter={handleChecked}
-                optionOnClick={() => navigate(`?subtitleId=${subtitle._id}`)}
+                onFilter={handleCheckedExam}
+                optionOnClick={() => {
+                  window.scrollTo(0, 0);
+                  navigate(`?examId=${exam._id}`);
+                }}
                 titleStyle={{
                   fontSize: '1rem',
                   fontWeight: '500',
                 }}
-                checkedOptions={state.checkedSubtitles?.reduce((acc, item) => {
+                checkedOptions={state.checkedExams?.reduce((acc, item) => {
                   acc[item] = true;
                   return acc;
                 }, {})}
               />
-            ))
-            .slice(0, showMore ? subtitles.length : 2)}
-        {!loading &&
-          exams.map((exam, idx) => (
-            <FilterField
-              title={`Exam ${idx + 1}`}
-              options={[...Array(`Let's take the exam ${idx + 1}`)]}
-              key={idx}
-              onFilter={handleCheckedExam}
-              optionOnClick={() => navigate(`?examId=${exam._id}`)}
-              titleStyle={{
-                fontSize: '1rem',
-                fontWeight: '500',
-              }}
-              checkedOptions={state.checkedExams?.reduce((acc, item) => {
-                acc[item] = true;
-                return acc;
-              }, {})}
-            />
-          ))}
-        {subtitles.length > 2 && (
-          <button
-            className={`${classes.showMore}`}
-            onClick={() => setShowMore(!showMore)}
-          >
-            {showMore ? 'Show Less' : 'Show More'}
-          </button>
-        )}
-      </section>
-      <section className={`${classes.rightSection}`}>
-        <div
-          className={searchParams.get('examId') ? classes.exam : classes.video}
-        >
-          {exam && searchParams.get('examId') ? (
-            <Exam
-              questions={exam?.questions}
-              title={"Let's take the exam"}
-              duration={exam?.duration}
-            ></Exam>
-          ) : (
-            <></>
+            ))}
+          {subtitles.length > 2 && (
+            <button
+              className={`${classes.showMore}`}
+              onClick={() => setShowMore(!showMore)}
+            >
+              {showMore ? 'Show Less' : 'Show More'}
+            </button>
           )}
+        </section>
+        <section className={`${classes.rightSection}`}>
+          <div
+            className={
+              searchParams.get('examId') ? classes.exam : classes.video
+            }
+          >
+            {exam && searchParams.get('examId') ? (
+              <Exam
+                questions={exam?.questions}
+                title={"Let's take the exam"}
+                duration={exam?.duration}
+              ></Exam>
+            ) : (
+              <></>
+            )}
 
-          {!exam && (
-            <div className={`${classes.video}`}>
-              {/* <iframe
+            {!exam && (
+              <div className={`${classes.video}`}>
+                {/* <iframe
                 width='911'
                 height='480'
                 src='https://www.youtube.com/embed/1v_TEnpqHXE'
@@ -868,8 +951,42 @@ const SubtitlesPage = () => {
             >
               Report
             </Reportform>
+              </div>
+            )}
           </div>
-          <div className={`${classes.line}`}></div>
+          <div className={`${classes.videoInfo}`}>
+            <div className={`${classes.line}`}></div>
+            <div className={`${classes.videoInfoHeader}`}>
+              <button
+                className={`${classes.button}`}
+                onClick={() => setVideoInfo(0)}
+                style={{ color: videoInfo === 0 ? 'black' : '#666f73' }}
+              >
+                Overview
+              </button>
+              <button
+                className={`${classes.button}`}
+                onClick={() => setVideoInfo(1)}
+                style={{ color: videoInfo === 1 ? 'black' : '#666f73' }}
+              >
+                Notes
+              </button>
+              <button
+                className={`${classes.button}`}
+                onClick={() => setVideoInfo(2)}
+                style={{ color: videoInfo === 2 ? 'black' : '#666f73' }}
+              >
+                Reviews
+              </button>
+              <button
+                className={`${classes.button}`}
+                onClick={() => setVideoInfo(3)}
+                style={{ color: videoInfo === 3 ? 'black' : '#666f73' }}
+              >
+                Q&A
+              </button>
+            </div>
+            <div className={`${classes.line}`}></div>
 
           <div className={`${classes.videoInfoBody}`}>
             {videoInfo === 0 && (
@@ -979,109 +1096,173 @@ const SubtitlesPage = () => {
                   className={`${classes.textarea}`}
                 />
                 <div className={`${classes.buttons}`}>
-                  <button
-                    className={`${classes.cancel}`}
-                    onClick={() => setWriteNote(false)}
-                  >
-                    Cancel
-                  </button>
-                  <button className={`${classes.save}`} onClick={addNote}>
-                    save
-                  </button>
+            <div className={`${classes.videoInfoBody}`}>
+              {videoInfo === 0 && (
+                <Box className={`${classes.overview}`}>
+                  <Typography variant='h6' gutterBottom>
+                    Course Description
+                  </Typography>
+                  <p>
+                    Lorem ipsum dolor sit amet consectetur adipisicing elit.
+                    Sint saepe porro laborum quas perspiciatis eos minus,
+                    numquam maiores, optio temporibus enim quis id aliquid
+                    accusamus eligendi vel, libero ea quidem.
+                    <span
+                      className={`${classes.showMoreDescription}`}
+                      onClick={() =>
+                        setShowMoreDescription(!showMoreDescription)
+                      }
+                    >
+                      {showMoreDescription ? 'Show Less' : 'Show More'}
+                    </span>
+                  </p>
+                </Box>
+              )}
+              {(videoInfo === 1 && writeNote && (
+                <div className={`${classes.writeNote}`}>
+                  <TextareaAutosize
+                    ref={noteContent}
+                    minRows={3}
+                    aria-label='maximum height'
+                    placeholder='Write your note here'
+                    className={`${classes.textarea}`}
+                  />
+                  <div className={`${classes.buttons}`}>
+                    <button
+                      className={`${classes.cancel}`}
+                      onClick={() => setWriteNote(false)}
+                    >
+                      Cancel
+                    </button>
+                    <button className={`${classes.save}`} onClick={addNote}>
+                      save
+                    </button>
+                  </div>
                 </div>
-              </div>
-            )) ||
-              (videoInfo === 1 && !writeNote && (
-                <button
-                  onClick={() => setWriteNote(true)}
-                  className={`${classes.addNote}`}
-                >
-                  Create a note for this lecture
-                  <span>
-                    <AiOutlinePlusCircle />
-                  </span>
-                </button>
-              ))}
-            <div className={`${classes.hr}`}></div>
+              )) ||
+                (videoInfo === 1 && !writeNote && (
+                  <button
+                    onClick={() => setWriteNote(true)}
+                    className={`${classes.addNote}`}
+                    disabled={
+                      !(
+                        searchParams.get('examId') ||
+                        searchParams.get('subtitleId')
+                      )
+                    }
+                  >
+                    Create a note for this lecture
+                    <span>
+                      <AiOutlinePlusCircle />
+                    </span>
+                  </button>
+                ))}
+              <div className={`${classes.hr}`}></div>
 
-            {videoInfo === 1 && (
-              <div className={`${classes.notes}`}>
-                {notes.map((note, idx) => (
-                  <div key={note.id} style={{ width: '100%' }}>
-                    <Box className={`${classes.note}`}>
-                      <div className={`${classes.noteHeader}`}>
-                        <Typography
-                          variant='h6'
-                          gutterBottom
-                          className={`${classes.noteTitle}`}
+              {videoInfo === 1 && (
+                <div className={`${classes.notes}`}>
+                  {notes.map((note, idx) => (
+                    <div key={note.id} style={{ width: '100%' }}>
+                      <Box className={`${classes.note}`}>
+                        <div className={`${classes.noteHeader}`}>
+                          <Typography
+                            variant='h6'
+                            gutterBottom
+                            className={`${classes.noteTitle}`}
+                          >
+                            Note {idx + 1}
+                          </Typography>
+                          <div className={`${classes.editIcons}`}>
+                            <AiFillEdit className={`${classes.noteIcons}`} />
+                            <AiFillDelete
+                              className={`${classes.noteIcons}`}
+                              onClick={() => {
+                                setDialog(note.id);
+                              }}
+                            />
+                          </div>
+                        </div>
+                        <div className={`${classes.noteContent}`}>
+                          <p>{note?.description}</p>
+                        </div>
+                      </Box>
+                      <div className={`${classes.hr}`}></div>
+                    </div>
+                  ))}
+                  <div
+                    style={{
+                      width: '100%',
+                      display: 'flex',
+                      justifyContent: 'flex-end',
+                      alignItems: 'center',
+                    }}
+                  >
+                    {notes.length !== 0 && (
+                      <button
+                        onClick={() => downloadNotes()}
+                        className={`${classes.downloadNotes}`}
+                      >
+                        Download notes
+                      </button>
+                    )}
+                  </div>
+                </div>
+              )}
+              <AlertDialog
+                title={'Delete Note'}
+                content={'Are you sure you want to delete this note ?'}
+                open={dialog !== -1}
+                handleAgree={() => {
+                  deleteNote(dialog);
+                  setDialog(-1);
+                  console.log('agree');
+                }}
+                handleDisagree={() => {
+                  setDialog(-1);
+                  console.log('disagree');
+                }}
+              />
+              {videoInfo === 2 && (
+                <>
+                  <div
+                    style={{
+                      width: '100%',
+                      alignItems: 'center',
+                      marginTop: '1rem',
+                    }}
+                  >
+                    {reviews
+                      ?.slice(
+                        reviewsPage * 3,
+                        Math.min(reviews.length, reviewsPage * 3 + 3)
+                      )
+                      .map((review, idx) => (
+                        <div
+                          key={idx}
+                          style={{
+                            marginBottom: '1rem',
+                          }}
                         >
-                          Note {idx + 1}
-                        </Typography>
-                        <div className={`${classes.editIcons}`}>
-                          <AiFillEdit className={`${classes.noteIcons}`} />
-                          <AiFillDelete
-                            className={`${classes.noteIcons}`}
-                            onClick={() => {
-                              setDialog(note.id);
-                            }}
+                          <Review
+                            username={review?.username}
+                            reviewText={review?.review}
+                            rate={review?.rate}
                           />
                         </div>
-                      </div>
-                      <div className={`${classes.noteContent}`}>
-                        <p>{note?.description}</p>
-                      </div>
-                    </Box>
-                    <div className={`${classes.hr}`}></div>
-                  </div>
-                ))}
-                <div
-                  style={{
-                    width: '100%',
-                    display: 'flex',
-                    justifyContent: 'flex-end',
-                    alignItems: 'center',
-                  }}
-                >
-                  {notes.length !== 0 && (
-                    <button
-                      onClick={() => downloadNotes()}
-                      className={`${classes.downloadNotes}`}
+                      ))}
+                    <div
+                      style={{
+                        width: '100%',
+                        display: 'flex',
+                        justifyContent: 'center',
+                        alignItems: 'center',
+                      }}
                     >
-                      Download notes
-                    </button>
-                  )}
-                </div>
-              </div>
-            )}
-            <AlertDialog
-              title={'Delete Note'}
-              content={'Are you sure you want to delete this note ?'}
-              open={dialog !== -1}
-              handleAgree={() => {
-                deleteNote(dialog);
-                setDialog(-1);
-                console.log('agree');
-              }}
-              handleDisagree={() => {
-                setDialog(-1);
-                console.log('disagree');
-              }}
-            />
-            {videoInfo === 2 && (
-              <>
-                <div
-                  style={{
-                    width: '100%',
-                    alignItems: 'center',
-                    marginTop: '1rem',
-                  }}
-                >
-                  {reviews
-                    ?.map((review, idx) => (
-                      <div
-                        key={idx}
-                        style={{
-                          marginBottom: '1rem',
+                      <Pagination
+                        count={Math.ceil(reviews.length / 3)}
+                        page={reviewsPage + 1}
+                        onChange={(e, page) => {
+                          setReviewsPage(page - 1);
                         }}
                       >
                         <Review
@@ -1116,115 +1297,152 @@ const SubtitlesPage = () => {
               </>
             )}
             
-
-            {videoInfo === 3 && writePost && (
-              <form
-                action=''
-                className={`${classes.writeNote}`}
-                onSubmit={addPost}
-              >
-                <div
-                  style={{
-                    width: '100%',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'flex-start',
-                  }}
-                >
-                  <label
-                    htmlFor='title'
-                    style={{
-                      fontSize: '1.2rem',
-                      fontWeight: '600',
-                      marginRight: '1rem',
-                    }}
-                  >
-                    Title
-                  </label>
-                </div>
-                <input
-                  type='text'
-                  id='title'
-                  className={`${classes.postTitle}`}
-                />
-                <div
-                  style={{
-                    width: '100%',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'flex-start',
-                  }}
-                >
-                  <label
-                    htmlFor='details'
-                    style={{
-                      fontSize: '1.2rem',
-                      fontWeight: '600',
-                      marginRight: '1rem',
-                    }}
-                  >
-                    Details
-                  </label>
-                </div>
-                <TextareaAutosize
-                  ref={noteContent}
-                  minRows={3}
-                  aria-label='maximum height'
-                  placeholder='Write your post here'
-                  className={`${classes.textarea}`}
-                />
-                <div className={`${classes.buttons}`}>
-                  <button
-                    className={`${classes.cancel}`}
-                    onClick={() => setWritePost(false)}
-                  >
-                    Cancel
-                  </button>
-                  <button className={`${classes.save}`} type='submit'>
-                    Post
-                  </button>
-                </div>
-              </form>
-            )}
-
-            {videoInfo === 3 && !writePost && (
-              <>
-                <button
-                  onClick={() => setWritePost(true)}
-                  className={`${classes.addNote}`}
-                >
-                  Create a post
-                  <span>
-                    <AiOutlinePlusCircle />
-                  </span>
-                </button>
-                {posts.length !== 0 && (
-                  <div className={`${classes.posts}`}>
-                    {posts
-                      .slice(
-                        postPage * 3,
-                        Math.min(posts.length, postPage * 3 + 3)
-                      )
-                      .map((post, idx) => (
-                        <Post post={post} key={post._id} />
-                      ))}
+                        color='primary'
+                        size='large'
+                        showFirstButton
+                        showLastButton
+                        classes={{
+                          ul: classes.pagination,
+                        }}
+                      />
+                    </div>
                   </div>
-                )}
-                <div>
-                  <Pagination
-                    count={
-                      posts.length % 3 === 0
-                        ? posts.length / 3
-                        : Math.floor(posts.length / 3) + 1
-                    }
-                    onChange={(e, page) => {
-                      setPostPage(page - 1);
+                  <div>
+                    <RatingForm
+                      buttonText={'Rate this course'}
+                      title={'Course'}
+                      textArea={
+                        'Tell us, what do you think about this course ?'
+                      }
+                      buttonStyle={{
+                        height: '3rem',
+                        borderRadius: '0.5rem',
+                        backgroundColor: 'rgb(74, 73, 73)',
+                        color: 'white',
+                        border: 'none',
+                        fontSize: '1.2rem',
+                        cursor: 'pointer',
+                        '&:hover': {
+                          backgroundColor: 'black',
+                        },
+                      }}
+                      onSubmit={postReview}
+                    />
+                  </div>
+                </>
+              )}
+
+              {videoInfo === 3 && writePost && (
+                <form
+                  action=''
+                  className={`${classes.writeNote}`}
+                  onSubmit={addPost}
+                >
+                  <div
+                    style={{
+                      width: '100%',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'flex-start',
                     }}
-                    color='primary'
+                  >
+                    <label
+                      htmlFor='title'
+                      style={{
+                        fontSize: '1.2rem',
+                        fontWeight: '600',
+                        marginRight: '1rem',
+                      }}
+                    >
+                      Title
+                    </label>
+                  </div>
+                  <input
+                    type='text'
+                    id='title'
+                    className={`${classes.postTitle}`}
                   />
-                </div>
-              </>
-            )}
+                  <div
+                    style={{
+                      width: '100%',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'flex-start',
+                    }}
+                  >
+                    <label
+                      htmlFor='details'
+                      style={{
+                        fontSize: '1.2rem',
+                        fontWeight: '600',
+                        marginRight: '1rem',
+                      }}
+                    >
+                      Details
+                    </label>
+                  </div>
+                  <TextareaAutosize
+                    ref={noteContent}
+                    minRows={3}
+                    aria-label='maximum height'
+                    placeholder='Write your post here'
+                    className={`${classes.textarea}`}
+                  />
+                  <div className={`${classes.buttons}`}>
+                    <button
+                      className={`${classes.cancel}`}
+                      onClick={() => setWritePost(false)}
+                    >
+                      Cancel
+                    </button>
+                    <button className={`${classes.save}`} type='submit'>
+                      Post
+                    </button>
+                  </div>
+                </form>
+              )}
+
+              {videoInfo === 3 && !writePost && (
+                <>
+                  <button
+                    onClick={() => setWritePost(true)}
+                    className={`${classes.addNote}`}
+                  >
+                    Create a post
+                    <span>
+                      <AiOutlinePlusCircle />
+                    </span>
+                  </button>
+                  {posts.length !== 0 && (
+                    <div className={`${classes.posts}`}>
+                      {posts
+                        .slice(
+                          postPage * 3,
+                          Math.min(posts.length, postPage * 3 + 3)
+                        )
+                        .map((post, idx) => (
+                          <Post post={post} key={post._id} />
+                        ))}
+                    </div>
+                  )}
+                  <div>
+                    <Pagination
+                      count={
+
+                        
+                        posts.length % 3 === 0
+                          ? posts.length / 3
+                          : Math.floor(posts.length / 3) + 1
+                      }
+                      onChange={(e, page) => {
+                        setPostPage(page - 1);
+                      }}
+                      color='primary'
+                    />
+                  </div>
+                </>
+              )}
+            </div>
           </div>
           <Dialog open={open} onClose={handleClose}  fullWidth={'true'} maxWidth={'sm'}>
 
@@ -1249,6 +1467,10 @@ const SubtitlesPage = () => {
         </div>
       </section>
     </main>
+        </section>
+      </main>
+      <Footer></Footer>
+    </div>
   );
 };
 
