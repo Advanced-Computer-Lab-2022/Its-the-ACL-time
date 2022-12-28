@@ -69,7 +69,7 @@ function SubTitle() {
   );
 }
 
-function SubtitleForm() {
+function SubtitleForm({ callBack, submitted }) {
   const classes = useStyles();
   const [subtitles, setSubtitles] = useState(0);
   const { courseId } = useParams();
@@ -84,12 +84,19 @@ function SubtitleForm() {
     else {
       let subTitle = [];
       for (let i = 0; i < subtitles; i++) {
-        subTitle[i] = {
-          title: e.target[i * 4].value,
-          link: e.target[i * 4 + 1].value,
-          duration: e.target[i * 4 + 2].value,
-          description: e.target[i * 4 + 3].value,
-        };
+        if (
+          e.target[i * 4].value === '' ||
+          e.target[i * 4 + 1].value === '' ||
+          e.target[i * 4 + 2].value === '' ||
+          e.target[i * 4 + 3].value === ''
+        ) {
+          setAlert('error', 'Please fill all the fields');
+          setTimeout(() => {
+            clearAlert();
+          }, 3000);
+          setLoading(false);
+          return;
+        }
       }
 
       try {
@@ -103,8 +110,8 @@ function SubtitleForm() {
             },
           }
         );
-        console.log(response);
         setAlert('success', 'Subtitles Added Successfully');
+        callBack(subTitle);
       } catch (error) {
         console.log(error);
         const msg = error.response.data.message;
@@ -113,9 +120,11 @@ function SubtitleForm() {
     }
     setTimeout(() => {
       clearAlert();
+      submitted();
     }, 3000);
     setLoading(false);
   };
+
   return (
     <div className={`${classes.container}`}>
       {loading && <Loading></Loading>}
@@ -129,11 +138,11 @@ function SubtitleForm() {
       <Form className={`${classes.form}`} onSubmit={handleSubmit}>
         {[...Array(subtitles)].map((e, i) => {
           return (
-            <>
+            <div key={'subtitle' + i}>
               <h2>Subtitle {i + 1}</h2>
-              <SubTitle key={'subtitle' + i} />
+              <SubTitle />
               <hr />
-            </>
+            </div>
           );
         })}
         <div className={classes.btns}>
