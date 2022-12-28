@@ -412,7 +412,18 @@ const CoursePage = () => {
             {alert && <SnackBar content={alert} />}
 
             <Box className={`${classes.reviewCourse}`}>
-              <div className={`${classes.reviewVideo}`}></div>
+
+              <div className={`${classes.reviewVideo}`}>
+                <iframe
+                  width="400"
+                  height="240"
+                  src='https://www.youtube.com/embed/QPzmsQ86_HM'
+                  title='YouTube video player'
+                  frameborder='0'
+                  allow='accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture'
+                  allowfullscreen
+                ></iframe>
+              </div>
               {!isEnrolled && (
                 <div className={`${classes.finalPrice}`}>
                   <Typography
@@ -438,7 +449,7 @@ const CoursePage = () => {
                 </button>
 
               ) : (
-                (user.type === "Individual trainee") ? <BuyCourse courseId={courseId} coursePrice={course?.price}></BuyCourse> : <RequestCourse></RequestCourse>
+                (user.type === "Individual trainee" || "Instructor") ? <BuyCourse courseId={courseId} coursePrice={course?.price}></BuyCourse> : <RequestCourse></RequestCourse>
               )}
               <p>
                 <AiOutlineCheck /> 30-Day Money-Back Guarantee
@@ -484,15 +495,6 @@ const CoursePage = () => {
               )} */}
             </Box>
             {/* frame for youtube video here  */}
-            {/* <iframe
-          width='560'
-          height='315'
-          src='https://www.youtube.com/embed/QPzmsQ86_HM'
-          title='YouTube video player'
-          frameborder='0'
-          allow='accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture'
-          allowfullscreen
-        ></iframe> */}
           </div>
           <div className={`${classes.content}`}>
             <section className={`${classes.description}`}>
@@ -678,20 +680,16 @@ const CoursePage = () => {
                     (item) =>
                       course &&
                       course.subject === item.subject && (
-                        <div
+                        <CourseComponent
                           key={item._id}
-                          onClick={() => window.scrollTo(0, 0)}
-                        >
-                          <CourseComponent
-                            title={item.title}
-                            subject={item.subject}
-                            description={item.summary}
-                            instructor={item.createdBy.username}
-                            price={item.price}
-                            courseId={item._id}
-                            horizontal={false}
-                          />
-                        </div>
+                          title={item.title}
+                          subject={item.subject}
+                          description={item.summary}
+                          instructor={item.createdBy.username}
+                          price={item.price}
+                          courseId={item._id}
+                          horizontal={false}
+                        />
                       )
                   )}
                 </Box>

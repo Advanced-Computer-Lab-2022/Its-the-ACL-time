@@ -21,7 +21,9 @@ const {
   courseRouter,
   userRouter,
   paymentRouter,
+  requestCourseRouter
 } = require('./routes');
+
 //Michael
 const examRouter = require('./routes/examRoutes');
 const adminroutes = require('./routes/AdminRoutes');
@@ -53,6 +55,8 @@ app.use('/api/v1/exam', authMiddleware, examRouter);
 app.use('/api/v1/question', questionRouter);
 app.use('/api/v1/refund', refundRouter);
 app.use('/api/v1/post', authMiddleware, postRouter);
+
+app.use('/api/v1/request',requestCourseRouter);
 
 app.use(notFoundMiddleware);
 app.use(errorHandlerMiddleware);

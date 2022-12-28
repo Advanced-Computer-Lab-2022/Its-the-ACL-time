@@ -5,6 +5,7 @@ const paymentRouter = require('./PaymentRouter');
 const examRouter = require('./examRoutes');
 const questionRouter = require('./questionRoutes');
 const notesRouter = require('./NotesRoutes');
+const requestCourseRouter = require('./RequestRouter');
 
 module.exports = {
   authRouter,
@@ -12,4 +13,5 @@ module.exports = {
   courseRouter,
   paymentRouter,
   notesRouter,
+  requestCourseRouter
 };
