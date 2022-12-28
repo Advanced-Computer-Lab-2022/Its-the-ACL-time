@@ -152,13 +152,17 @@ const AppProvider = ({ children }) => {
         };
       });
       addToLocalStorage({ user: data, token: tokenFromLocalStorage });
-      setAlert('success', 'User updated successfully');
+      return {
+        type: true,
+        msg: 'Profile Updated successfully',
+      };
     } catch (error) {
-      setAlert('error', error.response.data.msg);
+      console.log(error);
+      return {
+        type: false,
+        msg: error.response.data.msg,
+      };
     }
-    setTimeout(() => {
-      clearAlert();
-    }, 1000);
   };
 
   return (
