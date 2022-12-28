@@ -328,6 +328,7 @@ const CoursePage = () => {
           },
         }
       );
+      setRequestRefund(false);
       setAlert("You've requested a refund successfully");
     } catch (error) {
       console.log(error);
@@ -591,7 +592,7 @@ const CoursePage = () => {
                   alignItems: 'center',
                 }}
               >
-                <PromotionForm />
+                <PromotionForm submitted={() => setShowPromotionForm(false)} />
               </div>
             )}
 
@@ -603,7 +604,7 @@ const CoursePage = () => {
                   alignItems: 'center',
                 }}
               >
-                <ExamForm />
+                <ExamForm submitted={() => setShowExamForm(false)} />
               </div>
             )}
 

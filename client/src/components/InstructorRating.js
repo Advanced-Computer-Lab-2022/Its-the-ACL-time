@@ -130,8 +130,6 @@ function InstructorRating({ instructorId, type }) {
     setLoading(false);
   }, [instructorId, token]);
 
-  console.log(instructor);
-
   const postRating = async (rating) => {
     setLoading(true);
     try {

@@ -114,10 +114,20 @@ const CourseProvider = ({ children }) => {
     setState({
       ...state,
       myCourses: state.myCourses.map((c) =>
-        c._id.toString() === course._id.toString() ? course : c
+        c._id.toString() === courseId.toString()
+          ? {
+              ...c,
+              ...course,
+            }
+          : c
       ),
       courses: state.courses.map((c) =>
-        c._id.toString() === course._id.toString() ? course : c
+        c._id.toString() === courseId.toString()
+          ? {
+              ...c,
+              ...course,
+            }
+          : c
       ),
     });
   };
@@ -126,6 +136,7 @@ const CourseProvider = ({ children }) => {
     <CourseContext.Provider
       value={{
         ...state,
+        coursesState: state,
         setCoursesState: setState,
         createCourse,
         updateCourse,
