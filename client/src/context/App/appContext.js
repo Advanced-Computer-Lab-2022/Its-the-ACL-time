@@ -100,51 +100,24 @@ const AppProvider = ({ children }) => {
       const { token, user } = data;
 
       addToLocalStorage({ user, token });
+
       setState((prevState) => {
         return {
           ...prevState,
-          isLoading: false,
-          alert: true,
-          alertText: 'Successfully! Redirecting to home page...',
-          alertType: 'success',
           user,
           token,
         };
       });
 
-      setTimeout(() => {
-        window.location.href = '/';
-        setState((prevState) => {
-          return {
-            ...prevState,
-            alert: false,
-            alertText: '',
-            alertType: '',
-          };
-        });
-      }, 3000);
+      return {
+        msg: 'Successfully! Redirecting to home page...',
+        type: true,
+      };
     } catch (error) {
-      console.log(error.response.data.msg);
-      setState((prevState) => {
-        return {
-          ...prevState,
-          isLoading: false,
-          alert: true,
-          alertText: error.response.data.msg,
-          alertType: 'error',
-        };
-      });
-
-      setTimeout(() => {
-        setState((prevState) => {
-          return {
-            ...prevState,
-            alert: false,
-            alertText: '',
-            alertType: '',
-          };
-        });
-      }, 3000);
+      return {
+        msg: error.response.data.msg,
+        type: false,
+      };
     }
   };
 
@@ -192,7 +165,6 @@ const AppProvider = ({ children }) => {
     <AppContext.Provider
       value={{
         ...state,
-        setAppState: setState,
         setAlert,
         clearAlert,
         setup,
