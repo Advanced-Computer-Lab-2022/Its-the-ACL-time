@@ -396,6 +396,7 @@ function InstructorProfile({ courses }) {
                     horizontal={true}
                     rating={course?.rating}
                     progress={course?.progress}
+                    demo={false}
                   />
                 );
               })}

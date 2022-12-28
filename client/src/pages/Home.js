@@ -114,6 +114,7 @@ function EmptyCard() {
 function CenteredTabs({ changeTab }) {
   const classes = useStyles();
   const [value, setValue] = useState(0);
+  const { user, token } = useAppContext();
 
   const handleChange = (event, newValue) => {
     console.log(newValue);
@@ -131,8 +132,17 @@ function CenteredTabs({ changeTab }) {
         centered
       >
         <Tab label='Home' />
-        <Tab label='In Progress' />
-        <Tab label='Completed' />
+        {token &&
+          user &&
+          (user.type === 'Individual trainee' ||
+            user.type === 'Cooperate trainee') && <Tab label='In Progress' />}
+        {token &&
+          user &&
+          (user.type === 'Individual trainee' ||
+            user.type === 'Cooperate trainee') && <Tab label='Completed' />}
+        {token && user && user.type === 'Instructor' && (
+          <Tab label='My Courses' />
+        )}
       </Tabs>
     </Paper>
   );
@@ -174,8 +184,44 @@ const Home = () => {
           <CenteredTabs changeTab={(tab) => setTab(tab)} />
           <div className={classes.courses}>
             {tab === 0 && <Courses courses={courses} page={page} />}
-            {tab === 1 && <Courses courses={inProgress} page={page} />}
-            {tab === 2 && <Courses courses={completed} page={page} />}
+            {tab === 1 &&
+              inProgress
+                .slice(3 * page, Math.min(3 * page + 3, inProgress.length))
+                .map((course) => {
+                  return (
+                    <CourseComponent
+                      key={course?._id}
+                      title={course?.title}
+                      subject={course?.subject}
+                      description={course?.summary}
+                      instructor={course?.createdBy.username}
+                      courseId={course?._id}
+                      horizontal={true}
+                      rating={course?.rating}
+                      progress={course?.progress}
+                      demo={false}
+                    />
+                  );
+                })}
+            {tab === 2 &&
+              completed
+                .slice(3 * page, Math.min(3 * page + 3, completed.length))
+                .map((course) => {
+                  return (
+                    <CourseComponent
+                      key={course?._id}
+                      title={course?.title}
+                      subject={course?.subject}
+                      description={course?.summary}
+                      instructor={course?.createdBy.username}
+                      courseId={course?._id}
+                      horizontal={true}
+                      rating={course?.rating}
+                      progress={course?.progress}
+                      demo={false}
+                    />
+                  );
+                })}
           </div>
           {(tab === 0 && courses.length !== 0) ||
           (tab === 1 && inProgress.length !== 0) ||

@@ -53,6 +53,10 @@ const UserSchema = mongoose.Schema({
         type: Number,
         default: 0,
       },
+      reviewed: {
+        type: Boolean,
+        default: false,
+      },
     },
   ],
 

@@ -210,6 +210,7 @@ function CourseComponent({
   numOfVideos,
   numOfHours,
   numberOfStudents,
+  demo,
 }) {
   const classes = useStyles();
   const [showDemo, setShowDemo] = useState(false);
@@ -310,7 +311,7 @@ function CourseComponent({
                 </Grid>
                 <Grid>
                   <Typography variant='body2' color='textSecondary'>
-                    ${price && price}
+                    {price && `${price} $`}
                   </Typography>
                 </Grid>
               </Grid>
@@ -340,7 +341,7 @@ function CourseComponent({
                   : 0,
               }}
             >
-              {showDemo && (
+              {demo && showDemo && (
                 <Demo
                   title={title}
                   description={description}

@@ -32,6 +32,7 @@ export default function Courses({ courses, page, completed }) {
                 horizontal={true}
                 rating={course?.rating}
                 progress={course?.progress}
+                demo={true}
               />
             );
           })}
