@@ -74,23 +74,30 @@ module.exports.createUser = async (req, res) => {
   
   module.exports.updatecourserequest = async (req, res) => {
     const { id } = req.body;
-    const{courseid}=req.body;
+    const{courseid,state}=req.body;
     console.log("id:"+id)
-  
+    const courserequest= await CourseRequest.findOne({
+      createdBy:id,
+      course:courseid
+    }).populate("createdBy","username").populate("course","title")  
+  if(state=="GRANTED"){
     const user = await User.findOne(
       { _id: id }
     );
     console.log(user)
       user.courses.push({courseId:courseid})
       await user.save();
-    const courserequest= await CourseRequest.findOne({
-      createdBy:id,
-      course:courseid
-    })  
+   
     if (courserequest!=null){
-    courserequest.state="accepted"
+    courserequest.state="GRANTED"
     courserequest.save();}
-
+    }
+    else{
+    
+      if (courserequest!=null){
+      courserequest.state="DENIED"
+      courserequest.save();}
+    }
     res.status(200).json(courserequest);
   };
   

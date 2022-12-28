@@ -14,7 +14,7 @@ const CourseRequestSchema = mongoose.Schema(
     },
     state :{
         type: String,
-        enum: ['PENDING', 'GRANTED'],
+        enum: ['PENDING', 'GRANTED',"DENIED"],
     },
   },
   { timestamps: true }
