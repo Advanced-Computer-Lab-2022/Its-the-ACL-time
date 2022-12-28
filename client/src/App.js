@@ -53,6 +53,7 @@ import Profile from './pages/Profile';
 import Post from './components/Post';
 import InstructorRating from './components/InstructorRating';
 import { AppProvider } from './context/App/appContext';
+import NotFound from './pages/NotFound';
 
 function App() {
   return (
@@ -104,6 +105,7 @@ function App() {
                     </ProtectedRoute>
                   }
                 />
+
                 <Route path='/addCourse' element={<CourseForm />} />
                 <Route
                   path='/updateCourse/:courseId'
@@ -133,6 +135,7 @@ function App() {
               <Route path='/footer' element={<Footer />} />
               <Route path='/review' element={<Review />} />
               <Route path='/rate' element={<RatingStars />} />
+              <Route path='*' element={<NotFound />} />
             </Routes>
           </SearchProvider>
         </AppProvider>
@@ -140,20 +143,5 @@ function App() {
     </BrowserRouter>
   );
 }
-
-/*
-          Finished Components
-          1- NavBar
-          2- footer
-          3- courseComponent
-          4- review
-          5- exam      -> /dialog
-          6- question  -> /question
-          7- rating     -> /rating
-          8- certificate  -> /certificate
-          9- /test -> to send a certificate to your email, and download it as pdf
-          10- CourseForm (to add course) -> /addCourse
-          11- RatingStars -> /rate
-*/
 
 export default App;

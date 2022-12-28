@@ -400,6 +400,7 @@ function InstructorProfile({ courses }) {
                 );
               })}
           </div>
+
           <div
             style={{
               display: 'flex',
@@ -414,6 +415,20 @@ function InstructorProfile({ courses }) {
               color='primary'
             />
           </div>
+          <button
+            className='btn btn-primary'
+            style={{
+              marginTop: '2rem',
+              width: '20rem',
+              height: '3rem',
+              fontSize: '1.5rem',
+            }}
+            onClick={() => {
+              navigate('/addCourse');
+            }}
+          >
+            Create a Course
+          </button>
           <br />
           <br />
           <p>Have questions? Here are our most popular instructor resources.</p>

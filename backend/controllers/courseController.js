@@ -31,6 +31,12 @@ const createCourse = async (req, res) => {
   ) {
     throw new BadRequestError('Please provide all course values');
   }
+
+  const match = await Course.findOne({ title });
+
+  if (match)
+    throw new BadRequestError('Choose another title, as this one is taken');
+
   req.body.createdBy = userId;
   const course = await Course.create(req.body);
   const user = await User.findOne({
