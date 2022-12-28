@@ -4,27 +4,30 @@ const { UnauthorizedError, BadRequestError } = require('../Errors');
 const { verifyToken } = require('../utils/jwt');
 const { default: mongoose } = require('mongoose');
 
-
-
 const buyWithWallet = async (req, res) => {
   const { userId } = req.user;
   const { courseId } = req.params;
   const user = await User.findOne({
     _id: userId,
   });
-  let CourseObject =await Course.findById(courseId);
-  let balance = await Wallet.findOne({ owner: mongoose.Types.ObjectId(userId) });
-  console.log("balance",balance);
-  console.log("course price",CourseObject.price);
+  let CourseObject = await Course.findById(courseId);
+  let balance = await Wallet.findOne({
+    owner: mongoose.Types.ObjectId(userId),
+  });
+  console.log('balance', balance);
+  console.log('course price', CourseObject.price);
   if (balance.balance >= CourseObject.price) {
-    await Wallet.updateOne({ owner: userId }, { balance: balance.balance - CourseObject.price });
+    await Wallet.updateOne(
+      { owner: userId },
+      { balance: balance.balance - CourseObject.price }
+    );
     user.courses.push({ courseId: courseId, isCompleted: false });
     await user.save();
-    res.status(200).send({ msg: "payment success" });
+    res.status(200).send({ msg: 'payment success' });
   } else {
-    res.status(400).send({ msg: "payment failed" });
+    res.status(400).send({ msg: 'payment failed' });
   }
-}
+};
 
 const createCourse = async (req, res) => {
   const {
@@ -42,6 +45,7 @@ const createCourse = async (req, res) => {
     userId = instructorId;
     type = 'Instructor';
   }
+  console.log(req.user);
   if (type !== 'Instructor')
     throw new UnauthorizedError("you don't have permissions");
   if (
@@ -65,7 +69,7 @@ const createCourse = async (req, res) => {
   const user = await User.findOne({
     _id: userId,
   });
-  user.courses.push({ courseId: course._id });
+  user.courses.push({ courseId: course._id, reviewed: true });
   await user.save();
   res.status(StatusCodes.CREATED).json({ course });
 };
@@ -107,6 +111,7 @@ const getAllCourses = async (req, res) => {
 const updateCourse = async (req, res) => {
   const { type, userId } = req.user;
   const { courseId } = req.params;
+  const { type: updateType } = req.query;
 
   if (!courseId) throw new BadRequestError('Please provide course id');
 
@@ -132,6 +137,24 @@ const updateCourse = async (req, res) => {
     { ...req.body },
     { new: true }
   );
+
+  if (updateType === 'review') {
+    const user = await User.findOne({
+      _id: userId,
+    });
+
+    const course = user.courses.find(
+      (course) => course.courseId.toString() === courseId
+    );
+
+    if (!course) {
+      throw new BadRequestError('You are not enrolled in this course');
+    }
+
+    course.reviewed = true;
+    await user.save();
+  }
+
   if (updatedCourse.rating) {
     updatedCourse.rating =
       updatedCourse.reviews.reduce((acc, review) => acc + review.rate, 0) /
@@ -177,9 +200,6 @@ const courseEnroll = async (req, res) => {
   await user.save();
   res.status(200).json({ msg: 'You are enrolled in this course' });
 };
-
-
-
 
 const getEnrolledCourses = async (req, res) => {
   const userId = req.params.id;

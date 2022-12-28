@@ -93,19 +93,18 @@ const CourseProvider = ({ children }) => {
     }
   };
 
-  const updateCourse = async (courseId, course) => {
+  const updateCourse = async (courseId, course, type) => {
     console.log('updateCourse ');
     console.log(course);
+
+    const url = `http://localhost:8080/api/v1/course/${courseId}?type=${type}`;
+
     try {
-      const response = await axios.patch(
-        `http://localhost:8080/api/v1/course/${courseId}`,
-        course,
-        {
-          headers: {
-            authorization: `Bearer ${token}`,
-          },
-        }
-      );
+      const response = await axios.patch(url, course, {
+        headers: {
+          authorization: `Bearer ${token}`,
+        },
+      });
       console.log(response);
     } catch (error) {
       console.log(error);

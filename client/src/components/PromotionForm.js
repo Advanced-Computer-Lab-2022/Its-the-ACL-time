@@ -131,13 +131,17 @@ function PromotionForm({ submitted }) {
     setLoading(true);
     setAlert('Promotion code added successfully');
 
-    updateCourse(courseId, {
-      promotion: {
-        promotionPercentage,
-        startDate,
-        endDate,
+    updateCourse(
+      courseId,
+      {
+        promotion: {
+          promotionPercentage,
+          startDate,
+          endDate,
+        },
       },
-    });
+      'promotion'
+    );
 
     setTimeout(() => {
       setAlert(null);
