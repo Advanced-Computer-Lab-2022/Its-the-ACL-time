@@ -415,16 +415,15 @@ const CoursePage = () => {
             {alert && <SnackBar content={alert} />}
 
             <Box className={`${classes.reviewCourse}`}>
-
               <div className={`${classes.reviewVideo}`}>
                 <iframe
-                  width="400"
-                  height="240"
+                  width='400'
+                  height='240'
                   src='https://www.youtube.com/embed/QPzmsQ86_HM'
                   title='YouTube video player'
-                  frameborder='0'
+                  frameBorder='0'
                   allow='accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture'
-                  allowfullscreen
+                  allowFullScreen
                 ></iframe>
               </div>
               {!isEnrolled && (
@@ -446,13 +445,17 @@ const CoursePage = () => {
                 </div>
               )}
 
-
               {isEnrolled || isOwner ? (
-                <button className={`${classes.addToCart}`}><Link to={`/course/${courseId}/content`}>Go to course</Link>
+                <button className={`${classes.addToCart}`}>
+                  <Link to={`/course/${courseId}/content`}>Go to course</Link>
                 </button>
-
+              ) : user.type === 'Individual trainee' || 'Instructor' ? (
+                <BuyCourse
+                  courseId={courseId}
+                  coursePrice={course?.price}
+                ></BuyCourse>
               ) : (
-                (user.type === "Individual trainee" || "Instructor") ? <BuyCourse courseId={courseId} coursePrice={course?.price}></BuyCourse> : <RequestCourse></RequestCourse>
+                <RequestCourse></RequestCourse>
               )}
               <p>
                 <AiOutlineCheck /> 30-Day Money-Back Guarantee

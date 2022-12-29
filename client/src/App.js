@@ -54,6 +54,7 @@ import Post from './components/Post';
 import InstructorRating from './components/InstructorRating';
 import { AppProvider } from './context/App/appContext';
 import NotFound from './pages/NotFound';
+import InstructorProfile from './pages/InstructorProfile';
 
 function App() {
   return (
@@ -120,6 +121,10 @@ function App() {
                   element={<SubtitlesPage />}
                 />
                 <Route path='/course/:courseId' element={<CoursePage />} />
+                <Route
+                  path='/instructor/:instructorId'
+                  element={<InstructorProfile />}
+                />
 
                 <Route path='/results' element={<SearchResult />} />
               </Route>
