@@ -691,16 +691,18 @@ const CoursePage = () => {
                     (item) =>
                       course &&
                       course.subject === item.subject && (
-                        <CourseComponent
-                          key={item._id}
-                          title={item.title}
-                          subject={item.subject}
-                          description={item.summary}
-                          instructor={item.createdBy.username}
-                          price={item.price}
-                          courseId={item._id}
-                          horizontal={false}
-                        />
+                        <div onClick={() => window.scrollTo(0, 0)}>
+                          <CourseComponent
+                            key={item._id}
+                            title={item.title}
+                            subject={item.subject}
+                            description={item.summary}
+                            instructor={item.createdBy.username}
+                            price={item.price}
+                            courseId={item._id}
+                            horizontal={false}
+                          />
+                        </div>
                       )
                   )}
                 </Box>

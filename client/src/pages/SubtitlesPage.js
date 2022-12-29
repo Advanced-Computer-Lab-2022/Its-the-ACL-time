@@ -454,6 +454,7 @@ const SubtitlesPage = () => {
           checkedSubtitles: response.data.completedSubtitles,
           checkedExams: response.data.completedExams,
         });
+        console.log(response.data);
         setReviewed(response.data?.reviewed);
         setLoading(false);
       } catch (error) {
@@ -729,6 +730,7 @@ const SubtitlesPage = () => {
         rate: rating,
       },
     ]);
+    setReviewed(true);
     setLoading(false);
   };
 
@@ -1020,6 +1022,7 @@ const SubtitlesPage = () => {
                   <button
                     onClick={() => setWriteNote(true)}
                     className={`${classes.addNote}`}
+                    disabled={!searchParams.get('subtitleId')}
                   >
                     Create a note for this lecture
                     <span>
@@ -1280,7 +1283,7 @@ const SubtitlesPage = () => {
             <Dialog open={open} onClose={handleClose}>
               <DialogContent>
                 <DialogContentText>Comment</DialogContentText>
-                <div class='mb-3'></div>
+                <div className='mb-3'></div>
                 <div className='mb-3'>
                   <label
                     for='exampleFormControlTextarea1'

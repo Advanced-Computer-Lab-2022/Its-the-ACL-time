@@ -11,7 +11,9 @@ const addNote = async (req, res) => {
   const { subtitleId, userId, description } = req.body;
 
   if (!subtitleId || !userId || !description) {
-    res.status(StatusCodes.BAD_REQUEST).send('please provide all fields');
+    return res
+      .status(StatusCodes.BAD_REQUEST)
+      .send('please provide all fields');
   }
 
   const user = await User.findById(userId);
@@ -24,7 +26,9 @@ const addNote = async (req, res) => {
   console.log(subtitleId);
   const subtitle = await SubTitle.findById(subtitleId);
   if (!subtitle) {
-    res.status(StatusCodes.BAD_REQUEST).send('please provide a valid subtitle');
+    return res
+      .status(StatusCodes.BAD_REQUEST)
+      .send('please provide a valid subtitle');
   }
 
   const note = await NotesModel.create({
