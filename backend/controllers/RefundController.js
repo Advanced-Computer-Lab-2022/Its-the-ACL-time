@@ -42,8 +42,9 @@ const postRefund = async (req, res) => {
 
 const getRefunds = async (req, res) => {
   const { myRefunds } = req.query;
+  const { userId } = req.user;
   if (myRefunds) {
-    const refunds = await Refund.find({ user: req.user.userId })
+    const refunds = await Refund.find({ user: userId })
       .populate('course', 'title')
       .populate('user', 'username');
     return res.status(200).json(refunds);

@@ -21,7 +21,7 @@ const {
   courseRouter,
   userRouter,
   paymentRouter,
-  requestCourseRouter
+  requestCourseRouter,
 } = require('./routes');
 
 //Michael
@@ -53,10 +53,10 @@ app.use('/api/v1/payment', paymentRouter);
 app.use('/api/v1/note', notesRouter);
 app.use('/api/v1/exam', authMiddleware, examRouter);
 app.use('/api/v1/question', questionRouter);
-app.use('/api/v1/refund', refundRouter);
+app.use('/api/v1/refund', authMiddleware, refundRouter);
 app.use('/api/v1/post', authMiddleware, postRouter);
 
-app.use('/api/v1/request',requestCourseRouter);
+app.use('/api/v1/request', requestCourseRouter);
 
 app.use(notFoundMiddleware);
 app.use(errorHandlerMiddleware);

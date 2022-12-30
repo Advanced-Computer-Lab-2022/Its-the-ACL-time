@@ -36,9 +36,12 @@ import AssessmentIcon from '@material-ui/icons/Assessment';
 import CourseComponent from '../components/course/CourseComponent';
 import Loading from '../components/Loading';
 import MessageIcon from '@material-ui/icons/Message';
-// import money icon
 import RefundIcon from '@material-ui/icons/AttachMoney';
 import axios from 'axios';
+import { AiOutlineSearch } from 'react-icons/ai';
+import Wrapper from '../assets/Wrappers/SearchWrapper';
+import SearchIcon from '@material-ui/icons/Search';
+import CloseIcon from '@material-ui/icons/Close';
 
 const drawerWidth = 240;
 
@@ -250,6 +253,19 @@ const useStyles = makeStyles((theme) => ({
     width: '100%',
     marginTop: '2rem',
   },
+
+  search: {
+    display: 'flex',
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    width: '100%',
+    marginTop: '2rem',
+    border: '1px solid #e0e0e0',
+    borderRadius: '15px',
+    padding: '1rem',
+    boxShadow: '0 0 10px 0 rgba(0,0,0,0.3)',
+  },
 }));
 
 const Card = ({ image, title, text }) => {
@@ -268,7 +284,8 @@ const Card = ({ image, title, text }) => {
   );
 };
 
-const Refund = ({ refundMoney, state, course }) => {
+const Refund = ({ refundMoney, state, courseName }) => {
+  console.log(refundMoney, state, courseName);
   return (
     <div
       style={{
@@ -277,6 +294,7 @@ const Refund = ({ refundMoney, state, course }) => {
         alignItems: 'center',
         justifyContent: 'center',
         marginTop: '2rem',
+        marginBottom: '2rem',
         backgroundColor: '#e0e0e0',
         padding: '1rem',
         borderRadius: '15px',
@@ -285,7 +303,10 @@ const Refund = ({ refundMoney, state, course }) => {
         },
       }}
     >
-      {`You have requested a refund of $${refundMoney} for the course ${course}. Your request is currently`}
+      <span>
+        You have requested a refund of $<strong>{refundMoney}</strong> for{' '}
+        <strong>{courseName}</strong>. Your request is currently
+      </span>
       {state === 'pending' ? (
         <span style={{ color: 'orange' }}> pending</span>
       ) : state === 'approved' ? (
@@ -301,6 +322,34 @@ function InstructorProfile({ courses }) {
   const [page, setPage] = useState(0);
   const navigate = useNavigate();
   const classes = useStyles();
+  const [state, setState] = useState({
+    query: '',
+    filteredCourses: [],
+  });
+
+  const search = (term) => {
+    const searchResults = {};
+
+    const filteredCourses = [];
+    courses.forEach((course) => {
+      const title = course.title.toLowerCase().includes(term.toLowerCase());
+      const subject = course.subject.toLowerCase().includes(term.toLowerCase());
+
+      if (title && !searchResults[title]) {
+        searchResults[title] = true;
+        filteredCourses.push(course);
+      }
+      if (subject && !searchResults[subject]) {
+        searchResults[subject] = true;
+        filteredCourses.push(course.subject);
+      }
+    });
+    console.log(filteredCourses);
+    setState({
+      query: term,
+      filteredCourses,
+    });
+  };
 
   return (
     <>
@@ -379,27 +428,61 @@ function InstructorProfile({ courses }) {
             width: '80%',
           }}
         >
+          <h2>My Courses</h2>
+          <form
+            style={{
+              marginBottom: '2rem',
+              width: '50%',
+            }}
+          >
+            <input
+              type='text'
+              placeholder='Search in your courses'
+              className={classes.search}
+              value={state.query}
+              name='searchInput'
+              onChange={(e) => search(e.target.value)}
+            />
+          </form>
           <div className={classes.courses}>
-            <h2>My Courses</h2>
-            {courses
-              ?.slice(page * 3, Math.min(page * 3 + 3, courses.length))
-              .map((course) => {
-                return (
-                  <CourseComponent
-                    key={course?._id}
-                    title={course?.title}
-                    subject={course?.subject}
-                    description={course?.summary}
-                    instructor={course?.createdBy.username}
-                    price={course?.price}
-                    courseId={course?._id}
-                    horizontal={true}
-                    rating={course?.rating}
-                    progress={course?.progress}
-                    demo={false}
-                  />
-                );
-              })}
+            {state.query !== '' &&
+              state.filteredCourses.length !== 0 &&
+              state.filteredCourses
+                ?.slice(
+                  page * 3,
+                  Math.min(page * 3 + 3, state.filteredCourses.length)
+                )
+                .map((course) => {
+                  return (
+                    <CourseComponent
+                      key={course._id}
+                      title={course.title}
+                      subject={course.subject}
+                      description={course.summary}
+                      courseId={course._id}
+                      horizontal={true}
+                      rating={course.rating}
+                      demo={false}
+                    />
+                  );
+                })}
+            {state.query === '' &&
+              courses
+                ?.slice(page * 3, Math.min(page * 3 + 3, courses.length))
+                .map((course) => {
+                  return (
+                    <CourseComponent
+                      key={course?._id}
+                      title={course?.title}
+                      subject={course?.subject}
+                      description={course?.summary}
+                      courseId={course?._id}
+                      horizontal={true}
+                      rating={course?.rating}
+                      demo={false}
+                    />
+                  );
+                })}
           </div>
 
           <div
@@ -411,7 +494,11 @@ function InstructorProfile({ courses }) {
             }}
           >
             <Pagination
-              count={Math.ceil(courses.length / 3)}
+              count={
+                state.query === ''
+                  ? Math.ceil(courses.length / 3)
+                  : Math.ceil(state.filteredCourses.length / 3)
+              }
               onChange={(e, value) => setPage(value - 1)}
               color='primary'
             />
@@ -640,16 +727,25 @@ export default function Profile() {
   const [open, setOpen] = React.useState(false);
   const [component, setComponent] = useState('My Courses');
   const { myCourses } = useCourseContext();
-  const { user } = useAppContext();
+  const { user, token } = useAppContext();
   const [value, setValue] = React.useState(0);
   const [loading, setLoading] = useState(true);
   const [courses, setCourses] = useState([]);
   const [refunds, setRefunds] = useState([]);
+  const [refundPage, setRefundPage] = useState(0);
+
+  const navigate = useNavigate();
 
   useEffect(() => {
     async function getRefund() {
-      const res = await axios.get('http://localhost:8080/api/v1/refund/');
-      console.log(res.data);
+      const res = await axios.get(
+        'http://localhost:8080/api/v1/refund?myRefunds=true',
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
       setRefunds(res.data);
     }
 
@@ -664,7 +760,7 @@ export default function Profile() {
   }, [myCourses, component]);
 
   const handleChange = (event, newValue) => {
-    setValue(newValue);
+    setValue(newValue - 1);
   };
 
   const handleDrawerOpen = () => {
@@ -816,19 +912,42 @@ export default function Profile() {
           {component === 'Refund' && (
             <>
               <h1>Your refund requests</h1>
-              {refunds.map((refund) => (
-                <Refund
-                  key={refund._id}
-                  refundMoney={refund.refundMoney}
-                  courseName={
-                    courses.find((course) => course._id === refund.course)
-                      ?.title
-                  }
-                  state={refund.state}
-                />
-              ))}
+              {refunds
+                ?.slice(
+                  refundPage * 3,
+                  Math.min(refundPage * 3 + 3, refunds.length)
+                )
+                .map((refund) => (
+                  <Refund
+                    key={refund._id}
+                    refundMoney={refund.refundMoney}
+                    courseName={
+                      courses.find(
+                        (course) =>
+                          course._id.toString() === refund.course._id.toString()
+                      )?.title
+                    }
+                    state={refund.state}
+                  />
+                ))}
             </>
           )}
+          {component === 'Refund' && (
+            <Pagination
+              count={Math.ceil(refunds.length / 3)}
+              onChange={(e, v) => {
+                setRefundPage(v - 1);
+              }}
+              defaultPage={1}
+              color='primary'
+              size='large'
+              showFirstButton
+              showLastButton
+              classes={{ ul: classes.ul }}
+              style={{ marginTop: '2rem' }}
+            />
+          )}
+
           {component === 'Settings' && <Settings />}
 
           <br />

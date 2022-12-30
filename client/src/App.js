@@ -140,6 +140,7 @@ function App() {
               <Route path='/footer' element={<Footer />} />
               <Route path='/review' element={<Review />} />
               <Route path='/rate' element={<RatingStars />} />
+              <Route path='/ins' element={<Instructor />} />
               <Route path='*' element={<NotFound />} />
             </Routes>
           </SearchProvider>

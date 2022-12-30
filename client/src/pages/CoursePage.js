@@ -298,7 +298,9 @@ const CoursePage = () => {
     }
 
     function checkOwnership() {
-      const course = myCourses.find((course) => course._id === courseId);
+      const course = myCourses.find(
+        (course) => course._id.toString() === courseId.toString()
+      );
       if (course) {
         if (course.createdBy.toString() === user._id.toString()) {
           setIsOwner(true);
@@ -345,7 +347,7 @@ const CoursePage = () => {
   const applyCouponHandler = () => {
     console.log('apply coupon');
   };
-
+  console.log(isEnrolled);
   return (
     <>
       {loading && <Loading type={'spin'} color={'#3f51b5'} />}
@@ -464,6 +466,40 @@ const CoursePage = () => {
                 <AiOutlineCheck />
                 Full Lifetime Access
               </p>
+              {isEnrolled && applyCoupon && (
+                <>
+                  <hr className={`${classes.line}`} />
+                  <div className={`{${classes.applyCoupon}}`}>
+                    <input
+                      type={'number'}
+                      placeholder={'Enter the amount of money'}
+                      className={`${classes.applyCouponInput}`}
+                      ref={inputRef}
+                    />
+                    <button
+                      className={classes.applyCouponButton}
+                      onClick={() => {
+                        isEnrolled
+                          ? setRequestRefund(true)
+                          : applyCouponHandler();
+                      }}
+                    >
+                      Request
+                    </button>
+                  </div>
+                </>
+              )}
+              {isEnrolled && !applyCoupon && (
+                <>
+                  <button
+                    className={classes.coupon}
+                    onClick={() => setApplyCoupon(true)}
+                  >
+                    {isEnrolled ? <>Request Refund</> : <>Apply Coupon</>}
+                  </button>
+                </>
+              )}
+
               {/* {!applyCoupon && (
                 <button
                   className={classes.coupon}
