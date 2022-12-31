@@ -59,8 +59,8 @@ import InstructorProfile from './pages/InstructorProfile';
 function App() {
   return (
     <BrowserRouter>
-      <CourseProvider>
-        <AppProvider>
+      <AppProvider>
+        <CourseProvider>
           <SearchProvider>
             <Routes>
               <Route path='/landing' element={<Landing />} />
@@ -144,8 +144,8 @@ function App() {
               <Route path='*' element={<NotFound />} />
             </Routes>
           </SearchProvider>
-        </AppProvider>
-      </CourseProvider>
+        </CourseProvider>
+      </AppProvider>
     </BrowserRouter>
   );
 }

@@ -39,12 +39,14 @@ const createCourse = async (req, res) => {
     numberOfHours,
     instructorId,
   } = req.body;
+
   let type = req.user?.type;
   let userId = req.user?.userId;
   if (instructorId) {
     userId = instructorId;
     type = 'Instructor';
   }
+
   console.log(req.user);
   if (type !== 'Instructor')
     throw new UnauthorizedError("you don't have permissions");

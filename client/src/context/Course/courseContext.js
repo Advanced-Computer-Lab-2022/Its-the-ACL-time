@@ -12,7 +12,7 @@ const CourseContext = React.createContext();
 const CourseProvider = ({ children }) => {
   const [state, setState] = useState(initialState);
 
-  const { token } = useAppContext();
+  const { token, user } = useAppContext();
 
   const formMyCourses = (courses) => {
     let tmpCourses = [];
@@ -62,7 +62,7 @@ const CourseProvider = ({ children }) => {
     if (token && state.courses.length > 0) {
       getMyCourses();
     }
-  }, [state.courses, token]);
+  }, [state.courses, token, user]);
 
   const createCourse = async (course) => {
     try {
@@ -71,7 +71,7 @@ const CourseProvider = ({ children }) => {
         course,
         {
           headers: {
-            authorization: `Bearer ${token}`,
+            Authorization: `Bearer ${token}`,
           },
         }
       );
