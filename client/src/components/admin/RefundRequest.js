@@ -18,8 +18,8 @@ function RefundRequest() {
   const[progress,setprogress]=useState(true);
 
   useEffect(()=>{
-    const state="unseen"
-    axios.get(`http://localhost:8080/api/v1/refund`).then(res=>{
+    
+    axios.get(`http://localhost:8080/api/v1/admin/refund`).then(res=>{
     console.log(res.data);
     setrefund(res.data);
     setprogress(false);
@@ -28,11 +28,39 @@ function RefundRequest() {
     {console.log(err)}
    );
  },[]);
+ const approve =(RefundId,state,courseId1)=>{
+  setprogress(true);
+
+ // id.preventDefault();
+  axios.patch(`http://localhost:8080/api/v1/admin/updaterefund`,{RefundId:RefundId,state:state,courseId1:courseId1}).then(res=>{
+    console.log(res.data);
+    setrefund((old)=> old.map((report)=>{
+      if (report._id==RefundId){
+        return res.data
+      }
+      else{
+        return report
+      }
+    
+     }));
+    setprogress(false);
+    setopensnake(true);
+    setmessage("the Refund has been "+state +"d")
+    settypemessage("success")
+
+   })
+   .catch(err=>
+    {console.log(err)
+      setopensnake(true);
+      setmessage(err)
+      settypemessage("error")}
+   );
+ }
  
   return (
     <>
       <div class="container mt-3">
-      <h2>Reports</h2>
+      <h2>Refund Requests</h2>
 
 <table class="table  table-hover bg-light border border-success ">
 
@@ -51,9 +79,10 @@ function RefundRequest() {
         <tr>
         <td>{report.user.username }</td>
         <td>{report.course.title}</td>
-          <td>{report.status?"money returned":"pending request"}</td>
-          <td> {!report.status&& <button type="button" class="btn btn-primary"onClick={()=>{}}>retune money</button>}</td> 
-  
+          <td>{report.state}</td>
+          <td> {report.state==="pending"&&<button type="button" class="btn btn-primary"onClick={()=>{approve(report._id,"approved",report.course._id)}}>approve</button>}</td> 
+          <td> {report.state==="pending"&& <button type="button" class="btn btn-primary"onClick={()=>{approve(report._id,"rejected",report.course._id)}}>rejected</button>}</td> 
+
         </tr>)
       }
       

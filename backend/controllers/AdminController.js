@@ -1,5 +1,7 @@
 const { StatusCodes } = require('http-status-codes');
 const { Course, User,Report,CourseRequest,Question,Wallet} = require('../models');
+const Refund = require('../models/Refund');
+
 const { UnauthorizedError, BadRequestError } = require('../Errors');
 const { json } = require('express');
 
@@ -93,11 +95,12 @@ module.exports.createUser = async (req, res) => {
     courserequest.save();}
     }
     else{
-    
-      if (courserequest!=null){
-      courserequest.state="DENIED"
-      courserequest.save();}
+      await CourseRequest.findOneAndDelete({
+        createdBy:id,
+        course:courseid
+      })
     }
+
     res.status(200).json(courserequest);
   };
   
@@ -109,26 +112,49 @@ module.exports.createUser = async (req, res) => {
 
   
   module.exports.udaterefund = async (req, res) => {
-    const { id } = req.body;
-    const{courseid,RefundId}=req.body;
-    const user = await User.findOne(
-      { _id: id },
-    );
-   const course = await Course.findOne(
-      { _id: courseid },
-    );
-    const wallet = await Wallet.findOne(
-      { owner: id },
-    );
-    const refund = await RefundId.findOne(
+    const {state} = req.body;
+    const{RefundId,courseId1}=req.body;
+    console.log(courseId1)
+
+    const refund = await Refund.findOne(
       { _id: RefundId },
+    )  .populate('course', 'title')
+    .populate('user', 'username');
+   // console.log(refund);
+
+    const user = await User.findOne(
+      { _id: refund.user },
+    )
+    //console.log(user);
+   const course = await Course.findOne(
+      { _id: refund.course },
     );
+    //console.log(course.title);
+
+    const wallet = await Wallet.findOne(
+      { owner: refund.user },
+    );
+    //console.log(wallet);
+
+
+    if (state=="rejected"){
+      refund.state="rejected";
+
+    }else{
     wallet.balance+=course.price;
     wallet.save();
-    refund.state=true;
+    refund.state="approved";
+    for( var i = 0; i < user.courses.length; i++){ 
+     
+      if ( user.courses[i].courseId == courseId1) { 
+ // console.log("suuccess")
+          user.courses.splice(i, 1); 
+      }
+  }
+    //user.courses=user.courses.filter((x)=>x._id!==refund.course)
+    user.save();}
     refund.save();
-    user.courses=user.courses.filter((x)=>x._id!==courseid)
-    user.save();
+    //console.log("course id" +course._id,user);
     res.status(200).json(refund);
   };
 
@@ -156,21 +182,30 @@ module.exports.setpromtion = async (req, res) => {
     console.log(req.body);
     const report= await Report.findOne({_id:reportId }).populate("createdBy","username").populate("course","title");
     console.log(report)
-    report.commentsadmin.push(comment);
+    report.commentsadmin.push("admin :"+comment);
     report.save();
     res.status(StatusCodes.OK).json( report );
   };
   module.exports.usersetcomment = async (req, res) => {
-    const { reportId,comment} = req.body;
+    const { reportId,comment,username} = req.body;
     console.log(req.body);
     const report= await Report.findOne({_id:reportId }).populate("createdBy","username").populate("course","title");
    // console.log(report)
-    report.commentsuser.push(comment);
+    report.commentsadmin.push("user"+":"+comment);
     report.save();
     console.log(report)
     res.status(StatusCodes.OK).json( report );
   };
-
+  module.exports.getRefunds = async (req, res) => {
+   // const { myRefunds } = req.query;
+   //  const { userId } = req.user;
+   console.log("test")
+   
+      const refunds = await Refund.find()
+        .populate('course', 'title')
+        .populate('user', 'username');
+    res.status(200).json(refunds);
+  };
 
 
    

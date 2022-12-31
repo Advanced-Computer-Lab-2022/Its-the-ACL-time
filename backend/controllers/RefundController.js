@@ -50,10 +50,7 @@ const getRefunds = async (req, res) => {
     return res.status(200).json(refunds);
   }
 
-  const refunds = await Refund.find()
-    .populate('course', 'title')
-    .populate('user', 'username');
-  res.status(200).json(refunds);
+
 };
 
 module.exports = {

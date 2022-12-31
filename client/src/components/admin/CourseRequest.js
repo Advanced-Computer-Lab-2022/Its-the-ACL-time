@@ -54,7 +54,7 @@ function CourseRequest() {
         setopensnake(true);
         setprogress(false)
 
-        setmessage("there are error")
+        setmessage("there are an error")
         settypemessage("error")
 
       }
