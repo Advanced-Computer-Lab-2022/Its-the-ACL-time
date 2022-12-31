@@ -16,6 +16,10 @@ const refundSchema = mongoose.Schema({
   refundMoney: {
     type: Number,
   },
+
+  followUp: {
+    type: String,
+  },
 });
 
 module.exports = mongoose.model('Refund', refundSchema);

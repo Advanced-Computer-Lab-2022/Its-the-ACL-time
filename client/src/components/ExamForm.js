@@ -109,7 +109,6 @@ function ExamForm({ submitted }) {
   const classes = useStyles();
 
   const { courseId } = useParams();
-  const { alert, setAlert, clearAlert, alertText, alertType } = useAppContext();
   const [questions, setQuestions] = useState(0);
   const [disableAddExamButton, setDisableAddExamButton] = useState(true);
   const addExamButtonRef = useRef();
@@ -118,6 +117,15 @@ function ExamForm({ submitted }) {
   const minutesRef = useRef();
   const secondsRef = useRef();
   const questionsRef = useRef();
+  const [alert, setAlert] = useState(null);
+
+  const setAlertFunc = (type, message) => {
+    setAlert({ type, message });
+  };
+
+  const clearAlert = () => {
+    setAlert(null);
+  };
 
   const addQuestion = () => {
     setDisableAddExamButton(false);
@@ -129,6 +137,13 @@ function ExamForm({ submitted }) {
     setQuestions(questions - 1);
   };
 
+  const setError = () => {
+    setAlertFunc('error', "Exam's not been created successfully");
+    setTimeout(() => {
+      clearAlert();
+    }, 3000);
+  };
+
   const getExamData = async (e) => {
     const exam = {};
     exam['duration'] = {
@@ -136,6 +151,16 @@ function ExamForm({ submitted }) {
       minutes: minutesRef.current.value,
       seconds: secondsRef.current.value,
     };
+
+    if (
+      exam['duration']['hours'] === '' ||
+      exam['duration']['minutes'] === '' ||
+      exam['duration']['seconds'] === ''
+    ) {
+      setError();
+      return;
+    }
+
     const questions = [];
     for (let i = 0; i < questionsRef.current.children.length; i++) {
       let question = {};
@@ -143,10 +168,21 @@ function ExamForm({ submitted }) {
       question['title'] =
         questionsRef.current.children[i].children[1].children[1].value;
 
+      if (question['title'] === '') {
+        setError();
+        return;
+      }
+
       let choices = questionsRef.current.children[i].children[2];
       let choicesArray = [];
       for (let i = 0; i < 4; i++) {
         let row = choices.children[i];
+
+        if (row.children[0].children[0].children[1].value === '') {
+          setError();
+          return;
+        }
+
         choicesArray.push(row.children[0].children[0].children[1].value);
         answer = row.children[0].children[0].children[2].children[0].checked
           ? i
@@ -155,6 +191,11 @@ function ExamForm({ submitted }) {
       question['choices'] = choicesArray;
       question['answer'] = answer;
       questions.push(question);
+
+      if (answer === -1) {
+        setError();
+        return;
+      }
     }
     exam['questions'] = questions;
     exam['courseId'] = courseId;
@@ -163,30 +204,38 @@ function ExamForm({ submitted }) {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
     setLoading(true);
+
     const exam = await getExamData();
 
-    try {
-      const res = await axios.post('http://localhost:8080/api/v1/exam', exam, {
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${localStorage.getItem('token')}`,
-        },
-      });
-      console.log(res);
-      setAlert('success', "Exam's been created successfully");
-      setTimeout(() => {
-        clearAlert();
-        submitted();
-      }, 3000);
-    } catch (error) {
-      setAlert('error', "Exam's not been created successfully");
-      setTimeout(() => {
-        clearAlert();
-        submitted();
-      }, 3000);
+    if (exam) {
+      try {
+        const res = await axios.post(
+          'http://localhost:8080/api/v1/exam',
+          exam,
+          {
+            headers: {
+              'Content-Type': 'application/json',
+              Authorization: `Bearer ${localStorage.getItem('token')}`,
+            },
+          }
+        );
+        console.log(res);
+        setAlertFunc('success', "Exam's been created successfully");
+        setTimeout(() => {
+          clearAlert();
+          submitted();
+        }, 3000);
+      } catch (error) {
+        setAlertFunc('error', "Exam's not been created successfully");
+        setTimeout(() => {
+          clearAlert();
+          submitted();
+        }, 3000);
+      }
+      setLoading(false);
     }
-    setLoading(false);
   };
 
   return (
@@ -195,8 +244,8 @@ function ExamForm({ submitted }) {
 
       {loading && <Loading></Loading>}
       {alert && (
-        <Alert variant='filled' severity={alertType} sx={{ width: 20 }}>
-          {alertText}
+        <Alert variant='filled' severity={alert?.type} sx={{ width: 20 }}>
+          {alert?.message}
         </Alert>
       )}
       <Form className={`${classes.form}`} onSubmit={handleSubmit}>

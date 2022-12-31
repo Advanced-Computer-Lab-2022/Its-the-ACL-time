@@ -15,15 +15,11 @@ const CourseProvider = ({ children }) => {
   const { token } = useAppContext();
 
   const formMyCourses = (courses) => {
-    console.log('formMyCourses');
-    console.log(courses);
     let tmpCourses = [];
     courses.forEach((course) => {
       const totalInfo = state.courses.find((c) => c._id === course.courseId);
       tmpCourses.push({ ...course, ...totalInfo });
     });
-    console.log('tmpCourses');
-    console.log(tmpCourses);
     return tmpCourses;
   };
 
@@ -69,7 +65,6 @@ const CourseProvider = ({ children }) => {
   }, [state.courses, token]);
 
   const createCourse = async (course) => {
-    console.log(course);
     try {
       const response = await axios.post(
         'http://localhost:8080/api/v1/course',
@@ -94,9 +89,6 @@ const CourseProvider = ({ children }) => {
   };
 
   const updateCourse = async (courseId, course, type) => {
-    console.log('updateCourse ');
-    console.log(course);
-
     const url = `http://localhost:8080/api/v1/course/${courseId}?type=${type}`;
 
     try {
@@ -105,7 +97,6 @@ const CourseProvider = ({ children }) => {
           authorization: `Bearer ${token}`,
         },
       });
-      console.log(response);
     } catch (error) {
       console.log(error);
     }

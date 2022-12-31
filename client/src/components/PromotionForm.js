@@ -128,6 +128,23 @@ function PromotionForm({ submitted }) {
       }, 3000);
       return;
     }
+
+    if (promotionPercentage < 0 || promotionPercentage > 100) {
+      setAlert('Promotion percentage must be between 0 and 100');
+      setTimeout(() => {
+        setAlert(null);
+      }, 3000);
+      return;
+    }
+
+    if (startDate > endDate) {
+      setAlert('Start date must be before end date');
+      setTimeout(() => {
+        setAlert(null);
+      }, 3000);
+      return;
+    }
+
     setLoading(true);
     setAlert('Promotion code added successfully');
 
@@ -181,7 +198,6 @@ function PromotionForm({ submitted }) {
 
               <Form.Group as={Col} controlId='formGridNumberOfHours'>
                 <Form.Label>End Date</Form.Label>
-                {/* make the type of the form.control date */}
                 <Form.Control
                   type='date'
                   placeholder='Enter course end date'

@@ -60,7 +60,17 @@ const UserSchema = mongoose.Schema({
     },
   ],
 
-  ratings: [Number],
+  ratings: [
+    {
+      user: {
+        type: mongoose.Types.ObjectId,
+        ref: 'User',
+      },
+      rate: {
+        type: Number,
+      },
+    },
+  ],
   averageRating: {
     type: Number,
     default: 0,
