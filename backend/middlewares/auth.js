@@ -7,6 +7,7 @@ const authMiddleware = (req, res, next) => {
     throw new UnauthorizedError('Authentication failed');
   } else {
     const token = authHeader.split(' ')[1];
+    console.log('token', token);
     try {
       const payload = verifyToken(token);
       req.user = { userId: payload.userId, type: payload.type };

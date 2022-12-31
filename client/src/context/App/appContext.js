@@ -140,7 +140,7 @@ const AppProvider = ({ children }) => {
         },
         {
           headers: {
-            Authorization: `Bearer ${tokenFromLocalStorage}`,
+            Authorization: `Bearer ${state.token}`,
           },
         }
       );
@@ -151,7 +151,7 @@ const AppProvider = ({ children }) => {
           user: data,
         };
       });
-      addToLocalStorage({ user: data, token: tokenFromLocalStorage });
+      addToLocalStorage({ user: data, token: state.token });
       return {
         type: true,
         msg: 'Profile Updated successfully',
