@@ -117,7 +117,6 @@ function CenteredTabs({ changeTab }) {
   const { user, token } = useAppContext();
 
   const handleChange = (event, newValue) => {
-    console.log(newValue);
     changeTab(newValue);
     setValue(newValue);
   };

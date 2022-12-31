@@ -24,7 +24,6 @@ import Footer from '../components/Footer';
 import engagingCourse from '../assets/images/engaging-course.jpg';
 import buildAudience from '../assets/images/build-audience.jpg';
 import videoCreating from '../assets/images/video-creation.jpg';
-import Courses from './Courses';
 import { Alert, Pagination } from '@material-ui/lab';
 import VideoLibraryIcon from '@material-ui/icons/VideoLibrary';
 import ChatIcon from '@material-ui/icons/Chat';
@@ -38,10 +37,6 @@ import Loading from '../components/Loading';
 import MessageIcon from '@material-ui/icons/Message';
 import RefundIcon from '@material-ui/icons/AttachMoney';
 import axios from 'axios';
-import { AiOutlineSearch } from 'react-icons/ai';
-import Wrapper from '../assets/Wrappers/SearchWrapper';
-import SearchIcon from '@material-ui/icons/Search';
-import CloseIcon from '@material-ui/icons/Close';
 
 const drawerWidth = 240;
 

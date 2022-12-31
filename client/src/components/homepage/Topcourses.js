@@ -13,16 +13,13 @@ function Topcourses() {
     axios
       .get('http://localhost:8080/api/v1/admin/courses')
       .then((res) => {
-        // console.log(res.data);
         setcours(res.data);
-        //  console.log("serd;lfkasjdfa"+coursess)
       })
       .catch((err) => {
         console.log(err);
       });
   }, []);
   const { courses } = useCourseContext();
-  console.log(courses);
   let sort = courses.sort((a, b) => {
     return b.rating - a.rating;
   });
@@ -51,13 +48,10 @@ function Topcourses() {
       },
     ];
   }
-  console.log(sort);
 
   const h1 = `/course/${sort[0]._id}`;
   const h2 = `/course/${sort[1]._id}`;
   const h3 = `/course/${sort[2]._id}`;
-
-  console.log(h1);
 
   const v1 = {
     border_radius: '30px 0 0 30px',

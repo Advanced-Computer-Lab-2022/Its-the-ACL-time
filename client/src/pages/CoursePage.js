@@ -244,17 +244,18 @@ const useStyles = makeStyles((theme) => ({
 const CoursePage = () => {
   const classes = useStyles();
   const { courseId } = useParams();
-  const [subtitles, setSubtitles] = useState([]);
+  const [subtitles, setSubtitles] = useState(null);
   const { courses, myCourses } = useCourseContext();
   const [course, setCourse] = useState({});
   const { token, user } = useAppContext();
   const [showDescription, setShowDescription] = useState(false);
   const [applyCoupon, setApplyCoupon] = useState(false);
   const [requestRefund, setRequestRefund] = useState(false);
+  const [showRefundForm, setShowRefundForm] = useState(false);
   const [isOwner, setIsOwner] = useState(false);
   const [isEnrolled, setIsEnrolled] = useState(false);
   const [discountPrice, setDiscountPrice] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [showExamForm, setShowExamForm] = useState(false);
   const [showSubtitleForm, setShowSubtitleForm] = useState(false);
   const [alert, setAlert] = useState(null);
@@ -266,6 +267,8 @@ const CoursePage = () => {
   };
 
   useEffect(() => {
+    setLoading(true);
+
     function getCourse() {
       const course = courses.find(
         (course) => course._id.toString() === courseId.toString()
@@ -310,9 +313,31 @@ const CoursePage = () => {
       }
     }
 
+    async function checkRefundState() {
+      const response = await axios.get(
+        `http://localhost:8080/api/v1/refund`,
+        {
+          courseId,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      console.log(response.data);
+    }
+
     checkOwnership();
     getCourse();
-    getSubtitles();
+
+    if (!subtitles) {
+      getSubtitles();
+    }
+
+    if (isEnrolled) {
+      checkRefundState();
+    }
   }, [courseId, courses, myCourses, token]);
 
   const requestRefundHandler = () => {
@@ -389,8 +414,7 @@ const CoursePage = () => {
                       <Rating
                         name='customized-empty'
                         disabled
-                        defaultValue={1}
-                        value={course?.rating}
+                        value={course?.rating || 0}
                         precision={0.2}
                         emptyIcon={
                           <StarBorderIcon
@@ -434,7 +458,7 @@ const CoursePage = () => {
                     variant='h6'
                     className={`${classes.discountPrice}`}
                   >
-                    {discountPrice && discountPrice}
+                    {discountPrice && Math.floor(discountPrice)}
                     {!discountPrice && course?.price}$
                   </Typography>
                   <Typography variant='h6' className={`${classes.actualPrice}`}>
@@ -727,9 +751,11 @@ const CoursePage = () => {
                     (item) =>
                       course &&
                       course.subject === item.subject && (
-                        <div onClick={() => window.scrollTo(0, 0)}>
+                        <div
+                          onClick={() => window.scrollTo(0, 0)}
+                          key={item._id}
+                        >
                           <CourseComponent
-                            key={item._id}
                             title={item.title}
                             subject={item.subject}
                             description={item.summary}

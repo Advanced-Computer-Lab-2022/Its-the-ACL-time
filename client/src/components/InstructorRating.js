@@ -122,6 +122,7 @@ function InstructorRating({ instructorId, type }) {
             },
           }
         );
+        console.log(res.data);
         setInstructor(res.data);
       } catch (error) {
         console.log(error);
