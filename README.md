@@ -107,5 +107,5 @@ We have 2 main users in our website:
 #### As an Instructor 
 -  can sign up, log in, log out, change his mail, password or biography, receive an email for changing forgetten password
 -  view and accept the contract with the website 
--  
+-  ![Add_course](https://ibb.co/YL3mDmv)
 -  
