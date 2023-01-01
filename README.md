@@ -141,10 +141,10 @@ We have 2 main users in our website:
 
 
 ## API references
-Stripe API for Payment process --> https://stripe.com/docs/api
-Googleapis --> https://googleapis.dev/nodejs/googleapis/latest/tasks/
-Nodemailer --> https://nodemailer.com/about/
-Jwt --> https://jwt.io/introduction
+- Stripe API for Payment process --> https://stripe.com/docs/api
+- Googleapis --> https://googleapis.dev/nodejs/googleapis/latest/tasks/
+- Nodemailer --> https://nodemailer.com/about/
+- Jwt --> https://jwt.io/introduction
 
 
 ## Code Example 
