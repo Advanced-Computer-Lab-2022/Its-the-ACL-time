@@ -148,7 +148,7 @@ We have 2 main users in our website:
 
 
 ## Code Example 
-LOGIN PROCESS
+
 export default function Login() {
   const classes = useStyles();
 
