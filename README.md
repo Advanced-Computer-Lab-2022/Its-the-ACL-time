@@ -95,17 +95,27 @@ We have 2 main users in our website:
 - add another administrator with a set username and password.
 - add instructor or corporate trainees and create their usernames and passwords.
 - view course requests from corporate trainees.
+![course request](https://user-images.githubusercontent.com/72264551/210169548-c9c9b6cf-cd16-42e9-8cd7-f68435a08828.png)
 - can set promotion for specific course, number of courses or all courses.
-
 
 ### Guest 
 - select gender and country, view and accept the website payment policy.
 - can view all courses with their total hours, price and rating.
+![courses](https://user-images.githubusercontent.com/72264551/210169508-9be74393-d5fd-4285-87c9-3597d50264a6.png)
 - can filter the courses based on price, subject, or rating.
 - can search for specific course based on instructor or subject and can see a preview video for this course 
+![filter](https://user-images.githubusercontent.com/72264551/210169482-2e937386-6ad2-4724-81c1-9d148a4ac90e.png)
 - can view the most popular courses.
+ ![popular](https://user-images.githubusercontent.com/72264551/210169452-1bf3290a-a2aa-4886-95e4-936addf208c1.png)
+
 #### As an Instructor 
--  can sign up, log in, log out, change his mail, password or biography, receive an email for changing forgetten password
+-  can sign up, log in, log out, change his mail, password or biography, receive an email for changing forgetten password (Update his profile)
+![update profile](https://user-images.githubusercontent.com/72264551/210169281-3e45b755-ccc0-450b-b916-9abdc460eb02.png)
 -  view and accept the contract with the website 
+-  Add Course with subtitles, videos and can define promotion  
 ![add course](https://user-images.githubusercontent.com/72264551/210169092-3d1d114b-bc61-4e55-bff2-78d049985f5a.png)
--  
+![upload](https://user-images.githubusercontent.com/72264551/210169354-37c8bca2-3de7-4ff5-b868-3c4865b88f37.png)
+- view his/her rating and reviews as an instructor
+![rating](https://user-images.githubusercontent.com/72264551/210169410-995fc80d-babf-43d3-b2b7-1227df1a4cd1.png)
+
+-  Create an Exam 
