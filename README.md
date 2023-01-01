@@ -196,7 +196,7 @@ export default function Login() {
 
   const handleLogin = async (e) => {
     e.preventDefault();
-
+}
     const user = {
       email: email.current.value,
       password: password.current.value,
