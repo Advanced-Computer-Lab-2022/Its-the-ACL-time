@@ -134,11 +134,11 @@ function CenteredTabs({ changeTab }) {
         {token &&
           user &&
           (user.type === 'Individual trainee' ||
-            user.type === 'Cooperate trainee') && <Tab label='In Progress' />}
+            user.type === 'Corporate trainee') && <Tab label='In Progress' />}
         {token &&
           user &&
           (user.type === 'Individual trainee' ||
-            user.type === 'Cooperate trainee') && <Tab label='Completed' />}
+            user.type === 'Corporate trainee') && <Tab label='Completed' />}
         {token && user && user.type === 'Instructor' && (
           <Tab label='My Courses' />
         )}
