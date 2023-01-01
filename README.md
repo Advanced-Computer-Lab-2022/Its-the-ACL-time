@@ -17,7 +17,7 @@
 ### Course 
 Advanced Computer Lab (CSEN 704/ DMET 706), Winter 2022
 
-### Theme
+### Motivation
 The theme of the project, is to create a complete Online learning platform. a learning platform is a web application through which Instructors can provide their courses online and individuals can join these courses.
 Such websites include Coursera.com, Udacity.com, and Udemy.com
 
