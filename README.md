@@ -149,10 +149,10 @@ We have 2 main users in our website:
 
 ## Code Example 
 LOGIN PROCESS
-router.route('/login').post(login);
+ - router.route('/login').post(login);
 
 
-const login = async (req, res) => {
+- const login = async (req, res) => {
   const { email, password } = req.body;
 
   if (!email || !password)
@@ -177,42 +177,7 @@ const login = async (req, res) => {
   res.status(StatusCodes.OK).json({ user, token });
 };
 
-export default function Login() {
-  const classes = useStyles();
-
-  const {
-    setup,
-    setAlert,
-    clearAlert,
-    alert,
-    alertText,
-    alertType,
-    isLoading,
-  } = useAppContext();
-
-  const email = useRef();
-  const password = useRef();
-  const navigate = useNavigate();
-
-  const handleLogin = async (e) => {
-    e.preventDefault();
-}
-    const user = {
-      email: email.current.value,
-      password: password.current.value,
-      endPoint: 'login',
-    };
-    if (!user.email || !user.password) {
-      setAlert('error', 'Please Provide all values');
-      setTimeout(() => clearAlert(), 3000);
-    } else {
-      const status = await setup(user);
-      if (status) {
-        console.log('Login Success' + status);
-        setTimeout(() => navigate('/'), 3000);
-      }
-    }
-  };
+-
   
   
 
