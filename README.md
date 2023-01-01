@@ -89,14 +89,17 @@ We have 2 main users in our website:
    * Individual trainee 
    * Corporate trainee
    
-   
+
 ### Administrator
 - Log in using his email and password.
 - add another administrator with a set username and password.
 - add instructor or corporate trainees and create their usernames and passwords.
+![add](https://user-images.githubusercontent.com/72264551/210170605-b2b4e7ff-9af4-4391-ac03-adf7a90cadee.png)
 - view course requests from corporate trainees.
 ![course request](https://user-images.githubusercontent.com/72264551/210169548-c9c9b6cf-cd16-42e9-8cd7-f68435a08828.png)
-- can set promotion for specific course, number of courses or all courses.
+- view reports and resolve or pend it 
+![reports](https://user-images.githubusercontent.com/72264551/210170658-248856e0-da70-4cb7-a70c-ec68053f4716.png)
+
 
 ### Guest 
 - select gender and country, view and accept the website payment policy.
@@ -117,5 +120,96 @@ We have 2 main users in our website:
 ![upload](https://user-images.githubusercontent.com/72264551/210169354-37c8bca2-3de7-4ff5-b868-3c4865b88f37.png)
 - view his/her rating and reviews as an instructor
 ![rating](https://user-images.githubusercontent.com/72264551/210169410-995fc80d-babf-43d3-b2b7-1227df1a4cd1.png)
-
 -  Create an Exam 
+![createExam](https://user-images.githubusercontent.com/72264551/210171381-d3357f82-16f7-4884-9648-fd157220d9ca.jpeg)
+
+
+#### As an individual trainee /corporate trainee 
+- receive an email to change a forgotten password 
+![forget](https://user-images.githubusercontent.com/72264551/210171495-9b72ca67-aa2f-476a-9636-0c11ed8aa6be.jpeg)
+- rate course and instructor 
+![rate course](https://user-images.githubusercontent.com/72264551/210171321-f6d2af5e-142a-45a1-aed2-d45b4ca24622.png)
+- solve the exam, view the correct answers and view his grade 
+![solveExam](https://user-images.githubusercontent.com/72264551/210171615-3d51cfcb-edf4-401a-8b66-e6c9e4bfd2d1.jpeg)
+- write notes while watching the video
+![writeNotes](https://user-images.githubusercontent.com/72264551/210171658-88e162d0-7304-41f5-8fff-76be0653b9ad.jpeg)
+- recieve a Certificate at the end of the course 
+[certificate (3).pdf](https://github.com/Advanced-Computer-Lab-2022/Its-the-ACL-time/files/10328842/certificate.3.pdf)
+- report any problem and see the previous reports 
+![previous](https://user-images.githubusercontent.com/72264551/210171769-2ab4e848-2b75-4d2d-8760-f35fe06f41cd.png)
+![report](https://user-images.githubusercontent.com/72264551/210171774-928a8d17-768e-4874-8f2e-291488e19df0.png)
+
+
+## API references
+Stripe API for Payment process --> https://stripe.com/docs/api
+
+
+## Code Example 
+LOGIN PROCESS
+router.route('/login').post(login);
+
+
+const login = async (req, res) => {
+  const { email, password } = req.body;
+
+  if (!email || !password)
+    throw new BadRequestError('please provide all values');
+
+  const user = await User.findOne({ email });
+
+  if (!user) throw new UnauthorizedError('Invalid credentials');
+
+  const isMatch = await user.comparePassword(password.toString());
+
+  if (!isMatch) throw new UnauthorizedError('Invalid credentials');
+
+  const token = await generateToken({
+    userId: user._id,
+    type: user.type,
+  });
+
+  user.type = {};
+  user.password = '';
+
+  res.status(StatusCodes.OK).json({ user, token });
+};
+
+export default function Login() {
+  const classes = useStyles();
+
+  const {
+    setup,
+    setAlert,
+    clearAlert,
+    alert,
+    alertText,
+    alertType,
+    isLoading,
+  } = useAppContext();
+
+  const email = useRef();
+  const password = useRef();
+  const navigate = useNavigate();
+
+  const handleLogin = async (e) => {
+    e.preventDefault();
+
+    const user = {
+      email: email.current.value,
+      password: password.current.value,
+      endPoint: 'login',
+    };
+    if (!user.email || !user.password) {
+      setAlert('error', 'Please Provide all values');
+      setTimeout(() => clearAlert(), 3000);
+    } else {
+      const status = await setup(user);
+      if (status) {
+        console.log('Login Success' + status);
+        setTimeout(() => navigate('/'), 3000);
+      }
+    }
+  };
+  
+  
+
