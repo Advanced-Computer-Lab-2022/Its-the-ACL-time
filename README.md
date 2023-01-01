@@ -9,8 +9,8 @@
   * [Admin Functionalities](#administrator)
   * [User/Guest Functionalities](#guest)
 - [API References](#api-references)
-  * [Admin Router](#admin-router)
-  * [User Router](#user-router)
+- [Code Example](#code-example)
+
 
 ## Project Description
 
