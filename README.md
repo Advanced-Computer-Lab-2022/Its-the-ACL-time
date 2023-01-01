@@ -7,7 +7,7 @@
 - [Installation](#installation)
 - [Features](#features)
   * [Admin Functionalities](#administrator)
-  * [User/Guest Functionalities](#user)
+  * [User/Guest Functionalities](#guest)
 - [API References](#api-references)
   * [Admin Router](#admin-router)
   * [User Router](#user-router)
