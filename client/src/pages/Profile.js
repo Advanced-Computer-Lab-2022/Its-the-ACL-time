@@ -37,8 +37,34 @@ import Loading from '../components/Loading';
 import MessageIcon from '@material-ui/icons/Message';
 import RefundIcon from '@material-ui/icons/AttachMoney';
 import axios from 'axios';
+import FilterField from '../components/FilterField';
+import RatingStars from '../components/RatingStars';
 
 const drawerWidth = 240;
+
+const ratingOptions = [1, 2, 3, 4, 5].map((rate) => {
+  return (
+    <span
+      style={{
+        display: 'flex',
+        alignItems: 'center',
+      }}
+    >
+      <RatingStars rate={rate} />
+      <p
+        style={{
+          marginLeft: '0.5rem',
+          fontSize: '.8rem',
+          fontWeight: '600',
+          color: '#A9A9A9',
+          marginTop: '1rem',
+        }}
+      >
+        star{rate > 1 ? 's' : ''}
+      </p>
+    </span>
+  );
+});
 
 const InstructorSideBar = [
   {
@@ -317,33 +343,125 @@ function InstructorProfile({ courses }) {
   const [page, setPage] = useState(0);
   const navigate = useNavigate();
   const classes = useStyles();
-  const [state, setState] = useState({
-    query: '',
-    filteredCourses: [],
-  });
+  const inputRef = useRef();
+
+  const [renderedCourses, setRenderedCourses] = useState([]);
+  const [topics, setTopics] = useState([]);
+  const [prices, setPrices] = useState([]);
+  const [ratings, setRatings] = useState([]);
+
+  useEffect(() => {
+    setRenderedCourses(courses);
+  }, [courses]);
 
   const search = (term) => {
+    if (term === '') {
+      return courses;
+    }
+
     const searchResults = {};
 
-    const filteredCourses = [];
+    const searchedCourses = [];
     courses.forEach((course) => {
       const title = course.title.toLowerCase().includes(term.toLowerCase());
       const subject = course.subject.toLowerCase().includes(term.toLowerCase());
 
       if (title && !searchResults[title]) {
         searchResults[title] = true;
-        filteredCourses.push(course);
+        searchedCourses.push(course);
       }
       if (subject && !searchResults[subject]) {
         searchResults[subject] = true;
-        filteredCourses.push(course.subject);
+        searchedCourses.push(course);
       }
     });
-    console.log(filteredCourses);
-    setState({
-      query: term,
-      filteredCourses,
+    console.log(searchedCourses);
+    return searchedCourses;
+  };
+
+  const checkCourse = (candidateCourse, topics, prices, ratings) => {
+    let topicFlag =
+      topics.length === 0 || topics.includes(candidateCourse.title)
+        ? true
+        : false;
+
+    let priceFlag = prices.length === 0;
+
+    prices.forEach((price) => {
+      const [min, max] = price.split('-');
+      priceFlag =
+        priceFlag ||
+        (candidateCourse.price >= parseInt(min) &&
+          candidateCourse.price <= parseInt(max));
     });
+
+    let ratingFlag = ratings.length === 0;
+
+    ratings.forEach((rating) => {
+      ratingFlag = ratingFlag || candidateCourse.rating === parseInt(rating);
+    });
+
+    return topicFlag && priceFlag && ratingFlag;
+  };
+
+  const handleFilter = (searchedCourses, topics, prices, ratings) => {
+    const filtered = searchedCourses.filter((course) => {
+      return checkCourse(course, topics, prices, ratings);
+    });
+    return filtered;
+  };
+
+  const handleResult = (filter, field) => {
+    const searchedCourses = search(inputRef.current.value);
+
+    let currentTopics = topics;
+    let currentPrices = prices;
+    let currentRatings = ratings;
+
+    if (filter) {
+      switch (field) {
+        case 'Topic':
+          if (topics.indexOf(filter) !== -1) {
+            setTopics((prev) => [...prev.filter((topic) => topic !== filter)]);
+            currentTopics.splice(currentTopics.indexOf(filter), 1);
+          } else {
+            setTopics((prev) => [...prev, filter]);
+            currentTopics.push(filter);
+          }
+          break;
+
+        case 'Price':
+          if (prices.indexOf(filter) !== -1) {
+            setPrices((prev) => [...prev.filter((price) => price !== filter)]);
+            currentPrices.splice(currentPrices.indexOf(filter), 1);
+          } else {
+            setPrices((prev) => [...prev, filter]);
+            currentPrices.push(filter);
+          }
+          break;
+        case 'Rating':
+          if (ratings.indexOf(filter) !== -1) {
+            setRatings((prev) => [
+              ...prev.filter((rating) => rating !== filter),
+            ]);
+            currentRatings.splice(currentRatings.indexOf(filter), 1);
+          } else {
+            setRatings((prev) => [...prev, filter]);
+            currentRatings.push(filter);
+          }
+          break;
+        default:
+          break;
+      }
+    }
+
+    const filteredCourses = handleFilter(
+      searchedCourses,
+      currentTopics,
+      currentPrices,
+      currentRatings
+    );
+    setRenderedCourses(filteredCourses);
   };
 
   return (
@@ -424,28 +542,77 @@ function InstructorProfile({ courses }) {
           }}
         >
           <h2>My Courses</h2>
-          <form
+          <div
             style={{
-              marginBottom: '2rem',
-              width: '50%',
+              width: '100%',
+              display: 'flex',
+              flexDirection: 'row',
+              justifyContent: 'center',
+              alignItems: 'center',
             }}
           >
-            <input
-              type='text'
-              placeholder='Search in your courses'
-              className={classes.search}
-              value={state.query}
-              name='searchInput'
-              onChange={(e) => search(e.target.value)}
-            />
-          </form>
-          <div className={classes.courses}>
-            {state.query !== '' &&
-              state.filteredCourses.length !== 0 &&
-              state.filteredCourses
+            <form
+              style={{
+                width: '50%',
+                marginBottom: '2rem',
+              }}
+            >
+              <input
+                type='text'
+                placeholder='Search in your courses'
+                className={classes.search}
+                name='searchInput'
+                ref={inputRef}
+                onChange={handleResult}
+              />
+            </form>
+          </div>
+          <div
+            style={{
+              width: '100%',
+              display: 'flex',
+              flexDirection: 'row',
+              justifyContent: 'flex-start',
+              alignItems: 'flex-start',
+            }}
+          >
+            <div
+              style={{
+                marginRight: '2rem',
+                backgroundColor: '#f5f5f5',
+                padding: '1rem',
+                borderRadius: '1rem',
+              }}
+            >
+              <FilterField
+                title='Topic'
+                options={courses.map((course) => course.subject)}
+                onFilter={handleResult}
+              />
+              <hr className={`${classes.hr}`} />
+              <FilterField
+                title='Rating'
+                options={ratingOptions}
+                onFilter={handleResult}
+              />
+              <hr />
+              <FilterField
+                title='Price'
+                options={[
+                  '0 - 10',
+                  '10 - 100',
+                  '100 - 1000',
+                  '1000 - 10000',
+                  '10000+',
+                ]}
+                onFilter={handleResult}
+              />
+            </div>
+            <div className={classes.courses}>
+              {renderedCourses
                 ?.slice(
                   page * 3,
-                  Math.min(page * 3 + 3, state.filteredCourses.length)
+                  Math.min(page * 3 + 3, renderedCourses.length)
                 )
                 .map((course) => {
                   return (
@@ -461,23 +628,7 @@ function InstructorProfile({ courses }) {
                     />
                   );
                 })}
-            {state.query === '' &&
-              courses
-                ?.slice(page * 3, Math.min(page * 3 + 3, courses.length))
-                .map((course) => {
-                  return (
-                    <CourseComponent
-                      key={course?._id}
-                      title={course?.title}
-                      subject={course?.subject}
-                      description={course?.summary}
-                      courseId={course?._id}
-                      horizontal={true}
-                      rating={course?.rating}
-                      demo={false}
-                    />
-                  );
-                })}
+            </div>
           </div>
 
           <div
@@ -489,11 +640,7 @@ function InstructorProfile({ courses }) {
             }}
           >
             <Pagination
-              count={
-                state.query === ''
-                  ? Math.ceil(courses.length / 3)
-                  : Math.ceil(state.filteredCourses.length / 3)
-              }
+              count={Math.ceil(renderedCourses.length / 3) || 1}
               onChange={(e, value) => setPage(value - 1)}
               color='primary'
             />

@@ -330,12 +330,12 @@ const useStyles = makeStyles((theme) => ({
 
 const SubtitlesPage = () => {
   const Alert = React.forwardRef(function Alert(props, ref) {
-    return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
+    return <MuiAlert elevation={6} ref={ref} variant='filled' {...props} />;
   });
   const classes = useStyles();
-  const[opensnake,setopensnake]=useState(false);
-  const[message,setmessage]=useState("");
-  const[typemessage,settypemessage]=useState("");
+  const [opensnake, setopensnake] = useState(false);
+  const [message, setmessage] = useState('');
+  const [typemessage, settypemessage] = useState('');
   const [loading, setLoading] = useState(true);
   const [showList, setShowList] = useState(true);
   const [subtitles, setSubtitles] = useState([]);
@@ -398,16 +398,15 @@ const SubtitlesPage = () => {
         );
         console.log(report);
         setopensnake(true);
-        setmessage("Message added")
-        settypemessage("success")
+        setmessage('Message added');
+        settypemessage('success');
         setOpen(false);
-
       })
       .catch((err) => {
-        console.log(err)
+        console.log(err);
         setopensnake(true);
-        setmessage(err)
-        settypemessage("error")
+        setmessage(err);
+        settypemessage('error');
       });
   };
 
@@ -898,16 +897,20 @@ const SubtitlesPage = () => {
               </Reportform>
             </div>
             <Snackbar
-        anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
-        open={opensnake}
-        onClose={opensnake}
-        message={message}
-        key={"top" + "center"}
-      >
-       <Alert onClose={()=> setopensnake(false)} severity={typemessage} sx={{ width: '100%' }}>
-          {message}
-        </Alert>
-      </Snackbar>
+              anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
+              open={opensnake}
+              onClose={opensnake}
+              message={message}
+              key={'top' + 'center'}
+            >
+              <Alert
+                onClose={() => setopensnake(false)}
+                severity={typemessage}
+                sx={{ width: '100%' }}
+              >
+                {message}
+              </Alert>
+            </Snackbar>
             <div className={`${classes.line}`}></div>
 
             <div className={`${classes.videoInfoBody}`}>
@@ -945,7 +948,6 @@ const SubtitlesPage = () => {
                         <th>Type</th>
 
                         <th>Follew UP </th>
-                       
 
                         <th></th>
                       </tr>
@@ -956,7 +958,7 @@ const SubtitlesPage = () => {
                           <td>{x.title}</td>
                           <td>{x.status}</td>
                           <td>{x.type}</td>
-                         
+
                           <td>
                             {
                               <Accordion>
