@@ -452,7 +452,7 @@ const CoursePage = () => {
                 </button>
 
               ) : (
-                (user.type === "Individual trainee" || "Instructor") ? <BuyCourse courseId={courseId} coursePrice={course?.price}></BuyCourse> : <RequestCourse></RequestCourse>
+                (user.type === "Individual trainee" || user.type === "Instructor") ? <BuyCourse courseId={courseId} coursePrice={course?.price}></BuyCourse> : <RequestCourse courseId={courseId}></RequestCourse>
               )}
               <p>
                 <AiOutlineCheck /> 30-Day Money-Back Guarantee

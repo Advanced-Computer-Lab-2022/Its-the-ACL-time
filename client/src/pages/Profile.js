@@ -37,6 +37,7 @@ import CourseComponent from '../components/course/CourseComponent';
 import Loading from '../components/Loading';
 import MessageIcon from '@material-ui/icons/Message';
 // import money icon
+import InstructorWallet from '../components/InstructorWallet';
 import RefundIcon from '@material-ui/icons/AttachMoney';
 import axios from 'axios';
 
@@ -685,7 +686,7 @@ export default function Profile() {
           (clsx(classes.appBar, {
             [classes.appBarShift]: open,
           }),
-          'bg-dark')
+            'bg-dark')
         }
       >
         <Toolbar
@@ -740,18 +741,18 @@ export default function Profile() {
           {
             // choose which sidebar to render based on user role
             user.type === 'Instructor' &&
-              InstructorSideBar.map((item, index) => (
-                <ListItem
-                  button
-                  key={index}
-                  onClick={() => {
-                    setComponent(item.title);
-                  }}
-                >
-                  <ListItemIcon>{item.icon}</ListItemIcon>
-                  <ListItemText primary={item.title} />
-                </ListItem>
-              ))
+            InstructorSideBar.map((item, index) => (
+              <ListItem
+                button
+                key={index}
+                onClick={() => {
+                  setComponent(item.title);
+                }}
+              >
+                <ListItemIcon>{item.icon}</ListItemIcon>
+                <ListItemText primary={item.title} />
+              </ListItem>
+            ))
           }
           {user.type === 'Corporate trainee' &&
             CorporateSideBar.map((item, index) => (
@@ -813,6 +814,9 @@ export default function Profile() {
           {component === 'My Courses' && user.type === 'Instructor' && (
             <InstructorProfile courses={courses}></InstructorProfile>
           )}
+          {component === "Wallet" && user.type === 'Instructor'
+            && <InstructorWallet></InstructorWallet>
+          }
           {component === 'Refund' && (
             <>
               <h1>Your refund requests</h1>

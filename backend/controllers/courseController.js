@@ -3,6 +3,7 @@ const { Course, User, Wallet } = require('../models');
 const { UnauthorizedError, BadRequestError } = require('../Errors');
 const { verifyToken } = require('../utils/jwt');
 const { default: mongoose } = require('mongoose');
+const {addEarning,addWallet} = require('../utils/addEarning');
 
 const buyWithWallet = async (req, res) => {
   const { userId } = req.user;
@@ -23,6 +24,8 @@ const buyWithWallet = async (req, res) => {
     );
     user.courses.push({ courseId: courseId, isCompleted: false });
     await user.save();
+    addEarning(CourseObject.price,CourseObject.createdBy);
+    addWallet(CourseObject.price,CourseObject.createdBy);
     res.status(200).send({ msg: 'payment success' });
   } else {
     res.status(400).send({ msg: 'payment failed' });

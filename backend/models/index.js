@@ -8,6 +8,7 @@ const SubTitle = require('./SubTitle');
 const Report = require('./Report');
 const CourseRequest = require('./CourseRequest');
 const Post = require('./Post');
+const Earning = require('./EarningModel');
 
 module.exports = {
   User,
@@ -20,4 +21,5 @@ module.exports = {
   Report,
   CourseRequest,
   Post,
+  Earning
 };
