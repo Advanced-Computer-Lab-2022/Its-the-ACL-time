@@ -1,10 +1,45 @@
 import React, { useContext, useEffect, useState } from 'react';
 import axios from 'axios';
 import { useAppContext } from '../App/appContext';
+import currencyConverter from '../../services/CurrencyConverter';
 
 const initialState = {
   courses: [],
   myCourses: [],
+};
+
+const countryAbbreviation = {
+  Egypt: 'EG',
+  'United States': 'USD',
+  'United Kingdom': 'GBP',
+  Germany: 'EUR',
+  France: 'EUR',
+  Italy: 'EUR',
+  Spain: 'EUR',
+  Japan: 'JPY',
+  China: 'CNY',
+  India: 'INR',
+  Brazil: 'BRL',
+  Russia: 'RUB',
+  Australia: 'AUD',
+  Canada: 'CAD',
+  Mexico: 'MXN',
+  Indonesia: 'IDR',
+  Turkey: 'TRY',
+  'South Africa': 'ZAR',
+  Nigeria: 'NGN',
+  'Saudi Arabia': 'SAR',
+  'South Korea': 'KRW',
+  'United Arab Emirates': 'AED',
+  'Hong Kong': 'HKD',
+  'Taiwan, Province of China': 'TWD',
+  'Singapore, Republic of': 'SGD',
+  'Thailand, Kingdom of': 'THB',
+  'Philippines, Republic of the': 'PHP',
+  'Malaysia, Malaysia': 'MYR',
+  'Viet Nam': 'VND',
+  'New Zealand': 'NZD',
+  'Netherlands, Kingdom of the': 'EUR',
 };
 
 const CourseContext = React.createContext();
@@ -24,16 +59,31 @@ const CourseProvider = ({ children }) => {
   };
 
   useEffect(() => {
-    const getAllCourses = async () =>
-      axios
-        .get('http://localhost:8080/api/v1/course')
-        .then(({ data }) => {
-          setState({
-            ...state,
-            courses: data.courses,
-          });
-        })
-        .catch((error) => console.log(error));
+    const getAllCourses = async () => {
+      try {
+        const response = await axios.get('http://localhost:8080/api/v1/course');
+        const { data } = response;
+        const { courses } = data;
+
+        const country = countryAbbreviation[user?.country];
+        const convertedCourses = await Promise.all(
+          courses.map(async (course) => {
+            const { price, currency } = await currencyConverter(
+              country,
+              course.price
+            );
+            return { ...course, price, currency };
+          })
+        );
+
+        setState({
+          ...state,
+          courses: convertedCourses,
+        });
+      } catch (error) {
+        console.log(error);
+      }
+    };
 
     getAllCourses();
   }, [token]);

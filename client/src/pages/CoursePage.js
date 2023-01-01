@@ -1,5 +1,5 @@
 import RequestCourse from '../components/RequestCourse';
-import React, { useEffect, useMemo, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { makeStyles } from '@material-ui/core/styles';
 import { Link, useParams } from 'react-router-dom';
 import axios from 'axios';
@@ -459,10 +459,12 @@ const CoursePage = () => {
                     className={`${classes.discountPrice}`}
                   >
                     {discountPrice && Math.floor(discountPrice)}
-                    {!discountPrice && course?.price}$
+                    {!discountPrice && course?.price}
+                    {course?.currency}
                   </Typography>
                   <Typography variant='h6' className={`${classes.actualPrice}`}>
                     {discountPrice && course?.price}
+                    {course?.currency}
                   </Typography>
                   <Typography variant='h6' className={`${classes.discount}`}>
                     {discountPrice &&
@@ -756,12 +758,13 @@ const CoursePage = () => {
                           key={item._id}
                         >
                           <CourseComponent
-                            title={item.title}
-                            subject={item.subject}
-                            description={item.summary}
-                            instructor={item.createdBy.username}
-                            price={item.price}
-                            courseId={item._id}
+                            title={item?.title}
+                            subject={item?.subject}
+                            description={item?.summary}
+                            instructor={item?.createdBy.username}
+                            price={item?.price}
+                            courseId={item?._id}
+                            currency={item?.currency}
                             horizontal={false}
                           />
                         </div>

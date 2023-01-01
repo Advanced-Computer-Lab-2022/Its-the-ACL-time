@@ -234,13 +234,13 @@ function NavBar() {
                     }}
                   ></div>
                   <div className={`${classes.profileListBody}`}>
-                    <Link to='/profile/myCourses'>
-                      {/* learning icon */}
+                    <Link to='/profile'>
                       <span className={`${classes.profileListItem}`}>
                         <i
-                          className='fas fa-book-open'
+                          className='fas fa-user'
                           style={{ marginRight: '0.5rem' }}
                         ></i>
+
                         <p
                           style={{
                             fontSize: '1rem',
@@ -249,25 +249,7 @@ function NavBar() {
                             marginLeft: '0.5rem',
                           }}
                         >
-                          My Courses
-                        </p>
-                      </span>
-                    </Link>
-                    <Link to='/cart'>
-                      <span className={`${classes.profileListItem}`}>
-                        <i
-                          className='fas fa-shopping-cart'
-                          style={{ marginRight: '0.5rem' }}
-                        ></i>
-                        <p
-                          style={{
-                            fontSize: '1rem',
-                            fontWeight: '350',
-                            marginBottom: '0',
-                            marginLeft: '0.5rem',
-                          }}
-                        >
-                          Cart
+                          Profile
                         </p>
                       </span>
                     </Link>

@@ -128,6 +128,7 @@ function InstructorProfile() {
                       title={course?.title}
                       subject={course?.subject}
                       price={course?.price}
+                      currency={course?.currency}
                       description={course?.summary}
                       previewLink={course?.previewLink}
                       numberOfHours={course?.numberOfHours}

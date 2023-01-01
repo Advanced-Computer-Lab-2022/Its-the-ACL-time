@@ -208,12 +208,6 @@ export default function Register() {
                 defaultValue={'user'}
               >
                 <MenuItem
-                  value='Instructor'
-                  onClick={() => handleCompanyPolicy(true)}
-                >
-                  Instructor
-                </MenuItem>
-                <MenuItem
                   value='Individual trainee'
                   onClick={() => handleCompanyPolicy(false)}
                 >

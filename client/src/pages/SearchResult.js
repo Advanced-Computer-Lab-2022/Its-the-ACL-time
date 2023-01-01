@@ -308,6 +308,7 @@ function SearchResult() {
                     instructor={course.createdBy.username}
                     price={course.price}
                     courseId={course._id}
+                    currency={course.currency}
                     horizontal={true}
                     rating={course.rating}
                   />

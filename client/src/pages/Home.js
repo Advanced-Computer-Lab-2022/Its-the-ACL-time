@@ -151,9 +151,9 @@ const Home = () => {
   const classes = useStyles();
   const [tab, setTab] = useState(0);
   const { courses, myCourses } = useCourseContext();
-  const [sortedCourses, setSortedCourses] = useState([]);
-  const [inProgress, setInprogress] = useState([]);
-  const [completed, setCompleted] = useState([]);
+  const [sortedCourses, setSortedCourses] = useState();
+  const [inProgress, setInprogress] = useState();
+  const [completed, setCompleted] = useState();
   const [page, setPage] = useState(0);
   const [loading, setLoading] = useState(true);
 
@@ -170,7 +170,9 @@ const Home = () => {
       setSortedCourses(courses);
       setInprogress(inprogress);
       setCompleted(completed);
-      setLoading(false);
+      if (completed && inprogress && courses) {
+        setLoading(false);
+      }
     }
   }, [myCourses, courses]);
 
@@ -218,6 +220,7 @@ const Home = () => {
                       rating={course?.rating}
                       progress={course?.progress}
                       demo={false}
+                      currency={course?.currency}
                     />
                   );
                 })}
@@ -312,6 +315,7 @@ const Home = () => {
                       courseId={course?._id}
                       horizontal={false}
                       subject={course?.subject}
+                      currency={course?.currency}
                       numOfHours={course?.numOfHours}
                     />
                   );
