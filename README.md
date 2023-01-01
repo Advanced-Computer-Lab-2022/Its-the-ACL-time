@@ -149,26 +149,6 @@ We have 2 main users in our website:
 
 ## Code Example 
 
-export default function Login() {
-  const classes = useStyles();
-
-  const {
-    setup,
-    setAlert,
-    clearAlert,
-    alert,
-    alertText,
-    alertType,
-    isLoading,
-  } = useAppContext();
-
-  const email = useRef();
-  const password = useRef();
-  const navigate = useNavigate();
-
-  const handleLogin = async (e) => {
-    e.preventDefault();
-
     const user = {
       email: email.current.value,
       password: password.current.value,
@@ -184,91 +164,4 @@ export default function Login() {
         setTimeout(() => navigate('/'), 3000);
       }
     }
-  };
-
-  return (
-    <Container component='main' maxWidth='xs'>
-      <CssBaseline />
-      <div className={classes.paper}>
-        <Avatar className={classes.avatar}>
-          <LockOutlinedIcon />
-        </Avatar>
-        <Typography component='h1' variant='h5'>
-          Sign in
-        </Typography>
-        {isLoading && <Loading type='spinningBubbles' color='red' />}
-        {alert && (
-          <Alert variant='filled' severity={alertType}>
-            {alertText}
-          </Alert>
-        )}
-        <form className={classes.form} noValidate>
-          <TextField
-            inputRef={email}
-            variant='outlined'
-            margin='normal'
-            required
-            fullWidth
-            id='email'
-            label='Email Address'
-            name='email'
-            autoComplete='email'
-            autoFocus
-          />
-          <TextField
-            inputRef={password}
-            variant='outlined'
-            margin='normal'
-            required
-            fullWidth
-            name='password'
-            label='Password'
-            type='password'
-            id='password'
-            autoComplete='current-password'
-          />
-          <FormControlLabel
-            control={<Checkbox value='remember' color='primary' />}
-            label='Remember me'
-          />
-          <Button
-            type='submit'
-            fullWidth
-            variant='contained'
-            color='primary'
-            className={classes.submit}
-            onClick={handleLogin}
-          >
-            Sign In
-          </Button>
-          <Grid container>
-            <Grid item xs>
-              <Link
-                variant='body2'
-                onClick={() => {
-                  navigate('/forgetPassword');
-                }}
-                style={{ cursor: 'pointer' }}
-              >
-                Forgot password?
-              </Link>
-            </Grid>
-            <Grid item>
-              <Link href='/register' variant='body2'>
-                {"Don't have an account? Sign Up"}
-              </Link>
-            </Grid>
-          </Grid>
-        </form>
-      </div>
-      <Box mt={8}>
-        <Copyright />
-      </Box>
-    </Container>
-  );
-}
-
--
-  
-  
-
+ 
