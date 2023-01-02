@@ -12,6 +12,7 @@
 - [API References](#api-references)
 - [Code Example](#code-example)
 - [Credits](#credits)
+- [License](#license) 
 
 
 ## Project Description
@@ -224,4 +225,6 @@ if (oldPassword && newPassword) {
  - Traversy Media (Youtube Channel) --> https://www.youtube.com/channel/UC29ju8bIPH5as8OGnQzwJyA
  - The Net Ninja (Youtube Channel) --> https://www.youtube.com/channel/UCW5YeuERMmlnqo4oq8vwUpg
  - W3schools (Online Web Tutorials) --> https://www.w3schools.com/
+ 
+ ## License 
  
