@@ -9,6 +9,7 @@ import { useAppContext } from '../context/App/appContext';
 import { Pagination } from '@material-ui/lab';
 import motivationalImage from '../assets/images/motivational.jpg';
 import Footer from '../components/Footer';
+import { useNavigate } from 'react-router-dom';
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -150,6 +151,8 @@ function CenteredTabs({ changeTab }) {
 
 const Home = () => {
   const classes = useStyles();
+  const navigate = useNavigate();
+  const {user,token} = useAppContext();
   const [tab, setTab] = useState(0);
   const { courses, myCourses } = useCourseContext();
   const [sortedCourses, setSortedCourses] = useState();
@@ -157,7 +160,12 @@ const Home = () => {
   const [completed, setCompleted] = useState();
   const [page, setPage] = useState(0);
   const [loading, setLoading] = useState(true);
-
+  
+  if(user.type==="Admin"){
+    navigate('/admin');
+  }
+  
+  
   useEffect(() => {
     setLoading(true);
     if (myCourses && courses && courses.length > 0) {

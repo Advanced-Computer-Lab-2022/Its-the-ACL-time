@@ -148,7 +148,8 @@ const CourseProvider = ({ children }) => {
               country,
               course.price
             );
-            return { ...course, price, currency };
+            let originalPrice = course.price;
+            return { ...course, price,originalPrice, currency };
           })
         );
 

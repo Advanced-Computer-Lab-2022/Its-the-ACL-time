@@ -23,9 +23,9 @@ async function convertCurrencies(from, to, amount) {
 
 export default async function currencyConverter(country, price) {
   let currency = data[country];
-  price = await convertCurrencies('USD', currency, price);
+  let newPrice = await convertCurrencies('USD', currency, price);
   console.log('price', price);
-  return { price, currency };
+  return { newPrice, currency };
 }
 
 const data = {

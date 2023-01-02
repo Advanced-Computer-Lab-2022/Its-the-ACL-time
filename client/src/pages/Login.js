@@ -85,10 +85,15 @@ export default function Login() {
       if (result.type) {
         setAlert(result.msg);
         setAlertType('success');
+        let redirect = '/';
+        if (result.type === "Admin") {
+          redirect = '/admin';
+        }
+        console.log("login result",result);
         setTimeout(() => {
           setAlert(null);
           setAlertType(null);
-          navigate('/');
+          navigate(redirect);
         }, 3000);
       } else {
         setAlert(result.msg);

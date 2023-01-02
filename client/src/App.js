@@ -64,7 +64,7 @@ function App() {
           <SearchProvider>
             <Routes>
               <Route path='/landing' element={<Landing />} />
-              <Route path='admin' element={<Admin />}>
+              <Route path='admin' element={<ProtectedRoute><Admin /></ProtectedRoute>}>
                 <Route path='' element={<UserforAdmin />} />
                 <Route path='users' element={<UserforAdmin />} />
                 <Route path='Report' element={<Report></Report>} />
