@@ -1011,6 +1011,10 @@ export default function Profile() {
                 <ListItemText primary={item.title} />
               </ListItem>
             ))}
+          <ListItem>
+            <ListItemIcon><AccountBalanceWalletIcon></AccountBalanceWalletIcon></ListItemIcon>
+            <ListItemText primary={"wallet " + wallet + " $"} />
+          </ListItem>
         </List>
         <Divider />
         <ListItem
