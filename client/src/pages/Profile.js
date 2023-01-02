@@ -41,6 +41,7 @@ import axios from 'axios';
 import FilterField from '../components/FilterField';
 import RatingStars from '../components/RatingStars';
 import useWallet from '../components/CustomHooks/getWallet';
+import contract from '../assets/contract.pdf';
 
 const drawerWidth = 240;
 
@@ -84,6 +85,10 @@ const InstructorSideBar = [
   {
     title: 'Messages',
     icon: <MessageIcon />,
+  },
+  {
+    title: 'Contract',
+    icon: <HelpIcon />,
   },
 ];
 
@@ -282,6 +287,35 @@ const useStyles = makeStyles((theme) => ({
     boxShadow: '0 0 10px 0 rgba(0,0,0,0.3)',
   },
 }));
+
+const Contract = () => {
+  const classes = useStyles();
+
+  const downloadContract = () => {
+    const element = document.createElement('a');
+    element.setAttribute('href', contract);
+    element.setAttribute('download', 'contract.pdf');
+    element.style.display = 'none';
+    document.body.appendChild(element);
+    element.click();
+    document.body.removeChild(element);
+  };
+
+  return (
+    <div className={classes.contract}>
+      <h1>Contract</h1>
+      {/* make a button to download contract */}
+      <Button
+        variant='contained'
+        color='primary'
+        onClick={downloadContract}
+        style={{ marginTop: '1rem' }}
+      >
+        Download Contract
+      </Button>
+    </div>
+  );
+};
 
 const Card = ({ image, title, text }) => {
   const classes = useStyles();
@@ -917,7 +951,7 @@ export default function Profile() {
           (clsx(classes.appBar, {
             [classes.appBarShift]: open,
           }),
-            'bg-dark')
+          'bg-dark')
         }
       >
         <Toolbar
@@ -972,18 +1006,18 @@ export default function Profile() {
           {
             // choose which sidebar to render based on user role
             user.type === 'Instructor' &&
-            InstructorSideBar.map((item, index) => (
-              <ListItem
-                button
-                key={index}
-                onClick={() => {
-                  setComponent(item.title);
-                }}
-              >
-                <ListItemIcon>{item.icon}</ListItemIcon>
-                <ListItemText primary={item.title} />
-              </ListItem>
-            ))
+              InstructorSideBar.map((item, index) => (
+                <ListItem
+                  button
+                  key={index}
+                  onClick={() => {
+                    setComponent(item.title);
+                  }}
+                >
+                  <ListItemIcon>{item.icon}</ListItemIcon>
+                  <ListItemText primary={item.title} />
+                </ListItem>
+              ))
           }
           {user.type === 'Corporate trainee' &&
             CorporateSideBar.map((item, index) => (
@@ -1012,8 +1046,10 @@ export default function Profile() {
               </ListItem>
             ))}
           <ListItem>
-            <ListItemIcon><AccountBalanceWalletIcon></AccountBalanceWalletIcon></ListItemIcon>
-            <ListItemText primary={"wallet " + wallet + " $"} />
+            <ListItemIcon>
+              <AccountBalanceWalletIcon></AccountBalanceWalletIcon>
+            </ListItemIcon>
+            <ListItemText primary={'wallet ' + wallet + ' $'} />
           </ListItem>
         </List>
         <Divider />
@@ -1049,9 +1085,9 @@ export default function Profile() {
           {component === 'My Courses' && user.type === 'Instructor' && (
             <InstructorProfile courses={courses}></InstructorProfile>
           )}
-          {component === "Wallet" && user.type === 'Instructor'
-            && <InstructorWallet></InstructorWallet>
-          }
+          {component === 'Wallet' && user.type === 'Instructor' && (
+            <InstructorWallet></InstructorWallet>
+          )}
           {component === 'Refund' && (
             <>
               <h1>Your refund requests</h1>
@@ -1089,6 +1125,9 @@ export default function Profile() {
               classes={{ ul: classes.ul }}
               style={{ marginTop: '2rem' }}
             />
+          )}
+          {component === 'Contract' && user.type === 'Instructor' && (
+            <Contract></Contract>
           )}
 
           {component === 'Settings' && <Settings />}
