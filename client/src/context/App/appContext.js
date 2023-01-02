@@ -112,6 +112,7 @@ const AppProvider = ({ children }) => {
       return {
         msg: 'Successfully! Redirecting to home page...',
         type: true,
+        admin: user?.type === 'Admin',
       };
     } catch (error) {
       return {
