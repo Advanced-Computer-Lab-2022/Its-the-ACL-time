@@ -478,13 +478,8 @@ const CoursePage = () => {
                 <button className={`${classes.addToCart}`}>
                   <Link to={`/course/${courseId}/content`}>Go to course</Link>
                 </button>
-              ) : user.type === 'Individual trainee' || 'Instructor' ? (
-                <BuyCourse
-                  courseId={courseId}
-                  coursePrice={course?.price}
-                ></BuyCourse>
               ) : (
-                (user.type === "Individual trainee" || user.type === "Instructor") ? <BuyCourse courseId={courseId} coursePrice={course?.price}></BuyCourse> : <RequestCourse courseId={courseId}></RequestCourse>
+                (user.type === "Individual trainee" || user.type === "Instructor") ? <BuyCourse courseId={courseId} coursePrice={course?.originalPrice}></BuyCourse> : <RequestCourse courseId={courseId}></RequestCourse>
               )}
               <p>
                 <AiOutlineCheck /> 30-Day Money-Back Guarantee

@@ -161,11 +161,6 @@ const Home = () => {
   const [page, setPage] = useState(0);
   const [loading, setLoading] = useState(true);
   
-  if(user.type==="Admin"){
-    navigate('/admin');
-  }
-  
-  
   useEffect(() => {
     setLoading(true);
     if (myCourses && courses && courses.length > 0) {
