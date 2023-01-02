@@ -54,12 +54,13 @@ import Post from './components/Post';
 import InstructorRating from './components/InstructorRating';
 import { AppProvider } from './context/App/appContext';
 import NotFound from './pages/NotFound';
+import InstructorProfile from './pages/InstructorProfile';
 
 function App() {
   return (
     <BrowserRouter>
-      <CourseProvider>
-        <AppProvider>
+      <AppProvider>
+        <CourseProvider>
           <SearchProvider>
             <Routes>
               <Route path='/landing' element={<Landing />} />
@@ -120,6 +121,10 @@ function App() {
                   element={<SubtitlesPage />}
                 />
                 <Route path='/course/:courseId' element={<CoursePage />} />
+                <Route
+                  path='/instructor/:instructorId'
+                  element={<InstructorProfile />}
+                />
 
                 <Route path='/results' element={<SearchResult />} />
               </Route>
@@ -135,11 +140,12 @@ function App() {
               <Route path='/footer' element={<Footer />} />
               <Route path='/review' element={<Review />} />
               <Route path='/rate' element={<RatingStars />} />
+              <Route path='/ins' element={<Instructor />} />
               <Route path='*' element={<NotFound />} />
             </Routes>
           </SearchProvider>
-        </AppProvider>
-      </CourseProvider>
+        </CourseProvider>
+      </AppProvider>
     </BrowserRouter>
   );
 }

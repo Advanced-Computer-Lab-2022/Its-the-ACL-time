@@ -1,5 +1,5 @@
 import RequestCourse from '../components/RequestCourse';
-import React, { useEffect, useMemo, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { makeStyles } from '@material-ui/core/styles';
 import { Link, useParams } from 'react-router-dom';
 import axios from 'axios';
@@ -244,17 +244,18 @@ const useStyles = makeStyles((theme) => ({
 const CoursePage = () => {
   const classes = useStyles();
   const { courseId } = useParams();
-  const [subtitles, setSubtitles] = useState([]);
+  const [subtitles, setSubtitles] = useState(null);
   const { courses, myCourses } = useCourseContext();
   const [course, setCourse] = useState({});
   const { token, user } = useAppContext();
   const [showDescription, setShowDescription] = useState(false);
   const [applyCoupon, setApplyCoupon] = useState(false);
   const [requestRefund, setRequestRefund] = useState(false);
+  const [showRefundForm, setShowRefundForm] = useState(false);
   const [isOwner, setIsOwner] = useState(false);
   const [isEnrolled, setIsEnrolled] = useState(false);
   const [discountPrice, setDiscountPrice] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [showExamForm, setShowExamForm] = useState(false);
   const [showSubtitleForm, setShowSubtitleForm] = useState(false);
   const [alert, setAlert] = useState(null);
@@ -266,6 +267,8 @@ const CoursePage = () => {
   };
 
   useEffect(() => {
+    setLoading(true);
+
     function getCourse() {
       const course = courses.find(
         (course) => course._id.toString() === courseId.toString()
@@ -298,7 +301,9 @@ const CoursePage = () => {
     }
 
     function checkOwnership() {
-      const course = myCourses.find((course) => course._id === courseId);
+      const course = myCourses.find(
+        (course) => course._id.toString() === courseId.toString()
+      );
       if (course) {
         if (course.createdBy.toString() === user._id.toString()) {
           setIsOwner(true);
@@ -308,9 +313,31 @@ const CoursePage = () => {
       }
     }
 
+    async function checkRefundState() {
+      const response = await axios.get(
+        `http://localhost:8080/api/v1/refund`,
+        {
+          courseId,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      console.log(response.data);
+    }
+
     checkOwnership();
     getCourse();
-    getSubtitles();
+
+    if (!subtitles) {
+      getSubtitles();
+    }
+
+    if (isEnrolled) {
+      checkRefundState();
+    }
   }, [courseId, courses, myCourses, token]);
 
   const requestRefundHandler = () => {
@@ -345,7 +372,7 @@ const CoursePage = () => {
   const applyCouponHandler = () => {
     console.log('apply coupon');
   };
-
+  console.log(isEnrolled);
   return (
     <>
       {loading && <Loading type={'spin'} color={'#3f51b5'} />}
@@ -387,8 +414,7 @@ const CoursePage = () => {
                       <Rating
                         name='customized-empty'
                         disabled
-                        defaultValue={1}
-                        value={course?.rating}
+                        value={course?.rating || 0}
                         precision={0.2}
                         emptyIcon={
                           <StarBorderIcon
@@ -415,16 +441,15 @@ const CoursePage = () => {
             {alert && <SnackBar content={alert} />}
 
             <Box className={`${classes.reviewCourse}`}>
-
               <div className={`${classes.reviewVideo}`}>
                 <iframe
-                  width="400"
-                  height="240"
+                  width='400'
+                  height='240'
                   src='https://www.youtube.com/embed/QPzmsQ86_HM'
                   title='YouTube video player'
-                  frameborder='0'
+                  frameBorder='0'
                   allow='accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture'
-                  allowfullscreen
+                  allowFullScreen
                 ></iframe>
               </div>
               {!isEnrolled && (
@@ -433,11 +458,13 @@ const CoursePage = () => {
                     variant='h6'
                     className={`${classes.discountPrice}`}
                   >
-                    {discountPrice && discountPrice}
-                    {!discountPrice && course?.price}$
+                    {discountPrice && Math.floor(discountPrice)}
+                    {!discountPrice && course?.price}
+                    {course?.currency}
                   </Typography>
                   <Typography variant='h6' className={`${classes.actualPrice}`}>
                     {discountPrice && course?.price}
+                    {course?.currency}
                   </Typography>
                   <Typography variant='h6' className={`${classes.discount}`}>
                     {discountPrice &&
@@ -446,11 +473,15 @@ const CoursePage = () => {
                 </div>
               )}
 
-
               {isEnrolled || isOwner ? (
-                <button className={`${classes.addToCart}`}><Link to={`/course/${courseId}/content`}>Go to course</Link>
+                <button className={`${classes.addToCart}`}>
+                  <Link to={`/course/${courseId}/content`}>Go to course</Link>
                 </button>
-
+              ) : user.type === 'Individual trainee' || 'Instructor' ? (
+                <BuyCourse
+                  courseId={courseId}
+                  coursePrice={course?.price}
+                ></BuyCourse>
               ) : (
                 (user.type === "Individual trainee" || user.type === "Instructor") ? <BuyCourse courseId={courseId} coursePrice={course?.price}></BuyCourse> : <RequestCourse courseId={courseId}></RequestCourse>
               )}
@@ -461,6 +492,40 @@ const CoursePage = () => {
                 <AiOutlineCheck />
                 Full Lifetime Access
               </p>
+              {isEnrolled && applyCoupon && (
+                <>
+                  <hr className={`${classes.line}`} />
+                  <div className={`{${classes.applyCoupon}}`}>
+                    <input
+                      type={'number'}
+                      placeholder={'Enter the amount of money'}
+                      className={`${classes.applyCouponInput}`}
+                      ref={inputRef}
+                    />
+                    <button
+                      className={classes.applyCouponButton}
+                      onClick={() => {
+                        isEnrolled
+                          ? setRequestRefund(true)
+                          : applyCouponHandler();
+                      }}
+                    >
+                      Request
+                    </button>
+                  </div>
+                </>
+              )}
+              {isEnrolled && !applyCoupon && (
+                <>
+                  <button
+                    className={classes.coupon}
+                    onClick={() => setApplyCoupon(true)}
+                  >
+                    {isEnrolled ? <>Request Refund</> : <>Apply Coupon</>}
+                  </button>
+                </>
+              )}
+
               {/* {!applyCoupon && (
                 <button
                   className={classes.coupon}
@@ -688,16 +753,21 @@ const CoursePage = () => {
                     (item) =>
                       course &&
                       course.subject === item.subject && (
-                        <CourseComponent
+                        <div
+                          onClick={() => window.scrollTo(0, 0)}
                           key={item._id}
-                          title={item.title}
-                          subject={item.subject}
-                          description={item.summary}
-                          instructor={item.createdBy.username}
-                          price={item.price}
-                          courseId={item._id}
-                          horizontal={false}
-                        />
+                        >
+                          <CourseComponent
+                            title={item?.title}
+                            subject={item?.subject}
+                            description={item?.summary}
+                            instructor={item?.createdBy.username}
+                            price={item?.price}
+                            courseId={item?._id}
+                            currency={item?.currency}
+                            horizontal={false}
+                          />
+                        </div>
                       )
                   )}
                 </Box>

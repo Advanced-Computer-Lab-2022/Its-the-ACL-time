@@ -11,7 +11,6 @@ const useStyles = makeStyles((theme) => ({
     left: '50%',
     backgroundColor: 'rgba(0, 0, 0, 0.5)',
     zIndex: 1000,
-    color: 'white',
   },
 }));
 

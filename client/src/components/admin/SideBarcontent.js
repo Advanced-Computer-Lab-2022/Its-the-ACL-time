@@ -33,23 +33,12 @@ export const SideBarcontent = [
     icon: <IconName.FcAbout/>,
     cName: 'nav-text'
   },
-  {
-    title: 'Access Request',
-    path: '/admin/Access Request',
-    icon: <IconName.FcAbout/>,
-    cName: 'nav-text'
-  },
+ 
   {
     title: 'Refund Request',
     path: '/admin/Refund',
     icon: <IconName.FcAbout/>,
     cName: 'nav-text'
   },
-  {
-    title: 'Test',
-    path: '/admin/test',
-    icon: <IconName.FcAbout/>,
-    cName: 'nav-text'
-  },
- 
+  
 ];

@@ -19,6 +19,7 @@ import SentimentVerySatisfiedIcon from '@material-ui/icons/SentimentVerySatisfie
 import axios from 'axios';
 import { useAppContext } from '../context/App/appContext';
 import Loading from './Loading';
+import { Link, useNavigate } from 'react-router-dom';
 
 const useStyles = makeStyles((theme) => ({
   main: {
@@ -107,7 +108,7 @@ function InstructorRating({ instructorId, type }) {
   const [loading, setLoading] = useState(() => true);
   const [open, setOpen] = useState(() => false);
   const [rating, setRating] = useState(() => 0);
-
+  const navigate = useNavigate();
   useEffect(() => {
     if (instructorId === undefined) return;
     setLoading(true);
@@ -121,6 +122,7 @@ function InstructorRating({ instructorId, type }) {
             },
           }
         );
+        console.log(res.data);
         setInstructor(res.data);
       } catch (error) {
         console.log(error);
@@ -165,11 +167,15 @@ function InstructorRating({ instructorId, type }) {
       >
         <h1
           style={{
-            fontSize: '1.5rem',
+            // make it a link to instructor profile
+            fontSize: '1.2rem',
             fontWeight: '500',
-            color: '#333',
             marginLeft: '1rem',
+            cursor: 'pointer',
+            textDecoration: 'none',
+            color: '#333',
           }}
+          onClick={() => navigate(`/instructor/${instructor?._id}`)}
         >
           {!loading && instructor?.username}
         </h1>
@@ -184,7 +190,12 @@ function InstructorRating({ instructorId, type }) {
             fontWeight: '500',
           }}
         >
-          {instructor?.username?.substring(0, 2).toUpperCase()}
+          <Link
+            to={`/instructor/${instructor?._id}`}
+            style={{ textDecoration: 'none', color: '#333' }}
+          >
+            {instructor?.username?.substring(0, 2).toUpperCase()}
+          </Link>
         </Avatar>
         <div className={classes.icons}>
           <div className={classes.icon}>

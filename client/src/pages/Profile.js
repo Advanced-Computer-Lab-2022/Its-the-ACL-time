@@ -24,7 +24,6 @@ import Footer from '../components/Footer';
 import engagingCourse from '../assets/images/engaging-course.jpg';
 import buildAudience from '../assets/images/build-audience.jpg';
 import videoCreating from '../assets/images/video-creation.jpg';
-import Courses from './Courses';
 import { Alert, Pagination } from '@material-ui/lab';
 import VideoLibraryIcon from '@material-ui/icons/VideoLibrary';
 import ChatIcon from '@material-ui/icons/Chat';
@@ -36,12 +35,37 @@ import AssessmentIcon from '@material-ui/icons/Assessment';
 import CourseComponent from '../components/course/CourseComponent';
 import Loading from '../components/Loading';
 import MessageIcon from '@material-ui/icons/Message';
-// import money icon
 import InstructorWallet from '../components/InstructorWallet';
 import RefundIcon from '@material-ui/icons/AttachMoney';
 import axios from 'axios';
+import FilterField from '../components/FilterField';
+import RatingStars from '../components/RatingStars';
 
 const drawerWidth = 240;
+
+const ratingOptions = [1, 2, 3, 4, 5].map((rate) => {
+  return (
+    <span
+      style={{
+        display: 'flex',
+        alignItems: 'center',
+      }}
+    >
+      <RatingStars rate={rate} />
+      <p
+        style={{
+          marginLeft: '0.5rem',
+          fontSize: '.8rem',
+          fontWeight: '600',
+          color: '#A9A9A9',
+          marginTop: '1rem',
+        }}
+      >
+        star{rate > 1 ? 's' : ''}
+      </p>
+    </span>
+  );
+});
 
 const InstructorSideBar = [
   {
@@ -251,6 +275,19 @@ const useStyles = makeStyles((theme) => ({
     width: '100%',
     marginTop: '2rem',
   },
+
+  search: {
+    display: 'flex',
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    width: '100%',
+    marginTop: '2rem',
+    border: '1px solid #e0e0e0',
+    borderRadius: '15px',
+    padding: '1rem',
+    boxShadow: '0 0 10px 0 rgba(0,0,0,0.3)',
+  },
 }));
 
 const Card = ({ image, title, text }) => {
@@ -269,7 +306,8 @@ const Card = ({ image, title, text }) => {
   );
 };
 
-const Refund = ({ refundMoney, state, course }) => {
+const Refund = ({ refundMoney, state, courseName }) => {
+  console.log(refundMoney, state, courseName);
   return (
     <div
       style={{
@@ -278,6 +316,7 @@ const Refund = ({ refundMoney, state, course }) => {
         alignItems: 'center',
         justifyContent: 'center',
         marginTop: '2rem',
+        marginBottom: '2rem',
         backgroundColor: '#e0e0e0',
         padding: '1rem',
         borderRadius: '15px',
@@ -286,7 +325,10 @@ const Refund = ({ refundMoney, state, course }) => {
         },
       }}
     >
-      {`You have requested a refund of $${refundMoney} for the course ${course}. Your request is currently`}
+      <span>
+        You have requested a refund of $<strong>{refundMoney}</strong> for{' '}
+        <strong>{courseName}</strong>. Your request is currently
+      </span>
       {state === 'pending' ? (
         <span style={{ color: 'orange' }}> pending</span>
       ) : state === 'approved' ? (
@@ -302,6 +344,126 @@ function InstructorProfile({ courses }) {
   const [page, setPage] = useState(0);
   const navigate = useNavigate();
   const classes = useStyles();
+  const inputRef = useRef();
+
+  const [renderedCourses, setRenderedCourses] = useState([]);
+  const [topics, setTopics] = useState([]);
+  const [prices, setPrices] = useState([]);
+  const [ratings, setRatings] = useState([]);
+
+  useEffect(() => {
+    setRenderedCourses(courses);
+  }, [courses]);
+
+  const search = (term) => {
+    if (term === '') {
+      return courses;
+    }
+
+    const searchResults = {};
+
+    const searchedCourses = [];
+    courses.forEach((course) => {
+      const title = course.title.toLowerCase().includes(term.toLowerCase());
+      const subject = course.subject.toLowerCase().includes(term.toLowerCase());
+
+      if (title && !searchResults[title]) {
+        searchResults[title] = true;
+        searchedCourses.push(course);
+      }
+      if (subject && !searchResults[subject]) {
+        searchResults[subject] = true;
+        searchedCourses.push(course);
+      }
+    });
+    console.log(searchedCourses);
+    return searchedCourses;
+  };
+
+  const checkCourse = (candidateCourse, topics, prices, ratings) => {
+    let topicFlag =
+      topics.length === 0 || topics.includes(candidateCourse.title)
+        ? true
+        : false;
+
+    let priceFlag = prices.length === 0;
+
+    prices.forEach((price) => {
+      const [min, max] = price.split('-');
+      priceFlag =
+        priceFlag ||
+        (candidateCourse.price >= parseInt(min) &&
+          candidateCourse.price <= parseInt(max));
+    });
+
+    let ratingFlag = ratings.length === 0;
+
+    ratings.forEach((rating) => {
+      ratingFlag = ratingFlag || candidateCourse.rating === parseInt(rating);
+    });
+
+    return topicFlag && priceFlag && ratingFlag;
+  };
+
+  const handleFilter = (searchedCourses, topics, prices, ratings) => {
+    const filtered = searchedCourses.filter((course) => {
+      return checkCourse(course, topics, prices, ratings);
+    });
+    return filtered;
+  };
+
+  const handleResult = (filter, field) => {
+    const searchedCourses = search(inputRef.current.value);
+
+    let currentTopics = topics;
+    let currentPrices = prices;
+    let currentRatings = ratings;
+
+    if (filter) {
+      switch (field) {
+        case 'Topic':
+          if (topics.indexOf(filter) !== -1) {
+            setTopics((prev) => [...prev.filter((topic) => topic !== filter)]);
+            currentTopics.splice(currentTopics.indexOf(filter), 1);
+          } else {
+            setTopics((prev) => [...prev, filter]);
+            currentTopics.push(filter);
+          }
+          break;
+
+        case 'Price':
+          if (prices.indexOf(filter) !== -1) {
+            setPrices((prev) => [...prev.filter((price) => price !== filter)]);
+            currentPrices.splice(currentPrices.indexOf(filter), 1);
+          } else {
+            setPrices((prev) => [...prev, filter]);
+            currentPrices.push(filter);
+          }
+          break;
+        case 'Rating':
+          if (ratings.indexOf(filter) !== -1) {
+            setRatings((prev) => [
+              ...prev.filter((rating) => rating !== filter),
+            ]);
+            currentRatings.splice(currentRatings.indexOf(filter), 1);
+          } else {
+            setRatings((prev) => [...prev, filter]);
+            currentRatings.push(filter);
+          }
+          break;
+        default:
+          break;
+      }
+    }
+
+    const filteredCourses = handleFilter(
+      searchedCourses,
+      currentTopics,
+      currentPrices,
+      currentRatings
+    );
+    setRenderedCourses(filteredCourses);
+  };
 
   return (
     <>
@@ -380,27 +542,94 @@ function InstructorProfile({ courses }) {
             width: '80%',
           }}
         >
-          <div className={classes.courses}>
-            <h2>My Courses</h2>
-            {courses
-              ?.slice(page * 3, Math.min(page * 3 + 3, courses.length))
-              .map((course) => {
-                return (
-                  <CourseComponent
-                    key={course?._id}
-                    title={course?.title}
-                    subject={course?.subject}
-                    description={course?.summary}
-                    instructor={course?.createdBy.username}
-                    price={course?.price}
-                    courseId={course?._id}
-                    horizontal={true}
-                    rating={course?.rating}
-                    progress={course?.progress}
-                    demo={false}
-                  />
-                );
-              })}
+          <h2>My Courses</h2>
+          <div
+            style={{
+              width: '100%',
+              display: 'flex',
+              flexDirection: 'row',
+              justifyContent: 'center',
+              alignItems: 'center',
+            }}
+          >
+            <form
+              style={{
+                width: '50%',
+                marginBottom: '2rem',
+              }}
+            >
+              <input
+                type='text'
+                placeholder='Search in your courses'
+                className={classes.search}
+                name='searchInput'
+                ref={inputRef}
+                onChange={handleResult}
+              />
+            </form>
+          </div>
+          <div
+            style={{
+              width: '100%',
+              display: 'flex',
+              flexDirection: 'row',
+              justifyContent: 'flex-start',
+              alignItems: 'flex-start',
+            }}
+          >
+            <div
+              style={{
+                marginRight: '2rem',
+                backgroundColor: '#f5f5f5',
+                padding: '1rem',
+                borderRadius: '1rem',
+              }}
+            >
+              <FilterField
+                title='Topic'
+                options={courses.map((course) => course.subject)}
+                onFilter={handleResult}
+              />
+              <hr className={`${classes.hr}`} />
+              <FilterField
+                title='Rating'
+                options={ratingOptions}
+                onFilter={handleResult}
+              />
+              <hr />
+              <FilterField
+                title='Price'
+                options={[
+                  '0 - 10',
+                  '10 - 100',
+                  '100 - 1000',
+                  '1000 - 10000',
+                  '10000+',
+                ]}
+                onFilter={handleResult}
+              />
+            </div>
+            <div className={classes.courses}>
+              {renderedCourses
+                ?.slice(
+                  page * 3,
+                  Math.min(page * 3 + 3, renderedCourses.length)
+                )
+                .map((course) => {
+                  return (
+                    <CourseComponent
+                      key={course._id}
+                      title={course.title}
+                      subject={course.subject}
+                      description={course.summary}
+                      courseId={course._id}
+                      horizontal={true}
+                      rating={course.rating}
+                      demo={false}
+                    />
+                  );
+                })}
+            </div>
           </div>
 
           <div
@@ -412,7 +641,7 @@ function InstructorProfile({ courses }) {
             }}
           >
             <Pagination
-              count={Math.ceil(courses.length / 3)}
+              count={Math.ceil(renderedCourses.length / 3) || 1}
               onChange={(e, value) => setPage(value - 1)}
               color='primary'
             />
@@ -641,16 +870,25 @@ export default function Profile() {
   const [open, setOpen] = React.useState(false);
   const [component, setComponent] = useState('My Courses');
   const { myCourses } = useCourseContext();
-  const { user } = useAppContext();
+  const { user, token } = useAppContext();
   const [value, setValue] = React.useState(0);
   const [loading, setLoading] = useState(true);
   const [courses, setCourses] = useState([]);
   const [refunds, setRefunds] = useState([]);
+  const [refundPage, setRefundPage] = useState(0);
+
+  const navigate = useNavigate();
 
   useEffect(() => {
     async function getRefund() {
-      const res = await axios.get('http://localhost:8080/api/v1/refund/');
-      console.log(res.data);
+      const res = await axios.get(
+        'http://localhost:8080/api/v1/refund?myRefunds=true',
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
       setRefunds(res.data);
     }
 
@@ -665,7 +903,7 @@ export default function Profile() {
   }, [myCourses, component]);
 
   const handleChange = (event, newValue) => {
-    setValue(newValue);
+    setValue(newValue - 1);
   };
 
   const handleDrawerOpen = () => {
@@ -820,19 +1058,42 @@ export default function Profile() {
           {component === 'Refund' && (
             <>
               <h1>Your refund requests</h1>
-              {refunds.map((refund) => (
-                <Refund
-                  key={refund._id}
-                  refundMoney={refund.refundMoney}
-                  courseName={
-                    courses.find((course) => course._id === refund.course)
-                      ?.title
-                  }
-                  state={refund.state}
-                />
-              ))}
+              {refunds
+                ?.slice(
+                  refundPage * 3,
+                  Math.min(refundPage * 3 + 3, refunds.length)
+                )
+                .map((refund) => (
+                  <Refund
+                    key={refund._id}
+                    refundMoney={refund.refundMoney}
+                    courseName={
+                      courses.find(
+                        (course) =>
+                          course._id.toString() === refund.course._id.toString()
+                      )?.title
+                    }
+                    state={refund.state}
+                  />
+                ))}
             </>
           )}
+          {component === 'Refund' && (
+            <Pagination
+              count={Math.ceil(refunds.length / 3)}
+              onChange={(e, v) => {
+                setRefundPage(v - 1);
+              }}
+              defaultPage={1}
+              color='primary'
+              size='large'
+              showFirstButton
+              showLastButton
+              classes={{ ul: classes.ul }}
+              style={{ marginTop: '2rem' }}
+            />
+          )}
+
           {component === 'Settings' && <Settings />}
 
           <br />

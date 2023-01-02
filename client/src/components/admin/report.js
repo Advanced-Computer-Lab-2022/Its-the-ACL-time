@@ -77,10 +77,17 @@ setid(reportid);
     console.log(res.data);
     setreports((old)=> old.filter((report)=>report._id!==id));
     setprogress(false);
+    setopensnake(true);
+    setmessage("Problem have been resolved")
+    settypemessage("success")
+
 
    })
    .catch(err=>
-    {console.log(err)}
+    {console.log(err)
+      setopensnake(true);
+      setmessage(err)
+      settypemessage("error")}
    );
  }
  const pending =(id)=>{
@@ -91,10 +98,16 @@ setid(reportid);
     console.log(res.data);
     setreports((old)=> old.filter((report)=>report._id!==id));
     setprogress(false);
+    setopensnake(true);
+    setmessage("Problem have been Pending")
+    settypemessage("success")
 
    })
    .catch(err=>
-    {console.log(err)}
+    {console.log(err)
+      setopensnake(true);
+      setmessage(err)
+      settypemessage("error")}
    );
  }
  const addcomment =()=>{
@@ -107,6 +120,8 @@ setid(reportid);
      setmessage("comment add sussefully")
      settypemessage("success")
      setprogress(false);
+     setOpen(false);
+
 
 
      setreports((old)=> old.map((report)=>{
@@ -123,7 +138,7 @@ setid(reportid);
     .catch(err=>
      {console.log(err)
       setopensnake(true);
-      setmessage("report failed")
+      setmessage(err)
       settypemessage("error")
     
     }
@@ -148,8 +163,7 @@ setid(reportid);
         <th>Descrption</th>
         <th>Type</th>
         <th>Status</th>
-        <th>commets Adminn </th>
-        <th>Comments user</th>
+        <th>follew up</th>
         <th>      </th>
         <th>      </th>
 
@@ -172,7 +186,7 @@ setid(reportid);
        //   aria-controls="panel1a-content"
           id="panel1a-header"
         >
-          <Typography>commets</Typography>
+          <Typography>Messages</Typography>
         </AccordionSummary>
         <AccordionDetails>
           <Typography>
@@ -185,29 +199,10 @@ setid(reportid);
       </Accordion>
         }
         </td>
-        <td>{
-          <Accordion>
-        <AccordionSummary
-          expandIcon={<ExpandMoreIcon />}
-       //   aria-controls="panel1a-content"
-          id="panel1a-header"
-        >
-          <Typography>commets</Typography>
-        </AccordionSummary>
-        <AccordionDetails>
-          <Typography>
-           <ul> {report.commentsuser.map(comment=>
-            <li>{comment}</li>
-          )} </ul>   
-         
-          </Typography>
-        </AccordionDetails>
-      </Accordion>
-        }
-        </td>
-        <td> {report.status==="unseen" && <button type="button" class="btn btn-primary"onClick={()=>{resovle(report._id)}}>resolve</button>}</td> 
-        <td> {report.status==="unseen" && <button type="button" class="btn btn-primary"onClick={()=>{pending(report._id)}}>pending</button>}</td> 
-        <td> {report.status==="pending" && <button type="button" class="btn btn-primary"onClick={()=>{handleClickOpen(report._id)}}>add comment</button>}</td> 
+      
+        <td> {report.status!=="resloved" && <button type="button" class="btn btn-primary"onClick={()=>{resovle(report._id)}}>resolve</button>}</td> 
+        <td> {report.status=="unseen" && <button type="button" class="btn btn-primary"onClick={()=>{pending(report._id)}}>pending</button>}</td> 
+        <td> {report.status!=="unseen" && <button type="button" class="btn btn-primary"onClick={()=>{handleClickOpen(report._id)}}>add message</button>}</td> 
 
 
         </tr>)
@@ -234,7 +229,7 @@ setid(reportid);
         </DialogContent>
         <DialogActions>
           <Button onClick={handleClose}>Cancel</Button>
-          <Button onClick={addcomment}>add comment</Button>
+          <Button onClick={addcomment}>add Message</Button>
         </DialogActions>
       </Dialog>
     </div>

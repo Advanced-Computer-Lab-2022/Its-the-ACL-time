@@ -6,6 +6,7 @@ const {
   allWallets,
   updateWallet,
   deleteWallet,
+  findEarnings,
 } = require('../controllers/walletController');
 
 const {
@@ -36,11 +37,12 @@ const { authOwner, authAdmin, authMiddleware } = require('../middlewares');
 
 // wallet router
 
-router.get('/wallet', authAdmin, allWallets);
-router.get('/wallet/:id', authOwner, findWallet);
-router.post('/wallet/', authAdmin, addWallet);
-router.patch('/wallet/:id', authAdmin, updateWallet);
-router.delete('/wallet/:id', authAdmin, deleteWallet);
+router.get('/earning', authMiddleware, findEarnings);
+router.get('/wallet',authMiddleware , allWallets);
+router.get('/wallet/:id', authMiddleware , findWallet);
+router.post('/wallet/',authMiddleware , addWallet);
+router.patch('/wallet/:id', authMiddleware, updateWallet);
+router.delete('/wallet/:id', authMiddleware , deleteWallet);
 
 // end wallet router
 

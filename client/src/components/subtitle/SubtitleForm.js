@@ -84,6 +84,7 @@ function SubtitleForm({ callBack, submitted }) {
     else {
       let subTitle = [];
       for (let i = 0; i < subtitles; i++) {
+        console.log(e.target[i * 4].value);
         if (
           e.target[i * 4].value === '' ||
           e.target[i * 4 + 1].value === '' ||
@@ -96,9 +97,16 @@ function SubtitleForm({ callBack, submitted }) {
           }, 3000);
           setLoading(false);
           return;
+        } else {
+          subTitle.push({
+            title: e.target[i * 4].value,
+            link: e.target[i * 4 + 1].value,
+            duration: e.target[i * 4 + 2].value,
+            description: e.target[i * 4 + 3].value,
+          });
         }
       }
-
+      console.log(subTitle);
       try {
         const response = await axios.post(
           `http://localhost:8080/api/v1/course/${courseId}/subtitle`,

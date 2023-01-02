@@ -118,7 +118,6 @@ function CenteredTabs({ changeTab }) {
 
   console.log("user",user);
   const handleChange = (event, newValue) => {
-    console.log(newValue);
     changeTab(newValue);
     setValue(newValue);
   };
@@ -136,11 +135,11 @@ function CenteredTabs({ changeTab }) {
         {token &&
           user &&
           (user.type === 'Individual trainee' ||
-            user.type === 'Cooperate trainee') && <Tab label='In Progress' />}
+            user.type === 'Corporate trainee') && <Tab label='In Progress' />}
         {token &&
           user &&
           (user.type === 'Individual trainee' ||
-            user.type === 'Cooperate trainee') && <Tab label='Completed' />}
+            user.type === 'Corporate trainee') && <Tab label='Completed' />}
         {token && user && user.type === 'Instructor' && (
           <Tab label='My Courses' />
         )}
@@ -153,9 +152,9 @@ const Home = () => {
   const classes = useStyles();
   const [tab, setTab] = useState(0);
   const { courses, myCourses } = useCourseContext();
-  const [sortedCourses, setSortedCourses] = useState([]);
-  const [inProgress, setInprogress] = useState([]);
-  const [completed, setCompleted] = useState([]);
+  const [sortedCourses, setSortedCourses] = useState();
+  const [inProgress, setInprogress] = useState();
+  const [completed, setCompleted] = useState();
   const [page, setPage] = useState(0);
   const [loading, setLoading] = useState(true);
 
@@ -172,7 +171,9 @@ const Home = () => {
       setSortedCourses(courses);
       setInprogress(inprogress);
       setCompleted(completed);
-      setLoading(false);
+      if (completed && inprogress && courses) {
+        setLoading(false);
+      }
     }
   }, [myCourses, courses]);
 
@@ -220,6 +221,7 @@ const Home = () => {
                       rating={course?.rating}
                       progress={course?.progress}
                       demo={false}
+                      currency={course?.currency}
                     />
                   );
                 })}
@@ -314,6 +316,7 @@ const Home = () => {
                       courseId={course?._id}
                       horizontal={false}
                       subject={course?.subject}
+                      currency={course?.currency}
                       numOfHours={course?.numOfHours}
                     />
                   );

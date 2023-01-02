@@ -57,15 +57,6 @@ const Search = () => {
   const search = (term) => {
     const searchResults = {};
 
-    // const filteredCourses = courses.filter((course) => {
-    //   const title = course.title.toLowerCase().includes(term.toLowerCase());
-    //   const subject = course.subject.toLowerCase().includes(term.toLowerCase());
-    //   const createdBy = course.createdBy?.username
-    //     .toLowerCase()
-    //     .includes(term.toLowerCase());
-    //   return title || subject || createdBy;
-    // });
-
     const filteredCourses = [];
     courses.forEach((course) => {
       const title = course.title.toLowerCase().includes(term.toLowerCase());

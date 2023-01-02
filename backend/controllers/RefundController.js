@@ -42,17 +42,32 @@ const postRefund = async (req, res) => {
 
 const getRefunds = async (req, res) => {
   const { myRefunds } = req.query;
-  if (myRefunds) {
-    const refunds = await Refund.find({ user: req.user.userId })
+  const { userId, type } = req.user;
+  const { courseId } = req.body;
+
+  if (type === 'Admin') {
+    const refunds = await Refund.find()
       .populate('course', 'title')
       .populate('user', 'username');
-    return res.status(200).json(refunds);
+    res.status(200).json(refunds);
   }
 
-  const refunds = await Refund.find()
-    .populate('course', 'title')
-    .populate('user', 'username');
-  res.status(200).json(refunds);
+  if (type === 'Individual trainee') {
+    if (myRefunds) {
+      const refunds = await Refund.find({ user: userId })
+        .populate('course', 'title')
+        .populate('user', 'username');
+      return res.status(200).json(refunds);
+    }
+
+    if (courseId) {
+      const refund = await Refund.findOne({ course: courseId, user: userId });
+      if (refund) {
+        return res.status(200).json(refund);
+      }
+      return res.status(404).json({ message: 'No refund found' });
+    }
+  }
 };
 
 module.exports = {

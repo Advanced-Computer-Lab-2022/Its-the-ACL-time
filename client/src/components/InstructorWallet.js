@@ -1,6 +1,6 @@
 
 
-import * as React from 'react';
+import React, { useEffect,useState } from 'react';
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
 import TableCell from '@mui/material/TableCell';
@@ -9,6 +9,9 @@ import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import Paper from '@mui/material/Paper';
 import useWallet from './CustomHooks/getWallet';
+import axios from 'axios';
+import { backendApi } from '../projectConfig';
+import { useAppContext } from '../context/App/appContext';
 
 function createData(
     month,
@@ -17,12 +20,25 @@ function createData(
     return { month, earning };
 }
 
-const rows = [
-    createData('2022/1', 159),
-    createData('2022/1', 159),
-];
 
 function BasicTable() {
+    const { token, user } = useAppContext();
+    const [rows,setRows] = useState([]);
+    useEffect(() => {
+        let url = `${backendApi}user/earning`;
+        axios.get(url,
+            {
+                headers:
+                    { authorization: `Bearer ${token}` }
+            })
+            .then((res) => {
+                console.log("earning",res);
+                setRows(res.data);
+            })
+            .catch(
+                (err) => console.warn(err)
+            );
+    }, []);
     return (
         <TableContainer component={Paper}>
             <Table sx={{ minWidth: 650 }} aria-label="simple table">
@@ -35,11 +51,11 @@ function BasicTable() {
                 <TableBody>
                     {rows.map((row) => (
                         <TableRow
-                            key={row.month}
+                            key={row.monthDate}
                             sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
                         >
                             <TableCell component="th" scope="row">
-                                {row.month}
+                                {row.monthDate}
                             </TableCell>
                             <TableCell align="right">{row.earning}</TableCell>
                         </TableRow>

@@ -211,6 +211,7 @@ function CourseComponent({
   numOfHours,
   numberOfStudents,
   demo,
+  currency,
 }) {
   const classes = useStyles();
   const [showDemo, setShowDemo] = useState(false);
@@ -311,7 +312,7 @@ function CourseComponent({
                 </Grid>
                 <Grid>
                   <Typography variant='body2' color='textSecondary'>
-                    {price && `${price} $`}
+                    {price && `${price} ${currency}`}
                   </Typography>
                 </Grid>
               </Grid>
@@ -413,7 +414,12 @@ function CourseComponent({
                 {(description && description.slice(0, 50)) ||
                   'Course Description'}
               </Typography>
-              {price && <Typography variant='subtitle1'>${price}</Typography>}
+              {price && (
+                <Typography variant='subtitle1'>
+                  {price}
+                  {currency}
+                </Typography>
+              )}
               {progress && (
                 <div
                   style={{
@@ -445,6 +451,7 @@ function CourseComponent({
               subject={subject}
               numOfVideos={numOfVideos}
               numOfHours={numOfHours}
+              currency={currency}
               numberOfStudents={numberOfStudents}
             />
           )}

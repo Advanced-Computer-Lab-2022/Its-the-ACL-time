@@ -14,6 +14,7 @@ import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
 import DialogContentText from '@mui/material/DialogContentText';
 import Exam from '../components/Exam';
+import MuiAlert from '@mui/material/Alert';
 import { useAppContext } from '../context/App/appContext';
 import { jsPDF } from 'jspdf';
 import Review from '../components/Review';
@@ -29,6 +30,7 @@ import Accordion from '@mui/material/Accordion';
 import AccordionSummary from '@mui/material/AccordionSummary';
 import AccordionDetails from '@mui/material/AccordionDetails';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+import Snackbar from '@mui/material/Snackbar';
 
 const useStyles = makeStyles((theme) => ({
   main: {
@@ -327,8 +329,13 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 const SubtitlesPage = () => {
+  const Alert = React.forwardRef(function Alert(props, ref) {
+    return <MuiAlert elevation={6} ref={ref} variant='filled' {...props} />;
+  });
   const classes = useStyles();
-
+  const [opensnake, setopensnake] = useState(false);
+  const [message, setmessage] = useState('');
+  const [typemessage, settypemessage] = useState('');
   const [loading, setLoading] = useState(true);
   const [showList, setShowList] = useState(true);
   const [subtitles, setSubtitles] = useState([]);
@@ -390,9 +397,16 @@ const SubtitlesPage = () => {
           })
         );
         console.log(report);
+        setopensnake(true);
+        setmessage('Message added');
+        settypemessage('success');
+        setOpen(false);
       })
       .catch((err) => {
         console.log(err);
+        setopensnake(true);
+        setmessage(err);
+        settypemessage('error');
       });
   };
 
@@ -454,6 +468,7 @@ const SubtitlesPage = () => {
           checkedSubtitles: response.data.completedSubtitles,
           checkedExams: response.data.completedExams,
         });
+        console.log(response.data);
         setReviewed(response.data?.reviewed);
         setLoading(false);
       } catch (error) {
@@ -729,6 +744,7 @@ const SubtitlesPage = () => {
         rate: rating,
       },
     ]);
+    setReviewed(true);
     setLoading(false);
   };
 
@@ -880,6 +896,21 @@ const SubtitlesPage = () => {
                 Report
               </Reportform>
             </div>
+            <Snackbar
+              anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
+              open={opensnake}
+              onClose={opensnake}
+              message={message}
+              key={'top' + 'center'}
+            >
+              <Alert
+                onClose={() => setopensnake(false)}
+                severity={typemessage}
+                sx={{ width: '100%' }}
+              >
+                {message}
+              </Alert>
+            </Snackbar>
             <div className={`${classes.line}`}></div>
 
             <div className={`${classes.videoInfoBody}`}>
@@ -916,8 +947,7 @@ const SubtitlesPage = () => {
                         <th>Status</th>
                         <th>Type</th>
 
-                        <th>Message send to Admin </th>
-                        <th>Message form Admin</th>
+                        <th>Follew UP </th>
 
                         <th></th>
                       </tr>
@@ -928,6 +958,7 @@ const SubtitlesPage = () => {
                           <td>{x.title}</td>
                           <td>{x.status}</td>
                           <td>{x.type}</td>
+
                           <td>
                             {
                               <Accordion>
@@ -936,30 +967,7 @@ const SubtitlesPage = () => {
                                   //   aria-controls="panel1a-content"
                                   id='panel1a-header'
                                 >
-                                  <Typography>commets</Typography>
-                                </AccordionSummary>
-                                <AccordionDetails>
-                                  <Typography>
-                                    <ul>
-                                      {' '}
-                                      {x.commentsuser.map((comment) => (
-                                        <li>{comment}</li>
-                                      ))}{' '}
-                                    </ul>
-                                  </Typography>
-                                </AccordionDetails>
-                              </Accordion>
-                            }
-                          </td>
-                          <td>
-                            {
-                              <Accordion>
-                                <AccordionSummary
-                                  expandIcon={<ExpandMoreIcon />}
-                                  //   aria-controls="panel1a-content"
-                                  id='panel1a-header'
-                                >
-                                  <Typography>commets</Typography>
+                                  <Typography>Messages</Typography>
                                 </AccordionSummary>
                                 <AccordionDetails>
                                   <Typography>
@@ -984,7 +992,7 @@ const SubtitlesPage = () => {
                                   handleClickOpen(x._id);
                                 }}
                               >
-                                add comment
+                                Add Message
                               </button>
                             )}
                           </td>
@@ -1020,6 +1028,7 @@ const SubtitlesPage = () => {
                   <button
                     onClick={() => setWriteNote(true)}
                     className={`${classes.addNote}`}
+                    disabled={!searchParams.get('subtitleId')}
                   >
                     Create a note for this lecture
                     <span>
@@ -1280,7 +1289,7 @@ const SubtitlesPage = () => {
             <Dialog open={open} onClose={handleClose}>
               <DialogContent>
                 <DialogContentText>Comment</DialogContentText>
-                <div class='mb-3'></div>
+                <div className='mb-3'></div>
                 <div className='mb-3'>
                   <label
                     for='exampleFormControlTextarea1'

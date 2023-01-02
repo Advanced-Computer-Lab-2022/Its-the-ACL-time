@@ -42,12 +42,14 @@ const createCourse = async (req, res) => {
     numberOfHours,
     instructorId,
   } = req.body;
+
   let type = req.user?.type;
   let userId = req.user?.userId;
   if (instructorId) {
     userId = instructorId;
     type = 'Instructor';
   }
+
   console.log(req.user);
   if (type !== 'Instructor')
     throw new UnauthorizedError("you don't have permissions");
@@ -119,20 +121,38 @@ const updateCourse = async (req, res) => {
   if (!courseId) throw new BadRequestError('Please provide course id');
 
   const course = await Course.findOne({ _id: courseId });
+
   if (!course)
     throw new BadRequestError(`There is no course with this id ${courseId}`);
 
-  const user = await User.findOne({
-    _id: userId,
-  });
+  if (!updateType)
+    throw new BadRequestError('Please provide update type in query params');
+  else {
+    const user = await User.findOne({
+      _id: userId,
+    });
 
-  const isOwner =
-    course.createdBy.toString() === userId ||
-    user.courses.find((course) => course.courseId.toString() === courseId);
+    if (updateType === 'review') {
+      const course = user.courses.find(
+        (course) => course.courseId.toString() === courseId
+      );
 
-  if (!isOwner) {
-    console.log('You are not the owner of that course');
-    throw new UnauthorizedError('You are not the owner of that course');
+      if (!course) {
+        throw new BadRequestError('You are not enrolled in this course');
+      }
+
+      course.reviewed = true;
+      await user.save();
+    } else {
+      const isOwner =
+        course.createdBy.toString() === userId ||
+        user.courses.find((course) => course.courseId.toString() === courseId);
+
+      if (!isOwner) {
+        console.log('You are not the owner of that course');
+        throw new UnauthorizedError('You are not the owner of that course');
+      }
+    }
   }
 
   const updatedCourse = await Course.findOneAndUpdate(
@@ -140,23 +160,6 @@ const updateCourse = async (req, res) => {
     { ...req.body },
     { new: true }
   );
-
-  if (updateType === 'review') {
-    const user = await User.findOne({
-      _id: userId,
-    });
-
-    const course = user.courses.find(
-      (course) => course.courseId.toString() === courseId
-    );
-
-    if (!course) {
-      throw new BadRequestError('You are not enrolled in this course');
-    }
-
-    course.reviewed = true;
-    await user.save();
-  }
 
   if (updatedCourse.rating) {
     updatedCourse.rating =

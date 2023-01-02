@@ -33,6 +33,7 @@ export default function Courses({ courses, page, completed }) {
                 rating={course?.rating}
                 progress={course?.progress}
                 demo={true}
+                currency={course?.currency}
               />
             );
           })}
