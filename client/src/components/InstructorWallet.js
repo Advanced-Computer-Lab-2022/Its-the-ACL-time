@@ -57,7 +57,7 @@ function BasicTable() {
                             <TableCell component="th" scope="row">
                                 {row.monthDate}
                             </TableCell>
-                            <TableCell align="right">{row.earning}</TableCell>
+                            <TableCell align="right">{row.earning} $</TableCell>
                         </TableRow>
                     ))}
                 </TableBody>
@@ -70,7 +70,7 @@ export default function InstructorWallet() {
     const wallet = useWallet();
     return (
         <div>
-            <h1 className='text-center'>Total Earning: {wallet}</h1>
+            <h1 className='text-center'>Total Earning: {wallet} $</h1>
             <BasicTable></BasicTable>
         </div>
     )

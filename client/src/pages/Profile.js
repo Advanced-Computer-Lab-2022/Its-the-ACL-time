@@ -40,6 +40,7 @@ import RefundIcon from '@material-ui/icons/AttachMoney';
 import axios from 'axios';
 import FilterField from '../components/FilterField';
 import RatingStars from '../components/RatingStars';
+import useWallet from '../components/CustomHooks/getWallet';
 
 const drawerWidth = 240;
 
@@ -345,7 +346,6 @@ function InstructorProfile({ courses }) {
   const navigate = useNavigate();
   const classes = useStyles();
   const inputRef = useRef();
-
   const [renderedCourses, setRenderedCourses] = useState([]);
   const [topics, setTopics] = useState([]);
   const [prices, setPrices] = useState([]);
@@ -867,6 +867,7 @@ const Settings = () => {
 export default function Profile() {
   const classes = useStyles();
   const theme = useTheme();
+  const wallet = useWallet();
   const [open, setOpen] = React.useState(false);
   const [component, setComponent] = useState('My Courses');
   const { myCourses } = useCourseContext();
@@ -1018,6 +1019,10 @@ export default function Profile() {
                 <ListItemText primary={item.title} />
               </ListItem>
             ))}
+          <ListItem>
+            <ListItemIcon><AccountBalanceWalletIcon></AccountBalanceWalletIcon></ListItemIcon>
+            <ListItemText primary={"wallet "+wallet+" $"} />
+          </ListItem>
         </List>
         <Divider />
         <ListItem
