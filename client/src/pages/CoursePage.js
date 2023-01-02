@@ -274,6 +274,11 @@ const CoursePage = () => {
       const course = courses.find(
         (course) => course._id.toString() === courseId.toString()
       );
+
+      courses.map((course) => {
+        if (!course.price) course.price = course.originalPrice;
+      });
+
       setCourse(course);
       if (course && course.promotion) {
         const promotion = course.promotion;
@@ -282,7 +287,8 @@ const CoursePage = () => {
         const endDate = new Date(promotion.endDate);
         if (currentDate >= startDate && currentDate <= endDate) {
           setDiscountPrice(
-            course.price - (course.price * promotion.promotionPercentage) / 100
+            (course.price || course.originalPrice) -
+              (course.price * promotion.promotionPercentage) / 100
           );
         }
       }
@@ -306,7 +312,7 @@ const CoursePage = () => {
         (course) => course._id.toString() === courseId.toString()
       );
       if (course) {
-        if (course.createdBy.toString() === user._id.toString()) {
+        if (course.createdBy.toString() === user?._id.toString()) {
           setIsOwner(true);
         } else {
           setIsEnrolled(true);
@@ -457,11 +463,11 @@ const CoursePage = () => {
                     className={`${classes.discountPrice}`}
                   >
                     {discountPrice && Math.floor(discountPrice)}
-                    {!discountPrice && course?.price}
+                    {!discountPrice && (course?.price || course?.originalPrice)}
                     {course?.currency}
                   </Typography>
                   <Typography variant='h6' className={`${classes.actualPrice}`}>
-                    {discountPrice && course?.price}
+                    {discountPrice && (course?.price || course?.originalPrice)}
                     {course?.currency}
                   </Typography>
                   <Typography variant='h6' className={`${classes.discount}`}>
@@ -470,7 +476,7 @@ const CoursePage = () => {
                   </Typography>
                 </div>
               )}
-
+              {/* 
               {isEnrolled || isOwner ? (
                 <button className={`${classes.addToCart}`}>
                   <Link to={`/course/${courseId}/content`}>Go to course</Link>
@@ -483,7 +489,7 @@ const CoursePage = () => {
                 ></BuyCourse>
               ) : (
                 <RequestCourse courseId={courseId}></RequestCourse>
-              )}
+              )} */}
               <p>
                 <AiOutlineCheck /> 30-Day Money-Back Guarantee
               </p>
