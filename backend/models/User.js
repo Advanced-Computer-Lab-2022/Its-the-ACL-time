@@ -25,6 +25,7 @@ const UserSchema = mongoose.Schema({
   },
   country: {
     type: String,
+    default: "USA",
   },
   type: {
     type: String,

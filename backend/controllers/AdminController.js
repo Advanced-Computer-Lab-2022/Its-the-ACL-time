@@ -19,9 +19,12 @@ module.exports.createUser = async (req, res) => {
     ) {
       throw new BadRequestError('Please provide all admin values');
     }
+    
     //req.body.createdBy = userId;
   
-    const admin = await User.create(req.body);
+    const admin = await User.create(req.body); 
+    const wallet=await Wallet.create({owner:admin._id});
+
     res.status(StatusCodes.CREATED).json({ admin });
   };
   module.exports.getuser = async (req, res) => {
@@ -125,7 +128,7 @@ module.exports.createUser = async (req, res) => {
     const user = await User.findOne(
       { _id: refund.user },
     )
-    //console.log(user);
+    console.log(user);
    const course = await Course.findOne(
       { _id: refund.course },
     );
@@ -134,21 +137,22 @@ module.exports.createUser = async (req, res) => {
     const wallet = await Wallet.findOne(
       { owner: refund.user },
     );
-    //console.log(wallet);
+    console.log(wallet);
 
 
     if (state=="rejected"){
       refund.state="rejected";
 
     }else{
-    wallet.balance+=course.price;
-    wallet.save();
-    refund.state="approved";
+    
     for( var i = 0; i < user.courses.length; i++){ 
      
       if ( user.courses[i].courseId == courseId1) { 
  // console.log("suuccess")
           user.courses.splice(i, 1); 
+          wallet.balance+=course.price;
+    wallet.save();
+    refund.state="approved";
       }
   }
     //user.courses=user.courses.filter((x)=>x._id!==refund.course)
@@ -160,18 +164,23 @@ module.exports.createUser = async (req, res) => {
 
 
 module.exports.setpromtion = async (req, res) => {
-    const { coursesId ,promotion} = req.body;
-    console.log(coursesId);
+    const { coursesId ,promotion,startdate,enddate} = req.body;
+    console.log(req.body);
+    console.log(parseInt(promotion))
 
     for(let i=0;i<coursesId.length;i++){
       console.log(coursesId[i])
 
-    const updatedCourse = await Course.findOneAndUpdate(
+    const updatedCourse = await Course.findOne(
       { _id: coursesId[i] },
-      { promotion:promotion },
-    );}
-
-
+    );
+    
+    updatedCourse.promotion.promotionPercentage=parseInt(promotion);
+    updatedCourse.promotion.startDate=new Date(startdate);
+    updatedCourse.promotion.endDate=new Date(enddate);
+    updatedCourse.save();
+  }
+   
     const course= await Course.find({});
 
     
