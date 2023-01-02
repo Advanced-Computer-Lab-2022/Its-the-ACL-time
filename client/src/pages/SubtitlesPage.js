@@ -1,341 +1,341 @@
-import React, { useRef, useState } from 'react';
-import { makeStyles } from '@material-ui/core/styles';
-import FilterField from '../components/FilterField';
-import { Box, TextareaAutosize, Typography } from '@material-ui/core';
-import { AiFillCloseCircle, AiFillEdit, AiFillDelete } from 'react-icons/ai';
-import { useEffect } from 'react';
-import axios from 'axios';
-import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
-import { AiOutlinePlusCircle } from 'react-icons/ai';
-import AlertDialog from '../components/AlertDialog';
-import Dialog from '@mui/material/Dialog';
-import Button from '@mui/material/Button';
-import DialogActions from '@mui/material/DialogActions';
-import DialogContent from '@mui/material/DialogContent';
-import DialogContentText from '@mui/material/DialogContentText';
-import Exam from '../components/Exam';
-import MuiAlert from '@mui/material/Alert';
-import { useAppContext } from '../context/App/appContext';
-import { jsPDF } from 'jspdf';
-import Review from '../components/Review';
-import RatingForm from '../components/RatingForm';
-import { useCourseContext } from '../context/Course/courseContext';
-import LinearProgressBar from '../components/LinearProgressBar';
-import { Loading } from '../components';
-import Post from '../components/Post';
-import { Pagination } from '@material-ui/lab';
-import Footer from '../components/Footer';
-import Reportform from '../components/Reportform';
-import Accordion from '@mui/material/Accordion';
-import AccordionSummary from '@mui/material/AccordionSummary';
-import AccordionDetails from '@mui/material/AccordionDetails';
-import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
-import Snackbar from '@mui/material/Snackbar';
+import React, { useRef, useState } from "react";
+import { makeStyles } from "@material-ui/core/styles";
+import FilterField from "../components/FilterField";
+import { Box, TextareaAutosize, Typography } from "@material-ui/core";
+import { AiFillCloseCircle, AiFillEdit, AiFillDelete } from "react-icons/ai";
+import { useEffect } from "react";
+import axios from "axios";
+import { useNavigate, useParams, useSearchParams } from "react-router-dom";
+import { AiOutlinePlusCircle } from "react-icons/ai";
+import AlertDialog from "../components/AlertDialog";
+import Dialog from "@mui/material/Dialog";
+import Button from "@mui/material/Button";
+import DialogActions from "@mui/material/DialogActions";
+import DialogContent from "@mui/material/DialogContent";
+import DialogContentText from "@mui/material/DialogContentText";
+import Exam from "../components/Exam";
+import MuiAlert from "@mui/material/Alert";
+import { useAppContext } from "../context/App/appContext";
+import { jsPDF } from "jspdf";
+import Review from "../components/Review";
+import RatingForm from "../components/RatingForm";
+import { useCourseContext } from "../context/Course/courseContext";
+import LinearProgressBar from "../components/LinearProgressBar";
+import { Loading } from "../components";
+import Post from "../components/Post";
+import { Pagination } from "@material-ui/lab";
+import Footer from "../components/Footer";
+import Reportform from "../components/Reportform";
+import Accordion from "@mui/material/Accordion";
+import AccordionSummary from "@mui/material/AccordionSummary";
+import AccordionDetails from "@mui/material/AccordionDetails";
+import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
+import Snackbar from "@mui/material/Snackbar";
 
 const useStyles = makeStyles((theme) => ({
   main: {
-    display: 'flex',
-    justifyContent: 'space-between',
-    alignItems: 'flex-start',
-    width: '100%',
-    padding: '2rem 1rem',
-    marginTop: '2rem',
-    marginBottom: '5rem',
+    display: "flex",
+    justifyContent: "space-between",
+    alignItems: "flex-start",
+    width: "100%",
+    padding: "2rem 1rem",
+    marginTop: "2rem",
+    marginBottom: "5rem",
   },
   subtitles: {
-    width: '30%',
-    border: '1px solid #e0e0e0',
-    borderRadius: '0.5rem',
-    padding: '1rem',
-    marginRight: '1rem',
+    width: "30%",
+    border: "1px solid #e0e0e0",
+    borderRadius: "0.5rem",
+    padding: "1rem",
+    marginRight: "1rem",
   },
   courseContent: {
-    display: 'flex',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    width: '100%',
-    height: '3rem',
-    padding: '0.5rem',
-    border: 'none',
-    cursor: 'pointer',
-    '&:hover': {
-      backgroundColor: '#f5f5f5',
+    display: "flex",
+    justifyContent: "space-between",
+    alignItems: "center",
+    width: "100%",
+    height: "3rem",
+    padding: "0.5rem",
+    border: "none",
+    cursor: "pointer",
+    "&:hover": {
+      backgroundColor: "#f5f5f5",
     },
   },
   hr: {
-    width: '100%',
-    height: '1px',
-    border: 'none',
-    backgroundColor: '#e0e0e0',
+    width: "100%",
+    height: "1px",
+    border: "none",
+    backgroundColor: "#e0e0e0",
   },
   lectureTitle: {
-    fontWeight: '100',
-    fontSize: '1rem',
+    fontWeight: "100",
+    fontSize: "1rem",
   },
   showMore: {
-    width: '100%',
-    height: '3rem',
-    border: 'none',
-    backgroundColor: '#f5f5f5',
-    cursor: 'pointer',
-    '&:hover': {
-      backgroundColor: '#e0e0e0',
+    width: "100%",
+    height: "3rem",
+    border: "none",
+    backgroundColor: "#f5f5f5",
+    cursor: "pointer",
+    "&:hover": {
+      backgroundColor: "#e0e0e0",
     },
   },
 
   rightSection: {
-    width: '70%',
-    display: 'flex',
-    flexDirection: 'column',
-    borderRadius: '0.5rem',
+    width: "70%",
+    display: "flex",
+    flexDirection: "column",
+    borderRadius: "0.5rem",
   },
 
   video: {
-    width: '100%',
-    height: '30rem',
-    border: '1px solid #e0e0e0',
-    borderRadius: '0.5rem',
-    backgroundColor: 'black',
+    width: "100%",
+    height: "30rem",
+    border: "1px solid #e0e0e0",
+    borderRadius: "0.5rem",
+    backgroundColor: "black",
   },
 
   exam: {
-    width: '100%',
-    height: '30rem',
-    border: '1px solid #e0e0e0',
-    borderRadius: '0.5rem',
-    backgroundColor: 'white',
-    display: 'flex',
-    flexDirection: 'column',
-    alignItems: 'center',
+    width: "100%",
+    height: "30rem",
+    border: "1px solid #e0e0e0",
+    borderRadius: "0.5rem",
+    backgroundColor: "white",
+    display: "flex",
+    flexDirection: "column",
+    alignItems: "center",
   },
 
   videoInfoHeader: {
-    display: 'flex',
-    alignItems: 'center',
-    width: '100%',
-    height: '3rem',
-    padding: '0.5rem',
-    border: 'none',
+    display: "flex",
+    alignItems: "center",
+    width: "100%",
+    height: "3rem",
+    padding: "0.5rem",
+    border: "none",
   },
 
   button: {
-    border: 'none',
-    fontSize: '1.2rem',
-    fontWeight: '600',
-    color: '#666f73',
-    cursor: 'pointer',
-    '&:hover': {
-      color: 'black',
+    border: "none",
+    fontSize: "1.2rem",
+    fontWeight: "600",
+    color: "#666f73",
+    cursor: "pointer",
+    "&:hover": {
+      color: "black",
     },
-    marginRight: '1rem',
+    marginRight: "1rem",
   },
   line: {
-    width: '100%',
-    height: '1px',
-    border: 'none',
-    backgroundColor: '#e0e0e0',
+    width: "100%",
+    height: "1px",
+    border: "none",
+    backgroundColor: "#e0e0e0",
   },
   videoInfoBody: {
-    display: 'flex',
-    flexDirection: 'column',
-    alignItems: 'center',
-    width: '100%',
-    padding: '0.5rem',
-    border: 'none',
+    display: "flex",
+    flexDirection: "column",
+    alignItems: "center",
+    width: "100%",
+    padding: "0.5rem",
+    border: "none",
   },
   overview: {
-    width: '100%',
-    marginTop: '1rem',
+    width: "100%",
+    marginTop: "1rem",
   },
   showMoreDescription: {
-    color: '#0294d4',
-    cursor: 'pointer',
-    '&:hover': {
-      color: '#006db3',
+    color: "#0294d4",
+    cursor: "pointer",
+    "&:hover": {
+      color: "#006db3",
     },
   },
   addNote: {
-    display: 'flex',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    width: '100%',
-    height: '3rem',
-    backgroundColor: '#f5f5f5',
-    padding: '0.5rem',
-    border: 'none',
-    cursor: 'pointer',
-    '&:hover': {
-      backgroundColor: '#e0e0e0',
+    display: "flex",
+    justifyContent: "space-between",
+    alignItems: "center",
+    width: "100%",
+    height: "3rem",
+    backgroundColor: "#f5f5f5",
+    padding: "0.5rem",
+    border: "none",
+    cursor: "pointer",
+    "&:hover": {
+      backgroundColor: "#e0e0e0",
     },
-    color: '#666f73',
-    fontWeight: '600',
+    color: "#666f73",
+    fontWeight: "600",
   },
   writeNote: {
-    display: 'flex',
-    flexDirection: 'column',
-    alignItems: 'center',
-    width: '100%',
-    padding: '0.5rem',
-    border: 'none',
+    display: "flex",
+    flexDirection: "column",
+    alignItems: "center",
+    width: "100%",
+    padding: "0.5rem",
+    border: "none",
   },
   textarea: {
-    width: '100%',
-    height: '10rem',
-    padding: '0.5rem',
-    border: '1px solid #e0e0e0',
-    borderRadius: '0.5rem',
-    resize: 'none',
-    outline: 'none',
-    '&:focus': {
-      border: '1px solid #0294d4',
+    width: "100%",
+    height: "10rem",
+    padding: "0.5rem",
+    border: "1px solid #e0e0e0",
+    borderRadius: "0.5rem",
+    resize: "none",
+    outline: "none",
+    "&:focus": {
+      border: "1px solid #0294d4",
     },
   },
 
   buttons: {
-    display: 'flex',
-    justifyContent: 'flex-end',
-    alignItems: 'center',
-    width: '100%',
-    marginTop: '1rem',
+    display: "flex",
+    justifyContent: "flex-end",
+    alignItems: "center",
+    width: "100%",
+    marginTop: "1rem",
   },
 
   save: {
-    width: '100%',
-    height: '3rem',
-    border: 'none',
-    backgroundColor: '#0294d4',
-    color: 'white',
-    fontWeight: '600',
-    cursor: 'pointer',
-    '&:hover': {
-      backgroundColor: '#006db3',
+    width: "100%",
+    height: "3rem",
+    border: "none",
+    backgroundColor: "#0294d4",
+    color: "white",
+    fontWeight: "600",
+    cursor: "pointer",
+    "&:hover": {
+      backgroundColor: "#006db3",
     },
   },
   downloadNotes: {
-    width: '6rem',
-    height: '3rem',
-    border: 'none',
-    backgroundColor: '#666f73',
-    color: 'white',
-    fontWeight: '600',
-    cursor: 'pointer',
-    '&:hover': {
-      backgroundColor: '#4d5559',
+    width: "6rem",
+    height: "3rem",
+    border: "none",
+    backgroundColor: "#666f73",
+    color: "white",
+    fontWeight: "600",
+    cursor: "pointer",
+    "&:hover": {
+      backgroundColor: "#4d5559",
     },
-    marginTop: '1rem',
+    marginTop: "1rem",
   },
 
   cancel: {
-    width: '100%',
-    height: '3rem',
-    border: 'none',
-    backgroundColor: '#f5f5f5',
-    color: '#666f73',
-    fontWeight: '600',
-    cursor: 'pointer',
-    '&:hover': {
-      backgroundColor: '#e0e0e0',
+    width: "100%",
+    height: "3rem",
+    border: "none",
+    backgroundColor: "#f5f5f5",
+    color: "#666f73",
+    fontWeight: "600",
+    cursor: "pointer",
+    "&:hover": {
+      backgroundColor: "#e0e0e0",
     },
-    marginLeft: '1rem',
+    marginLeft: "1rem",
   },
 
   notes: {
-    marginTop: '2rem',
-    display: 'flex',
-    flexDirection: 'column',
-    alignItems: 'center',
-    width: '100%',
+    marginTop: "2rem",
+    display: "flex",
+    flexDirection: "column",
+    alignItems: "center",
+    width: "100%",
   },
 
   note: {
-    display: 'flex',
-    flexDirection: 'column',
-    alignItems: 'center',
-    width: '100%',
-    padding: '0.5rem',
-    border: 'none',
-    cursor: 'pointer',
-    '&:hover': {
-      backgroundColor: '#f5f5f5',
+    display: "flex",
+    flexDirection: "column",
+    alignItems: "center",
+    width: "100%",
+    padding: "0.5rem",
+    border: "none",
+    cursor: "pointer",
+    "&:hover": {
+      backgroundColor: "#f5f5f5",
     },
   },
 
   noteHeader: {
-    display: 'flex',
-    alignItems: 'center',
-    width: '100%',
-    justifyContent: 'space-between',
-    padding: '0.5rem',
-    border: 'none',
+    display: "flex",
+    alignItems: "center",
+    width: "100%",
+    justifyContent: "space-between",
+    padding: "0.5rem",
+    border: "none",
   },
 
   editIcons: {
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'flex-end',
-    border: 'none',
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "flex-end",
+    border: "none",
   },
 
   noteTitle: {
-    fontWeight: '600',
-    fontSize: '1.5rem',
+    fontWeight: "600",
+    fontSize: "1.5rem",
   },
 
   noteContent: {
-    marginTop: '1rem',
-    width: '100%',
-    border: '1px solid #e0e0e0',
-    borderRadius: '0.5rem',
-    padding: '0.5rem',
-    resize: 'none',
-    outline: 'none',
-    '&:focus': {
-      border: '1px solid #0294d4',
+    marginTop: "1rem",
+    width: "100%",
+    border: "1px solid #e0e0e0",
+    borderRadius: "0.5rem",
+    padding: "0.5rem",
+    resize: "none",
+    outline: "none",
+    "&:focus": {
+      border: "1px solid #0294d4",
     },
   },
 
   noteIcons: {
-    height: '100%',
+    height: "100%",
 
-    marginLeft: '1rem',
-    '&:hover': {
-      transform: 'scale(2)',
-      transition: 'transform 0.3s ease-in-out',
+    marginLeft: "1rem",
+    "&:hover": {
+      transform: "scale(2)",
+      transition: "transform 0.3s ease-in-out",
     },
   },
 
   postTitle: {
-    width: '100%',
-    height: '3rem',
-    borderRadius: '0.5rem',
-    padding: '0.5rem',
-    fontSize: '1.2rem',
-    marginBottom: '1rem',
-    border: '1px solid #e0e0e0',
-    resize: 'none',
-    outline: 'none',
-    '&:focus': {
-      border: '1px solid #0294d4',
+    width: "100%",
+    height: "3rem",
+    borderRadius: "0.5rem",
+    padding: "0.5rem",
+    fontSize: "1.2rem",
+    marginBottom: "1rem",
+    border: "1px solid #e0e0e0",
+    resize: "none",
+    outline: "none",
+    "&:focus": {
+      border: "1px solid #0294d4",
     },
   },
 
   posts: {
-    width: '100%',
-    display: 'flex',
-    justifyContent: 'center',
-    alignItems: 'center',
-    flexDirection: 'column',
+    width: "100%",
+    display: "flex",
+    justifyContent: "center",
+    alignItems: "center",
+    flexDirection: "column",
   },
 }));
 
 const SubtitlesPage = () => {
   const Alert = React.forwardRef(function Alert(props, ref) {
-    return <MuiAlert elevation={6} ref={ref} variant='filled' {...props} />;
+    return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
   });
   const classes = useStyles();
   const [opensnake, setopensnake] = useState(false);
-  const [message, setmessage] = useState('');
-  const [typemessage, settypemessage] = useState('');
+  const [message, setmessage] = useState("");
+  const [typemessage, settypemessage] = useState("");
   const [loading, setLoading] = useState(true);
   const [showList, setShowList] = useState(true);
   const [subtitles, setSubtitles] = useState([]);
@@ -367,10 +367,26 @@ const SubtitlesPage = () => {
   const [reviewPage, setReviewPage] = useState(0);
   const [subtitle, setSubtitle] = useState();
   const { courseID } = useParams();
+  console.log("course id",courseID);
+  const [reportId, setId] = useState("");
 
-  const [reportId, setId] = useState('');
+  const [comment, setComment] = useState("");
 
-  const [comment, setComment] = useState('');
+  function checkOwnership() {
+    let myCourses = user.courses;
+    console.log("my courses",myCourses);
+    const course = myCourses.find(
+      (course) => course.courseId.toString() === courseId.toString()
+    );
+    if (!course) {
+      console.log("course ",course);
+      console.log("course Id",courseId);
+      navigate("/fasldfkjalsdkfjlaksdfl");
+    }
+  }
+  useEffect(() => {
+    checkOwnership();
+  }, []);
 
   const handleClickOpen = (reportId) => {
     setId(reportId);
@@ -400,21 +416,21 @@ const SubtitlesPage = () => {
         );
         console.log(report);
         setopensnake(true);
-        setmessage('Message added');
-        settypemessage('success');
+        setmessage("Message added");
+        settypemessage("success");
         setOpen(false);
       })
       .catch((err) => {
         console.log(err);
         setopensnake(true);
         setmessage(err);
-        settypemessage('error');
+        settypemessage("error");
       });
   };
 
   const downloadNotes = () => {
     const doc = new jsPDF();
-    doc.text('Notes', 100, 10);
+    doc.text("Notes", 100, 10);
     let height = 0;
     notes.forEach((note, index) => {
       doc.text(`note ${index + 1}: `, 10, 20 + height);
@@ -423,11 +439,11 @@ const SubtitlesPage = () => {
         height += 10;
       }
     });
-    doc.save('notes.pdf');
+    doc.save("notes.pdf");
   };
 
   useEffect(() => {
-    console.log('courseId ' + courseId);
+    console.log("courseId " + courseId);
     async function fetchSubtitles() {
       const response = await axios.get(
         `http://localhost:8080/api/v1/course/${courseId}/subtitle`,
@@ -487,7 +503,7 @@ const SubtitlesPage = () => {
     const getExam = async (examId) => {
       try {
         const response = await axios.get(
-          'http://localhost:8080/api/v1/exam/' + examId,
+          "http://localhost:8080/api/v1/exam/" + examId,
           {
             headers: {
               Authorization: `Bearer ${token}`,
@@ -568,22 +584,22 @@ const SubtitlesPage = () => {
       }
     }
 
-    if (searchParams.has('examId')) {
-      getExam(searchParams.get('examId'));
+    if (searchParams.has("examId")) {
+      getExam(searchParams.get("examId"));
     }
 
-    if (searchParams.has('subtitleId')) {
-      fetchNotes(searchParams.get('subtitleId'));
-      fetchSubtitle(searchParams.get('subtitleId'));
+    if (searchParams.has("subtitleId")) {
+      fetchNotes(searchParams.get("subtitleId"));
+      fetchSubtitle(searchParams.get("subtitleId"));
     }
 
     if (videoInfo === 2) {
-      console.log('fetch reviews');
+      console.log("fetch reviews");
       fetchReviews();
     }
 
     if (videoInfo === 3) {
-      console.log('fetch posts');
+      console.log("fetch posts");
       fetchPosts();
     }
   }, [searchParams, user._id, token, videoInfo, courseId]);
@@ -618,11 +634,11 @@ const SubtitlesPage = () => {
   };
 
   const updateProgress = async (checkedSubtitles, checkedExams) => {
-    console.log('checkedSubtitles: ' + checkedSubtitles.length);
-    console.log('checkedExams ' + checkedExams.length);
-    console.log('subtitles ' + subtitles.length);
-    console.log('exams ' + exams.length);
-    console.log('-----------------------------------------------------');
+    console.log("checkedSubtitles: " + checkedSubtitles.length);
+    console.log("checkedExams " + checkedExams.length);
+    console.log("subtitles " + subtitles.length);
+    console.log("exams " + exams.length);
+    console.log("-----------------------------------------------------");
     try {
       await axios.patch(
         `http://localhost:8080/api/v1/user/progress/${courseId}`,
@@ -688,7 +704,7 @@ const SubtitlesPage = () => {
     setLoading(true);
     try {
       const response = await axios.post(
-        'http://localhost:8080/api/v1/post',
+        "http://localhost:8080/api/v1/post",
         {
           courseId,
           title,
@@ -712,8 +728,8 @@ const SubtitlesPage = () => {
   const addNote = async () => {
     setLoading(true);
     try {
-      const response = await axios.post('http://localhost:8080/api/v1/note', {
-        subtitleId: searchParams.get('subtitleId'),
+      const response = await axios.post("http://localhost:8080/api/v1/note", {
+        subtitleId: searchParams.get("subtitleId"),
         userId: user._id,
         description: noteContent.current.value,
       });
@@ -726,7 +742,7 @@ const SubtitlesPage = () => {
   };
 
   const deleteNote = async (noteId) => {
-    console.log('noteId ' + noteId);
+    console.log("noteId " + noteId);
     try {
       await axios.delete(
         `http://localhost:8080/api/v1/note/${noteId}?userId=${user._id}`,
@@ -756,7 +772,7 @@ const SubtitlesPage = () => {
           },
         ],
       },
-      'review'
+      "review"
     );
     setReviews([
       ...reviews,
@@ -773,10 +789,10 @@ const SubtitlesPage = () => {
   return (
     <div
       style={{
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
-        width: '100%',
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
+        width: "100%",
       }}
     >
       <main className={`${classes.main}`}>
@@ -801,8 +817,8 @@ const SubtitlesPage = () => {
                   onFilter={handleChecked}
                   optionOnClick={() => navigate(`?subtitleId=${subtitle._id}`)}
                   titleStyle={{
-                    fontSize: '1rem',
-                    fontWeight: '500',
+                    fontSize: "1rem",
+                    fontWeight: "500",
                   }}
                   checkedOptions={state.checkedSubtitles?.reduce(
                     (acc, item) => {
@@ -823,8 +839,8 @@ const SubtitlesPage = () => {
                 onFilter={handleCheckedExam}
                 optionOnClick={() => navigate(`?examId=${exam._id}`)}
                 titleStyle={{
-                  fontSize: '1rem',
-                  fontWeight: '500',
+                  fontSize: "1rem",
+                  fontWeight: "500",
                 }}
                 checkedOptions={state.checkedExams?.reduce((acc, item) => {
                   acc[item] = true;
@@ -837,17 +853,17 @@ const SubtitlesPage = () => {
               className={`${classes.showMore}`}
               onClick={() => setShowMore(!showMore)}
             >
-              {showMore ? 'Show Less' : 'Show More'}
+              {showMore ? "Show Less" : "Show More"}
             </button>
           )}
         </section>
         <section className={`${classes.rightSection}`}>
           <div
             className={
-              searchParams.get('examId') ? classes.exam : classes.video
+              searchParams.get("examId") ? classes.exam : classes.video
             }
           >
-            {exam && searchParams.get('examId') ? (
+            {exam && searchParams.get("examId") ? (
               <Exam
                 questions={exam?.questions}
                 title={"Let's take the exam"}
@@ -860,12 +876,12 @@ const SubtitlesPage = () => {
             {!exam && (
               <div className={`${classes.video}`}>
                 <iframe
-                  width='911'
-                  height='480'
+                  width="911"
+                  height="480"
                   src={`${subtitle?.link}`}
-                  title='YouTube video player'
-                  frameBorder='0'
-                  allow='accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture'
+                  title="YouTube video player"
+                  frameBorder="0"
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                   allowFullScreen
                 ></iframe>
               </div>
@@ -877,28 +893,28 @@ const SubtitlesPage = () => {
               <button
                 className={`${classes.button}`}
                 onClick={() => setVideoInfo(0)}
-                style={{ color: videoInfo === 0 ? 'black' : '#666f73' }}
+                style={{ color: videoInfo === 0 ? "black" : "#666f73" }}
               >
                 Overview
               </button>
               <button
                 className={`${classes.button}`}
                 onClick={() => setVideoInfo(1)}
-                style={{ color: videoInfo === 1 ? 'black' : '#666f73' }}
+                style={{ color: videoInfo === 1 ? "black" : "#666f73" }}
               >
                 Notes
               </button>
               <button
                 className={`${classes.button}`}
                 onClick={() => setVideoInfo(2)}
-                style={{ color: videoInfo === 2 ? 'black' : '#666f73' }}
+                style={{ color: videoInfo === 2 ? "black" : "#666f73" }}
               >
                 Reviews
               </button>
               <button
                 className={`${classes.button}`}
                 onClick={() => setVideoInfo(3)}
-                style={{ color: videoInfo === 3 ? 'black' : '#666f73' }}
+                style={{ color: videoInfo === 3 ? "black" : "#666f73" }}
               >
                 Q&A
               </button>
@@ -906,29 +922,29 @@ const SubtitlesPage = () => {
               <button
                 className={`${classes.button}`}
                 onClick={handleSubmit}
-                style={{ color: videoInfo === 4 ? 'black' : '#666f73' }}
+                style={{ color: videoInfo === 4 ? "black" : "#666f73" }}
               >
                 Previous Reports
               </button>
               <Reportform
                 courseid={courseId}
                 className={`${classes.button}`}
-                style={{ color: videoInfo === 3 ? 'black' : '#666f73' }}
+                style={{ color: videoInfo === 3 ? "black" : "#666f73" }}
               >
                 Report
               </Reportform>
             </div>
             <Snackbar
-              anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
+              anchorOrigin={{ vertical: "top", horizontal: "center" }}
               open={opensnake}
               onClose={opensnake}
               message={message}
-              key={'top' + 'center'}
+              key={"top" + "center"}
             >
               <Alert
                 onClose={() => setopensnake(false)}
                 severity={typemessage}
-                sx={{ width: '100%' }}
+                sx={{ width: "100%" }}
               >
                 {message}
               </Alert>
@@ -938,7 +954,7 @@ const SubtitlesPage = () => {
             <div className={`${classes.videoInfoBody}`}>
               {videoInfo === 0 && (
                 <Box className={`${classes.overview}`}>
-                  <Typography variant='h6' gutterBottom>
+                  <Typography variant="h6" gutterBottom>
                     Course Description
                   </Typography>
                   <p>
@@ -949,17 +965,17 @@ const SubtitlesPage = () => {
                         setShowMoreDescription(!showMoreDescription)
                       }
                     >
-                      {showMoreDescription ? 'Show Less' : 'Show More'}
+                      {showMoreDescription ? "Show Less" : "Show More"}
                     </span>
                   </p>
                 </Box>
               )}
               {videoInfo === 4 && (
                 <Box className={`${classes.overview}`}>
-                  <Typography variant='h6' gutterBottom>
+                  <Typography variant="h6" gutterBottom>
                     Previous Reports
                   </Typography>
-                  <table class='table  table-hover bg-light border border-success '>
+                  <table class="table  table-hover bg-light border border-success ">
                     <thead>
                       <tr>
                         <th>Dscription</th>
@@ -984,17 +1000,17 @@ const SubtitlesPage = () => {
                                 <AccordionSummary
                                   expandIcon={<ExpandMoreIcon />}
                                   //   aria-controls="panel1a-content"
-                                  id='panel1a-header'
+                                  id="panel1a-header"
                                 >
                                   <Typography>Messages</Typography>
                                 </AccordionSummary>
                                 <AccordionDetails>
                                   <Typography>
                                     <ul>
-                                      {' '}
+                                      {" "}
                                       {x.commentsadmin.map((comment) => (
                                         <li>{comment}</li>
-                                      ))}{' '}
+                                      ))}{" "}
                                     </ul>
                                   </Typography>
                                 </AccordionDetails>
@@ -1002,11 +1018,11 @@ const SubtitlesPage = () => {
                             }
                           </td>
                           <td>
-                            {' '}
-                            {report.status !== 'resolved' && (
+                            {" "}
+                            {report.status !== "resolved" && (
                               <button
-                                type='button'
-                                class='btn btn-primary'
+                                type="button"
+                                class="btn btn-primary"
                                 onClick={() => {
                                   handleClickOpen(x._id);
                                 }}
@@ -1026,8 +1042,8 @@ const SubtitlesPage = () => {
                   <TextareaAutosize
                     ref={noteContent}
                     minRows={3}
-                    aria-label='maximum height'
-                    placeholder='Write your note here'
+                    aria-label="maximum height"
+                    placeholder="Write your note here"
                     className={`${classes.textarea}`}
                   />
                   <div className={`${classes.buttons}`}>
@@ -1047,7 +1063,7 @@ const SubtitlesPage = () => {
                   <button
                     onClick={() => setWriteNote(true)}
                     className={`${classes.addNote}`}
-                    disabled={!searchParams.get('subtitleId')}
+                    disabled={!searchParams.get("subtitleId")}
                   >
                     Create a note for this lecture
                     <span>
@@ -1060,11 +1076,11 @@ const SubtitlesPage = () => {
               {videoInfo === 1 && (
                 <div className={`${classes.notes}`}>
                   {notes.map((note, idx) => (
-                    <div key={note.id} style={{ width: '100%' }}>
+                    <div key={note.id} style={{ width: "100%" }}>
                       <Box className={`${classes.note}`}>
                         <div className={`${classes.noteHeader}`}>
                           <Typography
-                            variant='h6'
+                            variant="h6"
                             gutterBottom
                             className={`${classes.noteTitle}`}
                           >
@@ -1089,10 +1105,10 @@ const SubtitlesPage = () => {
                   ))}
                   <div
                     style={{
-                      width: '100%',
-                      display: 'flex',
-                      justifyContent: 'flex-end',
-                      alignItems: 'center',
+                      width: "100%",
+                      display: "flex",
+                      justifyContent: "flex-end",
+                      alignItems: "center",
                     }}
                   >
                     {notes.length !== 0 && (
@@ -1107,26 +1123,26 @@ const SubtitlesPage = () => {
                 </div>
               )}
               <AlertDialog
-                title={'Delete Note'}
-                content={'Are you sure you want to delete this note ?'}
+                title={"Delete Note"}
+                content={"Are you sure you want to delete this note ?"}
                 open={dialog !== -1}
                 handleAgree={() => {
                   deleteNote(dialog);
                   setDialog(-1);
-                  console.log('agree');
+                  console.log("agree");
                 }}
                 handleDisagree={() => {
                   setDialog(-1);
-                  console.log('disagree');
+                  console.log("disagree");
                 }}
               />
               {videoInfo === 2 && (
                 <>
                   <div
                     style={{
-                      width: '100%',
-                      alignItems: 'center',
-                      marginTop: '1rem',
+                      width: "100%",
+                      alignItems: "center",
+                      marginTop: "1rem",
                     }}
                   >
                     {reviews
@@ -1138,7 +1154,7 @@ const SubtitlesPage = () => {
                         <div
                           key={idx}
                           style={{
-                            marginBottom: '1rem',
+                            marginBottom: "1rem",
                           }}
                         >
                           <Review
@@ -1150,10 +1166,10 @@ const SubtitlesPage = () => {
                       ))}
                     <div
                       style={{
-                        display: 'flex',
-                        justifyContent: 'center',
-                        alignItems: 'center',
-                        marginTop: '1rem',
+                        display: "flex",
+                        justifyContent: "center",
+                        alignItems: "center",
+                        marginTop: "1rem",
                       }}
                     >
                       <Pagination
@@ -1162,8 +1178,8 @@ const SubtitlesPage = () => {
                         onChange={(e, page) => {
                           setReviewPage(page - 1);
                         }}
-                        color='primary'
-                        size='large'
+                        color="primary"
+                        size="large"
                         showFirstButton
                         showLastButton
                       />
@@ -1172,21 +1188,21 @@ const SubtitlesPage = () => {
                   {!reviewed && (
                     <div>
                       <RatingForm
-                        buttonText={'Rate this course'}
-                        title={'Course'}
+                        buttonText={"Rate this course"}
+                        title={"Course"}
                         textArea={
-                          'Tell us, what do you think about this course ?'
+                          "Tell us, what do you think about this course ?"
                         }
                         buttonStyle={{
-                          height: '3rem',
-                          borderRadius: '0.5rem',
-                          backgroundColor: 'rgb(74, 73, 73)',
-                          color: 'white',
-                          border: 'none',
-                          fontSize: '1.2rem',
-                          cursor: 'pointer',
-                          '&:hover': {
-                            backgroundColor: 'black',
+                          height: "3rem",
+                          borderRadius: "0.5rem",
+                          backgroundColor: "rgb(74, 73, 73)",
+                          color: "white",
+                          border: "none",
+                          fontSize: "1.2rem",
+                          cursor: "pointer",
+                          "&:hover": {
+                            backgroundColor: "black",
                           },
                         }}
                         onSubmit={postReview}
@@ -1198,48 +1214,48 @@ const SubtitlesPage = () => {
 
               {videoInfo === 3 && writePost && (
                 <form
-                  action=''
+                  action=""
                   className={`${classes.writeNote}`}
                   onSubmit={addPost}
                 >
                   <div
                     style={{
-                      width: '100%',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'flex-start',
+                      width: "100%",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "flex-start",
                     }}
                   >
                     <label
-                      htmlFor='title'
+                      htmlFor="title"
                       style={{
-                        fontSize: '1.2rem',
-                        fontWeight: '600',
-                        marginRight: '1rem',
+                        fontSize: "1.2rem",
+                        fontWeight: "600",
+                        marginRight: "1rem",
                       }}
                     >
                       Title
                     </label>
                   </div>
                   <input
-                    type='text'
-                    id='title'
+                    type="text"
+                    id="title"
                     className={`${classes.postTitle}`}
                   />
                   <div
                     style={{
-                      width: '100%',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'flex-start',
+                      width: "100%",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "flex-start",
                     }}
                   >
                     <label
-                      htmlFor='details'
+                      htmlFor="details"
                       style={{
-                        fontSize: '1.2rem',
-                        fontWeight: '600',
-                        marginRight: '1rem',
+                        fontSize: "1.2rem",
+                        fontWeight: "600",
+                        marginRight: "1rem",
                       }}
                     >
                       Details
@@ -1248,8 +1264,8 @@ const SubtitlesPage = () => {
                   <TextareaAutosize
                     ref={noteContent}
                     minRows={3}
-                    aria-label='maximum height'
-                    placeholder='Write your post here'
+                    aria-label="maximum height"
+                    placeholder="Write your post here"
                     className={`${classes.textarea}`}
                   />
                   <div className={`${classes.buttons}`}>
@@ -1259,7 +1275,7 @@ const SubtitlesPage = () => {
                     >
                       Cancel
                     </button>
-                    <button className={`${classes.save}`} type='submit'>
+                    <button className={`${classes.save}`} type="submit">
                       Post
                     </button>
                   </div>
@@ -1299,7 +1315,7 @@ const SubtitlesPage = () => {
                       onChange={(e, page) => {
                         setPostPage(page - 1);
                       }}
-                      color='primary'
+                      color="primary"
                     />
                   </div>
                 </>
@@ -1308,18 +1324,18 @@ const SubtitlesPage = () => {
             <Dialog open={open} onClose={handleClose}>
               <DialogContent>
                 <DialogContentText>Comment</DialogContentText>
-                <div className='mb-3'></div>
-                <div className='mb-3'>
+                <div className="mb-3"></div>
+                <div className="mb-3">
                   <label
-                    for='exampleFormControlTextarea1'
-                    className='form-label'
+                    for="exampleFormControlTextarea1"
+                    className="form-label"
                   >
                     Comment
                   </label>
                   <textarea
-                    className='form-control'
-                    id='exampleFormControlTextarea1'
-                    rows='3'
+                    className="form-control"
+                    id="exampleFormControlTextarea1"
+                    rows="3"
                     onChange={(e) => {
                       setComment(e.target.value);
                     }}
