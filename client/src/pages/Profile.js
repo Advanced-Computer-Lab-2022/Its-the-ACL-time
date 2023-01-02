@@ -1003,22 +1003,19 @@ export default function Profile() {
         </div>
         <Divider />
         <List>
-          {
-            // choose which sidebar to render based on user role
-            user.type === 'Instructor' &&
-              InstructorSideBar.map((item, index) => (
-                <ListItem
-                  button
-                  key={index}
-                  onClick={() => {
-                    setComponent(item.title);
-                  }}
-                >
-                  <ListItemIcon>{item.icon}</ListItemIcon>
-                  <ListItemText primary={item.title} />
-                </ListItem>
-              ))
-          }
+          {user.type === 'Instructor' &&
+            InstructorSideBar.map((item, index) => (
+              <ListItem
+                button
+                key={index}
+                onClick={() => {
+                  setComponent(item.title);
+                }}
+              >
+                <ListItemIcon>{item.icon}</ListItemIcon>
+                <ListItemText primary={item.title} />
+              </ListItem>
+            ))}
           {user.type === 'Corporate trainee' &&
             CorporateSideBar.map((item, index) => (
               <ListItem

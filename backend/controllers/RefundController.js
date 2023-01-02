@@ -28,11 +28,21 @@ const postRefund = async (req, res) => {
   //     .status(404)
   //     .json({ message: 'You are not enrolled in this course' });
   // }
+  const alreadyRefunded = await Refund.findOne({
+    course: courseId,
+    user: userId,
+  });
+
+  if (alreadyRefunded) {
+    console.log('You already requested a refund');
+    return res.status(404).json({ message: 'You already requested a refund' });
+  }
 
   const refund = await Refund({
     course: courseId,
     user: userId,
     state: 'pending',
+    sended: true,
   });
 
   const savedRefund = await refund.save();
