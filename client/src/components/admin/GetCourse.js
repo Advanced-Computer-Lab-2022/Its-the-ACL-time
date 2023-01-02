@@ -53,6 +53,20 @@ const columns = [
     width: 110,
     editable: true,
   },
+  {
+    field: 'StartDate',
+    headerName: 'StartDate',
+    type: 'number',
+    width: 140,
+    editable: true,
+  },
+  {
+    field: 'EndDate',
+    headerName: 'EndDate',
+    type: 'number',
+    width: 140,
+    editable: true,
+  },
  
 ];
 
@@ -62,6 +76,10 @@ export default function GetCourse() {
   const[course,setcourse]=useState([])
   const[selectcourse,setselect]=useState([]);
   const[promotion,setpromtion]=useState(0);
+  const[startdate,setstartdate]=useState("");
+  const[enddate,setenddate]=useState("");
+
+
   const [open, setOpen] = React.useState(true);
   let rows = [
   ];
@@ -83,7 +101,7 @@ export default function GetCourse() {
   e.preventDefault();
   setOpen(true);
   // id.preventDefault();
-   axios.patch(`http://localhost:8080/api/v1/admin/setpromotion`,{coursesId:selectcourse,promotion:promotion}).then(res=>{
+   axios.patch(`http://localhost:8080/api/v1/admin/setpromotion`,{coursesId:selectcourse,promotion:promotion,startdate:startdate,enddate:enddate}).then(res=>{
      console.log(res.data);
      setcourse(res.data)
      setOpen(false);
@@ -100,7 +118,10 @@ export default function GetCourse() {
  for(let i=0;i<course.length;i++){
  // console.log(course[i].promotion);
   rows.push({id:course[i]._id,title:course[i].title,subject:course[i].subject,
-    price:course[i].price,promotion:course[i].promotion ,
+    price:course[i].price,promotion:course[i].promotion==null?0:course[i].promotion.promotionPercentage ,
+    StartDate:course[i].promotion==null?null:course[i].promotion.startDate,
+    EndDate:course[i].promotion==null?null:course[i].promotion.endDate,
+
     avatar:course[i].title[0]})
 
  };
@@ -113,10 +134,21 @@ export default function GetCourse() {
     <form className="row g-3 m-3">
   
   <div class="col-auto">
+  <label>promotion</label>
     <input type="text" className="form-control" id="inputPassword2" onChange={(e)=>setpromtion(e.target.value)} placeholder=""/>
   </div>
   <div class="col-auto">
+  <label>startdate</label>
+    <input type="text" className="form-control" id="inputPassword2" onChange={(e)=>setstartdate(e.target.value)} placeholder=""/>
+  </div> <div class="col-auto">
+  <label>enddate</label>
+
+    <input type="text" className="form-control" id="inputPassword2" onChange={(e)=>setenddate(e.target.value)} placeholder=""/>
+  </div>
+  <div>
+  <div class="col-auto">
     <button type="submit" className="btn btn-primary mb-3" onClick={udatepromotion}>Set Promtion</button>
+  </div>
   </div>
 </form>
        <Box sx={{ height: 650, width: '100%'}} >

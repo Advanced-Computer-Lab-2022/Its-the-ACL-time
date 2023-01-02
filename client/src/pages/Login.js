@@ -86,7 +86,7 @@ export default function Login() {
         setAlert(result.msg);
         setAlertType('success');
         let redirect = '/';
-        if (result.type === 'Admin') {
+        if (result.admin) {
           redirect = '/admin';
         }
         console.log('login result', result);

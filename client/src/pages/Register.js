@@ -65,8 +65,8 @@ export default function Register() {
   const email = useRef(null);
   const category = useRef(null);
   const [country, setCountry] = useState('Country');
-  const [showCompanyPolicy, setShowCompanyPolicy] = useState(false);
-  const [disable, setDisable] = useState(false);
+  const [showCompanyPolicy, setShowCompanyPolicy] = useState(true);
+  const [disable, setDisable] = useState(true);
   const [termsAndConditions, setTermsAndConditions] = useState(false);
   const [loading, setLoading] = useState(false);
   const [alert, setAlert] = useState(null);
@@ -90,7 +90,7 @@ export default function Register() {
       username: username.current.value,
       password: password.current.value,
       email: email.current.value,
-      type: category.current.value,
+      type: "Individual trainee",
       country: country.value,
       endPoint: 'register',
     };
@@ -194,27 +194,7 @@ export default function Register() {
                 autoComplete='current-password'
               />
             </Grid>
-            <Grid item xs={12}>
-              <TextField
-                select={true}
-                inputRef={category}
-                variant='outlined'
-                required
-                fullWidth
-                name='category'
-                label='Category'
-                type='password'
-                id='category'
-                defaultValue={'user'}
-              >
-                <MenuItem
-                  value='Individual trainee'
-                  onClick={() => handleCompanyPolicy(false)}
-                >
-                  Individual trainee
-                </MenuItem>
-              </TextField>
-            </Grid>
+         
             <Grid item xs={12}>
               <label>Country</label>
               <CountrySelector setCountry={setCountry} />
