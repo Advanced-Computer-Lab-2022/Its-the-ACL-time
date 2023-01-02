@@ -31,6 +31,7 @@ const questionRouter = require('./routes/questionRoutes');
 const notesRouter = require('./routes/NotesRoutes');
 const refundRouter = require('./routes/refundRoutes');
 const postRouter = require('./routes/PostRoutes');
+const { getUserInfo } = require('./controllers/userController');
 
 const corsOptions = {
   origin: 'http://localhost:3000',
@@ -40,8 +41,7 @@ const corsOptions = {
 app.use(cors(corsOptions));
 app.use(morgan('tiny'));
 app.use(express.json());
-
-app.use('/api/v1/user', authMiddleware, userRouter);
+app.use('/api/v1/user', userRouter);
 app.use('/api/v1/auth', authRouter);
 // app.use('/api/v1/user', userRouter);
 app.use('/api/v1/course', courseRouter);

@@ -38,38 +38,44 @@ const { authOwner, authAdmin, authMiddleware } = require('../middlewares');
 // wallet router
 
 router.get('/earning', authMiddleware, findEarnings);
-router.get('/wallet',authMiddleware , allWallets);
-router.get('/wallet/:id', authMiddleware , findWallet);
-router.post('/wallet/',authMiddleware , addWallet);
+router.get('/wallet', authMiddleware, allWallets);
+router.get('/wallet/:id', authMiddleware, findWallet);
+router.post('/wallet/', authMiddleware, addWallet);
 router.patch('/wallet/:id', authMiddleware, updateWallet);
-router.delete('/wallet/:id', authMiddleware , deleteWallet);
+router.delete('/wallet/:id', authMiddleware, deleteWallet);
 
 // end wallet router
 
 // certification router
 
-router.get('/certification', authAdmin, allCertifications);
-router.get('/certification/:id', authOwner, findCertification);
-router.post('/certification', authAdmin, createCertification);
-router.patch('/certification/:id', authAdmin, updateCertification);
-router.delete('/certification/:id', authAdmin, deleteCertification);
+router.get('/certification', authMiddleware, authAdmin, allCertifications);
+router.get('/certification/:id', authMiddleware, authOwner, findCertification);
+router.post('/certification', authMiddleware, authAdmin, createCertification);
+router.patch(
+  '/certification/:id',
+  authMiddleware,
+  authAdmin,
+  updateCertification
+);
+router.delete(
+  '/certification/:id',
+  authMiddleware,
+  authAdmin,
+  deleteCertification
+);
 // end certification router
 // bltagy edit
-router.patch('/restestpassword', changePassword);
-router.patch('/updateBio', updateBio);
-router.patch('/updateEmail', updateEmail);
-router.post('/reportproblem', createreport);
-router.get('/getrport', getreport);
+router.patch('/restestpassword', authMiddleware, changePassword);
+router.patch('/updateBio', authMiddleware, updateBio);
+router.patch('/updateEmail', authMiddleware, updateEmail);
+router.post('/reportproblem', authMiddleware, createreport);
+router.get('/getrport', authMiddleware, getreport);
 
-router.post('/courserequest', updateEmail);
+router.post('/courserequest', authMiddleware, updateEmail);
 
-
-
-
-
-router.get('/GetBio', GetBio);
+router.get('/GetBio', authMiddleware, GetBio);
 router.patch('/', authMiddleware, updateUserInfo);
-router.get('/:userId', authMiddleware, getUserInfo);
+router.get('/:userId', getUserInfo);
 
 // update course progress
 router.get('/progress/:id', authMiddleware, getUser);
