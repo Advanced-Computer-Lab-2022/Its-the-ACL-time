@@ -13,13 +13,6 @@ const refundSchema = mongoose.Schema({
     type: String,
     enum: ['pending', 'approved', 'rejected'],
   },
-  refundMoney: {
-    type: Number,
-  },
-
-  followUp: {
-    type: String,
-  },
 });
 
 module.exports = mongoose.model('Refund', refundSchema);

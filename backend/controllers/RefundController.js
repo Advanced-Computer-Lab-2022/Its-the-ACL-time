@@ -3,7 +3,7 @@ const User = require('../models/User');
 const Course = require('../models/Course');
 
 const postRefund = async (req, res) => {
-  const { refundMoney, courseId } = req.body;
+  const { courseId } = req.body;
   const { userId } = req.user;
 
   const user = await User.findById(userId);
@@ -33,7 +33,6 @@ const postRefund = async (req, res) => {
     course: courseId,
     user: userId,
     state: 'pending',
-    refundMoney,
   });
 
   const savedRefund = await refund.save();
