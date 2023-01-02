@@ -170,5 +170,5 @@ We have 2 main users in our website:
   ## Credits  
  - Traversy Media (Youtube Channel) --> https://www.youtube.com/channel/UC29ju8bIPH5as8OGnQzwJyA
  - The Net Ninja (Youtube Channel) --> https://www.youtube.com/channel/UCW5YeuERMmlnqo4oq8vwUpg
- - W3schools (Online Web Tutorials)
+ - W3schools (Online Web Tutorials) --> https://www.w3schools.com/
  
