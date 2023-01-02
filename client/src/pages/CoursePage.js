@@ -343,13 +343,13 @@ const CoursePage = () => {
 
   const requestRefundHandler = () => {
     setLoading(true);
-    const money = inputRef.current.value;
+    const reason = inputRef.current.value;
     setRequestRefund(false);
     try {
       const response = axios.post(
         `http://localhost:8080/api/v1/refund`,
         {
-          refundMoney: money,
+          refundMoney: reason,
           courseId,
         },
         {
@@ -446,7 +446,7 @@ const CoursePage = () => {
                 <iframe
                   width='400'
                   height='240'
-                  src='https://www.youtube.com/embed/QPzmsQ86_HM'
+                  src={course?.previewLink}
                   title='YouTube video player'
                   frameBorder='0'
                   allow='accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture'
@@ -493,8 +493,8 @@ const CoursePage = () => {
                   <hr className={`${classes.line}`} />
                   <div className={`{${classes.applyCoupon}}`}>
                     <input
-                      type={'number'}
-                      placeholder={'Enter the amount of money'}
+                      type={'text'}
+                      placeholder={'Enter the reason'}
                       className={`${classes.applyCouponInput}`}
                       ref={inputRef}
                     />

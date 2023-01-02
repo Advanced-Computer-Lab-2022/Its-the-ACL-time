@@ -141,7 +141,7 @@ const CourseProvider = ({ children }) => {
         const { data } = response;
         const { courses } = data;
 
-        const country = countryAbbreviation[user?.country] | "EG";
+        const country = countryAbbreviation[user?.country] | 'EG';
         const convertedCourses = await Promise.all(
           courses.map(async (course) => {
             const { price, currency } = await currencyConverter(
@@ -149,7 +149,7 @@ const CourseProvider = ({ children }) => {
               course.price
             );
             let originalPrice = course.price;
-            return { ...course, price,originalPrice, currency };
+            return { ...course, price, originalPrice, currency };
           })
         );
 

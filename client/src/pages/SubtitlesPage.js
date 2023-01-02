@@ -365,6 +365,8 @@ const SubtitlesPage = () => {
   const [open, setOpen] = React.useState(false);
   const [reviewed, setReviewed] = useState(false);
   const [reviewPage, setReviewPage] = useState(0);
+  const [subtitle, setSubtitle] = useState();
+  const { courseID } = useParams();
 
   const [reportId, setId] = useState('');
 
@@ -547,12 +549,32 @@ const SubtitlesPage = () => {
       }
     }
 
+    async function fetchSubtitle(subtitleId) {
+      try {
+        const response = await axios.get(
+          `http://localhost:8080/api/v1/course/
+          ${courseID}/subtitle/${subtitleId}
+          `,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+        console.log(response.data.subTitle);
+        setSubtitle(response.data.subTitle);
+      } catch (error) {
+        console.log(error);
+      }
+    }
+
     if (searchParams.has('examId')) {
       getExam(searchParams.get('examId'));
     }
 
     if (searchParams.has('subtitleId')) {
       fetchNotes(searchParams.get('subtitleId'));
+      fetchSubtitle(searchParams.get('subtitleId'));
     }
 
     if (videoInfo === 2) {
@@ -837,15 +859,15 @@ const SubtitlesPage = () => {
 
             {!exam && (
               <div className={`${classes.video}`}>
-                {/* <iframe
-                width='911'
-                height='480'
-                src='https://www.youtube.com/embed/1v_TEnpqHXE'
-                title='YouTube video player'
-                frameborder='0'
-                allow='accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture'
-                allowfullscreen
-              ></iframe> */}
+                <iframe
+                  width='911'
+                  height='480'
+                  src={`${subtitle?.link}`}
+                  title='YouTube video player'
+                  frameBorder='0'
+                  allow='accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture'
+                  allowFullScreen
+                ></iframe>
               </div>
             )}
           </div>
@@ -920,10 +942,7 @@ const SubtitlesPage = () => {
                     Course Description
                   </Typography>
                   <p>
-                    Lorem ipsum dolor sit amet consectetur adipisicing elit.
-                    Sint saepe porro laborum quas perspiciatis eos minus,
-                    numquam maiores, optio temporibus enim quis id aliquid
-                    accusamus eligendi vel, libero ea quidem.
+                    {subtitle?.description}
                     <span
                       className={`${classes.showMoreDescription}`}
                       onClick={() =>

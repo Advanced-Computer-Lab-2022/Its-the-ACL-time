@@ -34,7 +34,7 @@ const getAllSubTitles = async (req, res) => {
 
 const getSubTitle = async (req, res) => {
   const { subtitleId } = req.params;
-  const subTitle = await SubTitle.find({ _id: subtitleId });
+  const subTitle = await SubTitle.findOne({ _id: subtitleId });
   res.status(StatusCodes.OK).json({ subTitle });
 };
 
