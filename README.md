@@ -8,6 +8,7 @@
 - [Features](#features)
   * [Admin Functionalities](#administrator)
   * [User/Guest Functionalities](#guest)
+- [Testing](#testing)
 - [API References](#api-references)
 - [Code Example](#code-example)
 - [Credits](#credits)
@@ -140,7 +141,59 @@ We have 2 main users in our website:
 ![previous](https://user-images.githubusercontent.com/72264551/210171769-2ab4e848-2b75-4d2d-8760-f35fe06f41cd.png)
 ![report](https://user-images.githubusercontent.com/72264551/210171774-928a8d17-768e-4874-8f2e-291488e19df0.png)
 
+## Testing
+- Test if the instructor need to update course whether he is the owner or not 
+```
+const updateCourse = async (req, res) => {
+  const { type, userId } = req.user;
+  const { courseId } = req.params;
+  const { type: updateType } = req.query;
 
+  if (!courseId) throw new BadRequestError('Please provide course id');
+
+  const course = await Course.findOne({ _id: courseId });
+
+  if (!course)
+    throw new BadRequestError(`There is no course with this id ${courseId}`);
+
+  if (!updateType)
+    throw new BadRequestError('Please provide update type in query params');
+  else {
+    const user = await User.findOne({
+      _id: userId,
+    });
+
+    if (updateType === 'review') {
+      const course = user.courses.find(
+        (course) => course.courseId.toString() === courseId
+      );
+
+      if (!course) {
+        throw new BadRequestError('You are not enrolled in this course');
+      }
+
+      course.reviewed = true;
+      await user.save();
+    } else {
+      const isOwner =
+        course.createdBy.toString() === userId ||
+        user.courses.find((course) => course.courseId.toString() === courseId);
+
+      if (!isOwner) {
+        console.log('You are not the owner of that course');
+        throw new UnauthorizedError('You are not the owner of that course');
+      }
+    }
+  }
+  ```
+- test if user want to change password whether the old password is correct or not 
+```
+if (oldPassword && newPassword) {
+    const isMatch = await user.comparePassword(oldPassword.toString());
+    if (!isMatch) throw new UnauthorizedError('Invalid credentials');
+    user.password = newPassword;
+  }
+  ```
 ## API references
 - Stripe API for Payment process --> https://stripe.com/docs/api
 - Googleapis --> https://googleapis.dev/nodejs/googleapis/latest/tasks/
