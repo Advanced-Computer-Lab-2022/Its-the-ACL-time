@@ -262,6 +262,7 @@ const CoursePage = () => {
   const [showPromotionForm, setShowPromotionForm] = useState(false);
   const inputRef = useRef();
 
+  console.log("course",course);
   const updateSubtitles = (newSubtitles) => {
     setSubtitles([...subtitles, ...newSubtitles]);
   };
@@ -321,11 +322,11 @@ const CoursePage = () => {
         },
         {
           headers: {
-            Authorization: `Bearer ${token}`,
+            authorization: `Bearer ${token}`,
           },
         }
       );
-      console.log(response.data);
+      
     }
 
     checkOwnership();

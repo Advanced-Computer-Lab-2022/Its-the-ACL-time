@@ -89,10 +89,6 @@ const InstructorSideBar = [
 
 const CorporateSideBar = [
   {
-    title: 'Wallet',
-    icon: <AccountBalanceWalletIcon />,
-  },
-  {
     title: 'Messages',
     icon: <MessageIcon />,
   },
@@ -102,10 +98,6 @@ const IndividualSideBar = [
   {
     title: 'Refund',
     icon: <RefundIcon />,
-  },
-  {
-    title: 'Wallet',
-    icon: <AccountBalanceWalletIcon />,
   },
   {
     title: 'Messages',
@@ -1019,10 +1011,6 @@ export default function Profile() {
                 <ListItemText primary={item.title} />
               </ListItem>
             ))}
-          <ListItem>
-            <ListItemIcon><AccountBalanceWalletIcon></AccountBalanceWalletIcon></ListItemIcon>
-            <ListItemText primary={"wallet "+wallet+" $"} />
-          </ListItem>
         </List>
         <Divider />
         <ListItem
