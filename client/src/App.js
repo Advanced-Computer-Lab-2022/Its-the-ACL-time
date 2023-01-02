@@ -85,7 +85,7 @@ function App() {
               <Route path='/payment' element={<Payment />} />
               <Route path='/SuccessPayment' element={<SuccessPayment />} />
               <Route path='/FailedPayment' element={<FailedPayment />} />
-              <Route path='/profile' element={<Profile />}></Route>
+              <Route path='/profile' element={<ProtectedRoute><Profile /></ProtectedRoute>}></Route>
               <Route path='' element={<Instructor></Instructor>}></Route>
               <Route path='BioGraphy' element={<BioGraphy></BioGraphy>} />
               <Route path='myCourses' element={<Instructor></Instructor>} />
