@@ -13,6 +13,9 @@ const refundSchema = mongoose.Schema({
     type: String,
     enum: ['pending', 'approved', 'rejected'],
   },
+  sended: {
+    type: Boolean,
+  },
 });
 
 module.exports = mongoose.model('Refund', refundSchema);

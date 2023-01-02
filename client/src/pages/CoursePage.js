@@ -262,7 +262,7 @@ const CoursePage = () => {
   const [showPromotionForm, setShowPromotionForm] = useState(false);
   const inputRef = useRef();
 
-  console.log("course",course);
+  console.log('course', course);
   const updateSubtitles = (newSubtitles) => {
     setSubtitles([...subtitles, ...newSubtitles]);
   };
@@ -326,7 +326,6 @@ const CoursePage = () => {
           },
         }
       );
-      
     }
 
     checkOwnership();
@@ -343,13 +342,11 @@ const CoursePage = () => {
 
   const requestRefundHandler = () => {
     setLoading(true);
-    const reason = inputRef.current.value;
     setRequestRefund(false);
     try {
       const response = axios.post(
         `http://localhost:8080/api/v1/refund`,
         {
-          refundMoney: reason,
           courseId,
         },
         {
@@ -362,7 +359,7 @@ const CoursePage = () => {
       setAlert("You've requested a refund successfully");
     } catch (error) {
       console.log(error);
-      setAlert('Something went wrong');
+      setAlert('You have requested a refund before');
     }
     setLoading(false);
     setTimeout(() => {
@@ -478,8 +475,14 @@ const CoursePage = () => {
                 <button className={`${classes.addToCart}`}>
                   <Link to={`/course/${courseId}/content`}>Go to course</Link>
                 </button>
+              ) : user.type === 'Individual trainee' ||
+                user.type === 'Instructor' ? (
+                <BuyCourse
+                  courseId={courseId}
+                  coursePrice={course?.originalPrice}
+                ></BuyCourse>
               ) : (
-                (user.type === "Individual trainee" || user.type === "Instructor") ? <BuyCourse courseId={courseId} coursePrice={course?.originalPrice}></BuyCourse> : <RequestCourse courseId={courseId}></RequestCourse>
+                <RequestCourse courseId={courseId}></RequestCourse>
               )}
               <p>
                 <AiOutlineCheck /> 30-Day Money-Back Guarantee
