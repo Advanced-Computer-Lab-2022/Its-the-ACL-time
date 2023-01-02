@@ -35,10 +35,12 @@ import AssessmentIcon from '@material-ui/icons/Assessment';
 import CourseComponent from '../components/course/CourseComponent';
 import Loading from '../components/Loading';
 import MessageIcon from '@material-ui/icons/Message';
+import InstructorWallet from '../components/InstructorWallet';
 import RefundIcon from '@material-ui/icons/AttachMoney';
 import axios from 'axios';
 import FilterField from '../components/FilterField';
 import RatingStars from '../components/RatingStars';
+import useWallet from '../components/CustomHooks/getWallet';
 
 const drawerWidth = 240;
 
@@ -87,10 +89,6 @@ const InstructorSideBar = [
 
 const CorporateSideBar = [
   {
-    title: 'Wallet',
-    icon: <AccountBalanceWalletIcon />,
-  },
-  {
     title: 'Messages',
     icon: <MessageIcon />,
   },
@@ -100,10 +98,6 @@ const IndividualSideBar = [
   {
     title: 'Refund',
     icon: <RefundIcon />,
-  },
-  {
-    title: 'Wallet',
-    icon: <AccountBalanceWalletIcon />,
   },
   {
     title: 'Messages',
@@ -344,7 +338,6 @@ function InstructorProfile({ courses }) {
   const navigate = useNavigate();
   const classes = useStyles();
   const inputRef = useRef();
-
   const [renderedCourses, setRenderedCourses] = useState([]);
   const [topics, setTopics] = useState([]);
   const [prices, setPrices] = useState([]);
@@ -866,6 +859,7 @@ const Settings = () => {
 export default function Profile() {
   const classes = useStyles();
   const theme = useTheme();
+  const wallet = useWallet();
   const [open, setOpen] = React.useState(false);
   const [component, setComponent] = useState('My Courses');
   const { myCourses } = useCourseContext();
@@ -923,7 +917,7 @@ export default function Profile() {
           (clsx(classes.appBar, {
             [classes.appBarShift]: open,
           }),
-          'bg-dark')
+            'bg-dark')
         }
       >
         <Toolbar
@@ -978,18 +972,18 @@ export default function Profile() {
           {
             // choose which sidebar to render based on user role
             user.type === 'Instructor' &&
-              InstructorSideBar.map((item, index) => (
-                <ListItem
-                  button
-                  key={index}
-                  onClick={() => {
-                    setComponent(item.title);
-                  }}
-                >
-                  <ListItemIcon>{item.icon}</ListItemIcon>
-                  <ListItemText primary={item.title} />
-                </ListItem>
-              ))
+            InstructorSideBar.map((item, index) => (
+              <ListItem
+                button
+                key={index}
+                onClick={() => {
+                  setComponent(item.title);
+                }}
+              >
+                <ListItemIcon>{item.icon}</ListItemIcon>
+                <ListItemText primary={item.title} />
+              </ListItem>
+            ))
           }
           {user.type === 'Corporate trainee' &&
             CorporateSideBar.map((item, index) => (
@@ -1017,6 +1011,10 @@ export default function Profile() {
                 <ListItemText primary={item.title} />
               </ListItem>
             ))}
+          <ListItem>
+            <ListItemIcon><AccountBalanceWalletIcon></AccountBalanceWalletIcon></ListItemIcon>
+            <ListItemText primary={"wallet " + wallet + " $"} />
+          </ListItem>
         </List>
         <Divider />
         <ListItem
@@ -1051,6 +1049,9 @@ export default function Profile() {
           {component === 'My Courses' && user.type === 'Instructor' && (
             <InstructorProfile courses={courses}></InstructorProfile>
           )}
+          {component === "Wallet" && user.type === 'Instructor'
+            && <InstructorWallet></InstructorWallet>
+          }
           {component === 'Refund' && (
             <>
               <h1>Your refund requests</h1>

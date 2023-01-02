@@ -1,4 +1,4 @@
-const { Wallet } = require('../models');
+const { Wallet, Earning } = require('../models');
 const { StatusCodes } = require('http-status-codes');
 
 // allowed for the wallet owner
@@ -16,6 +16,16 @@ const findWallet = async (req, res) => {
   });
 };
 
+const findEarnings = async (req,res)=>{
+  const id = req.user.userId;
+  Earning.find({Instructor:id}, (err,data)=>{
+    if(err){
+      res.status(StatusCodes.NOT_FOUND).send(err);
+    }else{
+      res.status(StatusCodes.OK).json(data);
+    }
+  });
+}
 // allowed only for admin
 const addWallet = async (req, res) => {
   const { owner, balance } = req.body;
@@ -75,4 +85,5 @@ module.exports = {
   updateWallet,
   allWallets,
   deleteWallet,
+  findEarnings,
 };

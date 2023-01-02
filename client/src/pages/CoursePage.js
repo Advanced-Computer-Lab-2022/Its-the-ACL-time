@@ -262,6 +262,7 @@ const CoursePage = () => {
   const [showPromotionForm, setShowPromotionForm] = useState(false);
   const inputRef = useRef();
 
+  console.log("course",course);
   const updateSubtitles = (newSubtitles) => {
     setSubtitles([...subtitles, ...newSubtitles]);
   };
@@ -321,11 +322,11 @@ const CoursePage = () => {
         },
         {
           headers: {
-            Authorization: `Bearer ${token}`,
+            authorization: `Bearer ${token}`,
           },
         }
       );
-      console.log(response.data);
+      
     }
 
     checkOwnership();
@@ -483,7 +484,7 @@ const CoursePage = () => {
                   coursePrice={course?.price}
                 ></BuyCourse>
               ) : (
-                <RequestCourse></RequestCourse>
+                (user.type === "Individual trainee" || user.type === "Instructor") ? <BuyCourse courseId={courseId} coursePrice={course?.price}></BuyCourse> : <RequestCourse courseId={courseId}></RequestCourse>
               )}
               <p>
                 <AiOutlineCheck /> 30-Day Money-Back Guarantee

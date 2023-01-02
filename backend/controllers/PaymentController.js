@@ -1,14 +1,15 @@
 
 const { default: mongoose } = require('mongoose');
-const { PaymentModel, User, Course, Wallet } = require('../models');
+const { PaymentModel, User, Course, Wallet, Earning } = require('../models');
 const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
-
+const { addEarning, addWallet } = require("../utils/addEarning");
 
 const addPayment = async (request, response) => {
   const event = request.body;
   // Handle the event
   switch (event.type) {
     case 'checkout.session.completed':
+      console.log("course completed payment");
       const paymentIntent = event.data.object;
       PaymentModel.create({ sessionId: event.id, customerId: paymentIntent.client_reference_id, paymentId: paymentIntent.id });
       const client_reference_id = paymentIntent.client_reference_id.split('#');
@@ -16,12 +17,22 @@ const addPayment = async (request, response) => {
       const courseId = client_reference_id[1];
       const UserObject = await User.findById(userId);
       UserObject.courses.push({ courseId: courseId });
-      UserObject.save();
+      await UserObject.save();
+      console.log("user object");
+      console.log(UserObject);
       const CourseObject = await Course.findById(courseId);
-      const balance = await Wallet.findOne({ owner: mongoose.Types.ObjectId(CourseObject.createdBy) });
-      console.log("balance", balance);
-      const wallet = await Wallet.updateOne({ owner: CourseObject.createdBy }, { balance: balance.balance + CourseObject.price * (1 - CourseObject.promotion / 100) });
-      console.log("wallet", wallet);
+      let promotion = CourseObject.promotion
+      let date = new Date();
+      let startDate = new Date(promotion?.startDate);
+      let endDate = new Date(promotion?.endDate);
+      if (promotion && date >= startDate && date <= endDate) {
+        let balance = CourseObject.price * (1 - CourseObject.promotion.promotionPercentage / 100);
+        addWallet(balance, CourseObject.createdBy);
+        addEarning(balance, CourseObject.createdBy);
+      } else {
+        addWallet(CourseObject.price, CourseObject.createdBy);
+        addEarning(CourseObject.price, CourseObject.createdBy);
+      }
       break;
     default:
       console.log(`Unhandled event type ${event.type}`);
