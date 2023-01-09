@@ -5,13 +5,18 @@
 - [Tools and Frameworks](#tools-and-frameworks)
 - [Coding Style](#coding-style)
 - [Installation](#installation)
-- [Features](#features)
+- [How to run](How-to-run)
+- [Features And Screenshots](#features-and-screenshots)
   * [Admin Functionalities](#administrator)
   * [User/Guest Functionalities](#guest)
 - [Testing](#testing)
 - [API References](#api-references)
+- [Third party API](#third-party-api)
 - [Code Example](#code-example)
 - [Credits](#credits)
+- [Authors](#authors)
+- [License](#license)
+
 
 
 ## Project Description
@@ -81,9 +86,19 @@ In order to run our project, you should have the following installed in your mac
  - [MongoDB](https://docs.mongodb.com/manual/installation/) either locally or on a cloud.
 You have to create `.env` with the dbconnectionString.
 - And you can choose any text editor.
-     
 
-## Features 
+## How to run
+After installing project dependency and clone the project:
+### Run backend:
+- `cd backend`
+- `npm install`
+- `npm run startDev`
+### Run frontend
+- `cd client`
+- `npm install -f`
+- `npm start`
+
+## Features And Screenshots
 We have 2 main users in our website:
 - Adminstrator
 -  Guest can join AS 
@@ -195,6 +210,294 @@ if (oldPassword && newPassword) {
   }
   ```
 ## API references
+backend host: https://localhost:8080/
+
+### Admin Router 
+#### Route : `/api/v1/admin`
+
+#### Create User or Admin
+- Route : `/`
+- Request type : `POST`
+- Request Body : 
+ `
+  {
+  userName: 'Michael',
+  email: 'Michael@gmail.com',
+  password: '123',
+  token: "Bearer eyJhbGciOiJIUzI1NiJ9.eyJlbWFpbCI6IjFAMyIsInBhc3N3b3JkIjoiJDJiJDEwJHdsaHh0ZVVuWXQ0Ni8xWE9kN29RZHVDNXdySEFFL0FoZVVFSzFpanA5cmw1eE9yRnEveDE2In0.9mVIk0b4Qv9
+5ajUyRXKNGohy8mJBphb1m4c42WKu5jQ",
+ type: 'Instructor'
+ }
+`
+- Response Body : 
+-  `
+  {
+  id: "61c1cf32abcaed63d42a6aea"
+  userName: 'Michael',
+  email: 'Michael@gmail.com',
+  password: '123',
+  type: 'Instructor'
+ }
+`
+
+#### Get all reports 
+- Route : `/report`
+- Request type : `GET`
+- Request Body : 
+ `
+  {
+  state : pending
+ }
+`
+- Response Body : all the pending reports
+`
+
+#### change reports states 
+- Route : `/reportstate`
+- Request type : `PATCH`
+- Request Body : 
+ `
+  {
+  id: "61c1cf32abcaed63d42a6aea",
+  state : pending
+ }
+`
+- Response Body : same report with the new state
+`
+
+
+#### Get all course requests 
+- Route : `/courserequest`
+- Request type : `GET`
+- Request Body : 
+ `
+  {
+  state : pending
+ }
+`
+- Response Body : all the pending course requests
+`
+
+#### Grant course 
+- Route : `/grantcourse`
+- Request type : `PATCH`
+- Request Body : 
+ `
+  {
+  "id": "61c1cf32abcaed63d42a6aea",
+  state : grant
+ }
+`
+- Response Body : Grant course request 
+`
+
+#### Get all refund requests 
+- Route : `/refund`
+- Request type : `GET`
+- Request Body : No body
+- Response Body : Array of all refund requests
+`
+
+
+#### accept the refund  
+- Route : `/updaterefund`
+- Request type : `PATCH`
+- Request Body : 
+ `
+  {
+  id: "61c1cf32abcaed63d42a6aea" ,
+  state : grant
+ }
+`
+- Response Body : Modified the refund request
+`
+
+#### set promotion
+- Route : `/setpromotion`
+- Request type : `PATCH`
+- Request Body : 
+ `
+  {
+  Course id: "61c1cf32abcaed63d42a6aea" ,
+  promotion : 50 ,
+  startDate : 2-2-2020,
+  endDate : 2-2-2024,
+ }
+`
+- Response Body : the course with the new promotion
+`
+
+
+### Authentication Router
+#### Route : `/api/v1/auth`
+
+#### Login
+- Route : `/login`
+- Request type : `GET`
+- Request Body : 
+ `
+  {
+ email : 'michael@gmail.com',
+ password : '123'
+ }
+`
+- Response Body : 
+- `{
+  "_id":"61c1cf32abcaed63d42a6aea","username":"michael","email":"1@3","password":"$2b$10$wlhxteUnYt46/1XOd7oQduC5wrHAE/AheUEK1ijp9rl5xOrFq/x16","createdAt":    {"$date":"2021-12-21T12:57:22.511Z"},"updatedAt":{"$date":"2021-12-21T12:57:22.511Z"},"__v":0
+`
+
+
+#### Register
+- Route : `/register`
+- Request type : `POST`
+- Request Body : 
+ `{
+  userName: 'ahmed ',
+  email: 'ahmedsalah@gmail.com',
+  password: '123',
+  country: 'egypt'
+}
+
+#### Forgot Password
+- Route : `/forget`
+- Request type : `POST`
+- Request Body : 
+ `
+ { email: 'ahmed.salah@student.guc.edu.eg' }
+ ` 
+ 
+ ### update profile
+ - Route : `/update`
+- Request type : `PATCh`
+- Request Body : 
+ `
+ { email: 'ahmed.salah@student.guc.edu.eg',
+   biography : 'hi',
+   userId : "61c1cf32abcaed63d42a6aea"}
+ }
+ ` 
+ 
+ 
+
+### Course Router
+#### Route : `/api/v1/course`
+
+#### Create course
+- Route : `/`
+- Request type : `POST`
+- Request Body : 
+ `
+ { title : 'Machine learning', 
+   subject : 'Deep learning',
+   price : 500$,
+   summary : "hello",
+   preview link : "https://youtube.com",
+   number of hours : 3 ,
+   instructorId : "61c1cf32abcaed63d42a6aea"
+  }
+ ` 
+ #### Get all courses
+- Route : `/`
+- Request type : `GET`
+- Request Body : No body
+- Response Body : Array of all courses
+
+ #### Get all enrolled courses for user
+- Route : `/enrolledCourses`
+- Request type : `GET`
+- Request Body : { 
+ ` token: "Bearer eyJhbGciOiJIUzI1NiJ9.eyJlbWFpbCI6IjFAMyIsInBhc3N3b3JkIjoiJDJiJDEwJHdsaHh0ZVVuWXQ0Ni8xWE9kN29RZHVDNXdySEFFL0FoZVVFSzFpanA5cmw1eE9yRnEveDE2In0.9mVIk0b4Qv9
+5ajUyRXKNGohy8mJBphb1m4c42WKu5jQ"`
+ }
+- Response Body : Array of all enrolled courses
+
+
+ #### Buy course with wallet
+- Route : `/buyWithWallet/:courseId`
+- Request type : `GET`
+- Request Body : `{ token: "Bearer eyJhbGciOiJIUzI1NiJ9.eyJlbWFpbCI6IjFAMyIsInBhc3N3b3JkIjoiJDJiJDEwJHdsaHh0ZVVuWXQ0Ni8xWE9kN29RZHVDNXdySEFFL0FoZVVFSzFpanA5cmw1eE9yRnEveDE2In0.9mVIk0b4Qv9
+5ajUyRXKNGohy8mJBphb1m4c42WKu5jQ"
+}`
+- Response Body : buy the course
+
+ #### Get the course content
+- Route : `/courseId/subtitle`
+- Request type : `GET`
+- Request Body : { 
+ ` token: "Bearer eyJhbGciOiJIUzI1NiJ9.eyJlbWFpbCI6IjFAMyIsInBhc3N3b3JkIjoiJDJiJDEwJHdsaHh0ZVVuWXQ0Ni8xWE9kN29RZHVDNXdySEFFL0FoZVVFSzFpanA5cmw1eE9yRnEveDE2In0.9mVIk0b4Qv9
+5ajUyRXKNGohy8mJBphb1m4c42WKu5jQ"`
+ }
+- Response Body : get the content course
+
+ #### enroll user 
+- Route : `/courseId/enroll`
+- Request type : `GET`
+- Request Body : { 
+ ` token: "Bearer eyJhbGciOiJIUzI1NiJ9.eyJlbWFpbCI6IjFAMyIsInBhc3N3b3JkIjoiJDJiJDEwJHdsaHh0ZVVuWXQ0Ni8xWE9kN29RZHVDNXdySEFFL0FoZVVFSzFpanA5cmw1eE9yRnEveDE2In0.9mVIk0b4Qv9
+5ajUyRXKNGohy8mJBphb1m4c42WKu5jQ"`
+ }
+- Response Body : get the content course
+
+
+### Exam Router
+#### Route : `/api/v1/exam`
+
+#### Create exam
+- Route : `/`
+- Request type : `POST`
+- Request Body : 
+ `
+ { courseId : "61c1cf32abcaed63d42a6aea",
+   duration : 5,
+   questions : [{title:"question title",imageUrl:"url for question",choices:["first choice","second","third","fourth"],answer:1}]
+  }
+ ` 
+ #### Get Exam
+- Route : `/:id`
+- Request type : `GET`
+- Request Body : `  token: "Bearer eyJhbGciOiJIUzI1NiJ9.eyJlbWFpbCI6IjFAMyIsInBhc3N3b3JkIjoiJDJiJDEwJHdsaHh0ZVVuWXQ0Ni8xWE9kN29RZHVDNXdySEFFL0FoZVVFSzFpanA5cmw1eE9yRnEveDE2In0.9mVIk0b4Qv9
+5ajUyRXKNGohy8mJBphb1m4c42WKu5jQ"`
+- Response Body : get the exam
+
+
+### Payment Router
+#### Route : `/api/v1/payment`
+
+ #### create stripe checkout session
+- Route : `/create-checkout-session`
+- Request type : `POST`
+- Request Body : { 
+ ` token: "Bearer eyJhbGciOiJIUzI1NiJ9.eyJlbWFpbCI6IjFAMyIsInBhc3N3b3JkIjoiJDJiJDEwJHdsaHh0ZVVuWXQ0Ni8xWE9kN29RZHVDNXdySEFFL0FoZVVFSzFpanA5cmw1eE9yRnEveDE2In0.9mVIk0b4Qv9
+5ajUyRXKNGohy8mJBphb1m4c42WKu5jQ"`
+ }
+- Response Body : stripe checkout session id
+
+ #### listen to completed payment in stripe account
+- Route : `/webhook`
+- Request type : `POST`
+
+
+### Refund Router
+#### Route : `/api/v1/refund`
+
+ #### create refund request
+- Route : `/`
+- Request type : `POST`
+- Request Body : { 
+ ` token: "Bearer eyJhbGciOiJIUzI1NiJ9.eyJlbWFpbCI6IjFAMyIsInBhc3N3b3JkIjoiJDJiJDEwJHdsaHh0ZVVuWXQ0Ni8xWE9kN29RZHVDNXdySEFFL0FoZVVFSzFpanA5cmw1eE9yRnEveDE2In0.9mVIk0b4Qv9
+5ajUyRXKNGohy8mJBphb1m4c42WKu5jQ", 
+   courseId : "61c1cf32abcaed63d42a6aea"
+   }`
+- Response Body : `{
+   course : "61c1cf32abcaed63d42a6aea",
+   user : "61jhdh1h5j4d63d42a6aea",
+   state : "pending",
+   sended : true
+}
+
+
+
+## Third party API
 - Stripe API for Payment process --> https://stripe.com/docs/api
 - Googleapis --> https://googleapis.dev/nodejs/googleapis/latest/tasks/
 - Nodemailer --> https://nodemailer.com/about/
@@ -225,3 +528,12 @@ if (oldPassword && newPassword) {
  - The Net Ninja (Youtube Channel) --> https://www.youtube.com/channel/UCW5YeuERMmlnqo4oq8vwUpg
  - W3schools (Online Web Tutorials) --> https://www.w3schools.com/
  
+  ## Authors 
+ - [Michael Milad](https://github.com/Miichael-Yassa)
+ - [Fahd Hassan](https://github.com/FahdHassan)
+ - [Amir Ammar](https://github.com/amir-ammar)
+ - [Abdelrahman Fekri](https://github.com/abdelrahmanfekri)
+ - [Ahmed Salah](https://github.com/Elbltagy2)
+  
+  ## License
+  MIT
