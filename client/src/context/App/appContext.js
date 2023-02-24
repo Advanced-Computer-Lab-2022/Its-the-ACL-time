@@ -2,13 +2,14 @@ import React, { useContext, useState } from 'react';
 import axios from 'axios';
 import { backendApi } from '../../projectConfig';
 import { useEffect } from 'react';
-
-const userFromLocalStorage = localStorage.getItem('user');
-const tokenFromLocalStorage = localStorage.getItem('token');
+import { authActions } from '../../store/slices/auth-slice';
+import { useDispatch } from 'react-redux';
+import { getCourses } from '../../store/slices/course-slice';
+import { getMyCourses } from '../../store/slices/myCourses_slice';
 
 const initialState = {
-  user: JSON.parse(userFromLocalStorage),
-  token: tokenFromLocalStorage,
+  user: null,
+  token: null,
   isLoading: false,
   alert: false,
   alertType: '',
@@ -19,49 +20,32 @@ const AppContext = React.createContext();
 
 const AppProvider = ({ children }) => {
   const [state, setState] = useState(() => initialState);
+  const dispatch = useDispatch();
+  const user = JSON.parse(localStorage.getItem('user'));
+  const token = localStorage.getItem('token');
 
-  useEffect(() => {
-    const fetchState = async () => {
-      const userFromLocalStorage = localStorage.getItem('user');
-      const tokenFromLocalStorage = localStorage.getItem('token');
+  // useEffect(() => {
+  //   console.log('AppContext useEffect');
+  //   const fetchState = async () => {
+  //     const userFromLocalStorage = localStorage.getItem('user');
+  //     const tokenFromLocalStorage = localStorage.getItem('token');
 
-      setState({
-        ...state,
-        user: JSON.parse(userFromLocalStorage),
-        token: tokenFromLocalStorage,
-      });
-    };
-    fetchState();
-  }, []);
+  //     console.log(userFromLocalStorage);
 
-  const setAlert = (type, text) => {
-    setState({
-      ...state,
-      alert: true,
-      alertText: text,
-      alertType: type,
-    });
-  };
+  //     authActions.login({
+  //       user: JSON.parse(userFromLocalStorage),
+  //       token: tokenFromLocalStorage,
+  //       isLoggedIn: true,
+  //     });
 
-  function clearAlert() {
-    setTimeout(
-      () =>
-        setState((prevState) => {
-          return {
-            ...prevState,
-            alert: false,
-            alertText: '',
-            alertType: '',
-          };
-        }),
-      3000
-    );
-  }
-
-  const addToLocalStorage = ({ user, token }) => {
-    localStorage.setItem('user', JSON.stringify(user));
-    localStorage.setItem('token', token);
-  };
+  //     setState({
+  //       ...state,
+  //       user: JSON.parse(userFromLocalStorage),
+  //       token: tokenFromLocalStorage,
+  //     });
+  //   };
+  //   // fetchState();
+  // }, []);
 
   const setup = async ({
     email,
@@ -99,7 +83,7 @@ const AppProvider = ({ children }) => {
       const { data } = response;
       const { token, user } = data;
 
-      addToLocalStorage({ user, token });
+      // addToLocalStorage({ user, token });
 
       setState((prevState) => {
         return {
@@ -152,7 +136,7 @@ const AppProvider = ({ children }) => {
           user: data,
         };
       });
-      addToLocalStorage({ user: data, token: state.token });
+      // addToLocalStorage({ user: data, token: state.token });
       return {
         type: true,
         msg: 'Profile Updated successfully',
@@ -166,16 +150,23 @@ const AppProvider = ({ children }) => {
     }
   };
 
+  useEffect(() => {
+    if (user && token) {
+      dispatch(
+        authActions.login({
+          user,
+          token,
+        })
+      );
+      dispatch(getMyCourses(token));
+    }
+    dispatch(getCourses());
+  }, [token]);
+
   return (
     <AppContext.Provider
       value={{
-        ...state,
-        setAlert,
-        clearAlert,
         setup,
-        resetUser,
-        addToLocalStorage,
-        updateUser,
       }}
     >
       {children}

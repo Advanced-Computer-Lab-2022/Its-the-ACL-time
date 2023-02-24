@@ -3,7 +3,7 @@ const { Course, User, Wallet } = require('../models');
 const { UnauthorizedError, BadRequestError } = require('../Errors');
 const { verifyToken } = require('../utils/jwt');
 const { default: mongoose } = require('mongoose');
-const {addEarning,addWallet} = require('../utils/addEarning');
+const { addEarning, addWallet } = require('../utils/addEarning');
 
 const buyWithWallet = async (req, res) => {
   const { userId } = req.user;
@@ -24,8 +24,8 @@ const buyWithWallet = async (req, res) => {
     );
     user.courses.push({ courseId: courseId, isCompleted: false });
     await user.save();
-    addEarning(CourseObject.price,CourseObject.createdBy);
-    addWallet(CourseObject.price,CourseObject.createdBy);
+    addEarning(CourseObject.price, CourseObject.createdBy);
+    addWallet(CourseObject.price, CourseObject.createdBy);
     res.status(200).send({ msg: 'payment success' });
   } else {
     res.status(400).send({ msg: 'payment failed' });
@@ -96,13 +96,13 @@ const getAllCourses = async (req, res) => {
     .join(' ');
 
   let courses;
-
   if (myCourses === 'true' && token) {
     const { type, userId } = verifyToken(token);
     if (type === 'Instructor') {
       courses = await Course.find({ createdBy: userId }).select(`${query}`);
       return res.status(StatusCodes.OK).json({ courses });
     }
+
     courses = await User.findOne({ _id: userId });
     return res.status(StatusCodes.OK).json({ courses: courses.courses });
   }

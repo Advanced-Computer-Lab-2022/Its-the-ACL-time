@@ -9,14 +9,7 @@ const {
   findEarnings,
 } = require('../controllers/walletController');
 
-const {
-  changePassword,
-  GetBio,
-  updateBio,
-  updateEmail,
-  createreport,
-  getreport,
-} = require('../controllers/userController');
+const { createreport, getreport } = require('../controllers/userController');
 
 const {
   findCertification,
@@ -28,7 +21,7 @@ const {
 
 const {
   updateUserProgress,
-  getUser,
+  getUserProgress,
   updateUserInfo,
   getUserInfo,
 } = require('../controllers/userController');
@@ -64,21 +57,13 @@ router.delete(
   deleteCertification
 );
 // end certification router
-// bltagy edit
-router.patch('/restestpassword', authMiddleware, changePassword);
-router.patch('/updateBio', authMiddleware, updateBio);
-router.patch('/updateEmail', authMiddleware, updateEmail);
 router.post('/reportproblem', authMiddleware, createreport);
 router.get('/getrport', authMiddleware, getreport);
-
-router.post('/courserequest', authMiddleware, updateEmail);
-
-router.get('/GetBio', authMiddleware, GetBio);
 router.patch('/', authMiddleware, updateUserInfo);
 router.get('/:userId', getUserInfo);
 
 // update course progress
-router.get('/progress/:id', authMiddleware, getUser);
-router.patch('/progress/:id', authMiddleware, updateUserProgress);
+router.get('/progress/:courseId', authMiddleware, getUserProgress);
+router.patch('/progress/:courseId', authMiddleware, updateUserProgress);
 
 module.exports = router;

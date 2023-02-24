@@ -1,44 +1,6 @@
 const User = require('../models/User');
 const { Report } = require('../models');
 
-const changePassword = async (req, res) => {
-  const { userId } = req.user;
-  console.log(userId);
-  const { oldPassword, newPassword } = req.body;
-  const user = await User.findOne({ _id: userId });
-
-  const isMatch = await user.comparePassword(oldPassword.toString());
-
-  if (!isMatch) throw new UnauthorizedError('Invalid credentials');
-
-  user.password = newPassword;
-  await user.save();
-  res.status(200).json(user);
-};
-const GetBio = async (req, res) => {
-  const { userId } = req.user;
-  const user = await User.findOne({ _id: userId });
-  // await user.save();
-  res.status(200).json(user.biography);
-};
-const updateBio = async (req, res) => {
-  const { Bio } = req.body;
-  const { userId } = req.user;
-  const user = await User.findOne({ _id: userId });
-  user.biography = Bio;
-  await user.save();
-  res.status(200).json(user);
-};
-const updateEmail = async (req, res) => {
-  const { Email } = req.body;
-  const { userId } = req.user;
-  console.log(Email);
-  const user = await User.findOne({ _id: userId });
-  user.email = Email;
-  await user.save();
-  res.status(200).json(user);
-};
-
 const updateUserProgress = async (req, res) => {
   const { userId } = req.user;
   const { completedSubtitles, completedExams, progress } = req.body;
@@ -47,7 +9,7 @@ const updateUserProgress = async (req, res) => {
   });
 
   const course = user.courses.find(
-    (course) => course.courseId.toString() === req.params.id
+    (course) => course.courseId.toString() === req.params.courseId
   );
   console.log(completedSubtitles);
   if (completedExams) course.completedExams = completedExams;
@@ -72,7 +34,10 @@ const updateUserInfo = async (req, res) => {
     biography,
     country,
     rating,
+    contracted,
   } = req.body;
+
+  console.log(req.body);
 
   const user = await User.findOne({ _id: userId });
 
@@ -86,12 +51,16 @@ const updateUserInfo = async (req, res) => {
     if (!isMatch) throw new UnauthorizedError('Invalid credentials');
     user.password = newPassword;
   }
+  if (contracted) user.contracted = contracted;
 
   let instructor;
   if (rating && instructorId) {
+    const numRating = parseInt(rating);
     instructor = await User.findOne({ _id: instructorId });
-    instructor.ratings.push(rating);
-    const sum = instructor.ratings.reduce((a, b) => a + b, 0);
+    instructor.ratings.push({ user: userId, rate: numRating });
+    const sum = instructor.ratings.reduce((acc, curr) => {
+      return acc + curr.rate;
+    }, 0);
     const avg = sum / instructor.ratings.length || 0;
     instructor.averageRating = avg;
   }
@@ -113,21 +82,23 @@ const getUserInfo = async (req, res) => {
   res.status(200).json(user);
 };
 
-const getUser = async (req, res) => {
+const getUserProgress = async (req, res) => {
   const { userId } = req.user;
-  const { id } = req.params;
-  if (id) {
+  const { courseId } = req.params;
+  if (courseId) {
     const user = await User.findOne({
       _id: userId,
     });
 
     const courseProgress = user.courses.find(
-      (course) => course.courseId.toString() === id
+      (course) => course.courseId.toString() === courseId
     );
     console.log(courseProgress);
-    res.status(200).json(courseProgress);
-    return;
+    return res.status(200).json(courseProgress);
   }
+  res.status(200).json({
+    msg: 'Error',
+  });
 };
 // create problem
 const createreport = async (req, res) => {
@@ -162,17 +133,13 @@ const getreport = async (req, res) => {
   const report = await Report.find({
     createdBy: userId,
     course: req.query.id,
-  }).populate('createdBy',"username");
+  }).populate('createdBy', 'username');
   res.status(200).json(report);
 };
 
 module.exports = {
-  changePassword,
-  GetBio,
-  updateBio,
-  updateEmail,
   updateUserProgress,
-  getUser,
+  getUserProgress,
   createreport,
   getreport,
   updateUserInfo,

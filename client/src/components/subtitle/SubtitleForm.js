@@ -9,6 +9,7 @@ import { useParams } from 'react-router-dom';
 import { useAppContext } from '../../context/App/appContext';
 import { Alert } from '@material-ui/lab';
 import Loading from '../Loading';
+import { useSelector } from 'react-redux';
 
 const useStyles = makeStyles((theme) => ({
   container: {
@@ -74,11 +75,27 @@ function SubtitleForm({ callBack, submitted }) {
   const [subtitles, setSubtitles] = useState(0);
   const { courseId } = useParams();
   const [loading, setLoading] = useState(false);
-  const { alert, alertType, alertText, setAlert, clearAlert } = useAppContext();
+  const [alertType, setAlertType] = useState(null);
+  const [alertText, setAlertText] = useState(null);
+  const token = useSelector((state) => state.auth.token);
+  const [disabled, setDisabled] = useState(false);
+
+  const setAlert = (type, text) => {
+    setAlertType(type);
+    setAlertText(text);
+  };
+
+  const clearAlert = () => {
+    setTimeout(() => {
+      setAlertType(null);
+      setAlertText(null);
+    }, 3000);
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
+    setDisabled(true);
     const numOfQuestions = e.target[0].value;
     if (subtitles === 0) setSubtitles(parseInt(numOfQuestions));
     else {
@@ -114,80 +131,107 @@ function SubtitleForm({ callBack, submitted }) {
           {
             headers: {
               'Content-Type': 'application/json',
-              Authorization: `Bearer ${localStorage.getItem('token')}`,
+              Authorization: `Bearer ${token}`,
             },
           }
         );
         setAlert('success', 'Subtitles Added Successfully');
         callBack(subTitle);
+        setLoading(false);
+        clearAlert();
+        setTimeout(() => {
+          submitted();
+          setDisabled(false);
+        }, 3000);
       } catch (error) {
         console.log(error);
-        const msg = error.response.data.message;
+        const msg = error.response.data.msg;
         setAlert('error', msg);
+        setLoading(false);
+        clearAlert();
+        setTimeout(() => {
+          submitted();
+          setDisabled(false);
+        }, 3000);
       }
     }
-    setTimeout(() => {
-      clearAlert();
-      submitted();
-    }, 3000);
-    setLoading(false);
   };
 
   return (
-    <div className={`${classes.container}`}>
-      {loading && <Loading></Loading>}
-      {alert && (
-        <Alert variant={'standard'} severity={alertType}>
+    <>
+      {loading && (
+        <Loading
+          style={{
+            position: 'fixed',
+            top: '50vh',
+            left: '50vw',
+            zIndex: '1000',
+          }}
+        ></Loading>
+      )}
+      {alertType && (
+        <Alert
+          variant={'standard'}
+          severity={alertType}
+          style={{
+            position: 'fixed',
+            top: '10vh',
+            left: '40vw',
+            zIndex: '1000',
+          }}
+        >
           {alertText}
         </Alert>
       )}
-      <h1 className={`${classes.title}`}>Add SubTitle</h1>
+      <div className={`${classes.container}`}>
+        <h1 className={`${classes.title}`}>Add SubTitle</h1>
 
-      <Form className={`${classes.form}`} onSubmit={handleSubmit}>
-        {[...Array(subtitles)].map((e, i) => {
-          return (
-            <div key={'subtitle' + i}>
-              <h2>Subtitle {i + 1}</h2>
-              <SubTitle />
-              <hr />
+        <Form className={`${classes.form}`} onSubmit={handleSubmit}>
+          {[...Array(subtitles)].map((e, i) => {
+            return (
+              <div key={'subtitle' + i}>
+                <h2>Subtitle {i + 1}</h2>
+                <SubTitle />
+                <hr />
+              </div>
+            );
+          })}
+          <div className={classes.btns}>
+            <div className={classes.ARBtns}>
+              <Button
+                type='button'
+                onClick={() => setSubtitles(subtitles + 1)}
+                variant='primary'
+                style={{ marginRight: '1rem' }}
+              >
+                Add Subtitle
+              </Button>
+              <Button
+                type='button'
+                variant='default'
+                style={{ color: 'white', backgroundColor: '#f44336' }}
+                disabled={subtitles === 0}
+                onClick={() => setSubtitles(subtitles - 1)}
+              >
+                Remove Subtitle
+              </Button>
             </div>
-          );
-        })}
-        <div className={classes.btns}>
-          <div className={classes.ARBtns}>
             <Button
-              type='button'
-              onClick={() => setSubtitles(subtitles + 1)}
-              variant='primary'
-              style={{ marginRight: '1rem' }}
-            >
-              Add Subtitle
-            </Button>
-            <Button
-              type='button'
+              type='submit'
+              disabled={disabled || subtitles === 0}
               variant='default'
-              style={{ color: 'white', backgroundColor: '#f44336' }}
-              disabled={subtitles === 0}
-              onClick={() => setSubtitles(subtitles - 1)}
+              style={{
+                marginTop: '1rem',
+                color: 'white',
+                backgroundColor: '#4caf50',
+              }}
             >
-              Remove Subtitle
+              Submit
             </Button>
           </div>
-          <Button
-            type='submit'
-            disabled={loading || subtitles === 0}
-            variant='default'
-            style={{
-              marginTop: '1rem',
-              color: 'white',
-              backgroundColor: '#4caf50',
-            }}
-          >
-            Submit
-          </Button>
-        </div>
-      </Form>
-    </div>
+        </Form>
+      </div>
+    </>
   );
 }
 

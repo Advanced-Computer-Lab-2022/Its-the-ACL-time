@@ -7,6 +7,8 @@ import { Link } from 'react-router-dom';
 import { useEffect, useRef, useState } from 'react';
 import { useAppContext } from '../context/App/appContext';
 import { Box, Button, MenuItem, Select } from '@material-ui/core';
+import { useDispatch, useSelector } from 'react-redux';
+import { authActions } from '../store/slices/auth-slice';
 
 const useStyles = makeStyles((theme) => ({
   name: {
@@ -137,12 +139,13 @@ const languages = [
 
 function NavBar() {
   const classes = useStyles();
-  const { user, resetUser } = useAppContext();
   const profileList = useRef();
   const navigate = useNavigate();
   const [showProfileList, setShowProfileList] = useState(false);
   const [openLanguages, setOpenLanguages] = useState(false);
   const [language, setLanguage] = useState('');
+  const dispatch = useDispatch();
+  const { user } = useSelector((state) => state.auth);
 
   useEffect(() => {
     let mouseDownHandler = (e) => {
@@ -157,9 +160,20 @@ function NavBar() {
     };
   });
 
+  // useEffect(() => {
+  //   if (localStorage.getItem('user') && localStorage.getItem('token')) {
+  //     dispatch(
+  //       authActions.login({
+  //         user: JSON.parse(localStorage.getItem('user')),
+  //         token: localStorage.getItem('token'),
+  //       })
+  //     );
+  //   }
+  // }, []);
+
   const handleLogout = () => {
     console.log('logout');
-    resetUser();
+    dispatch(authActions.logout());
     navigate('/landing');
   };
 

@@ -26,7 +26,6 @@ export default function Reportform({ courseid }) {
   const [message, setmessage] = useState('');
   const [typemessage, settypemessage] = useState('');
   const [oenncircule, setcir] = useState(false);
-  console.log(courseid);
 
   const handleClickOpen = () => {
     settype('');

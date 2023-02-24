@@ -9,6 +9,38 @@ import Pagination from '@material-ui/lab/Pagination';
 import { useCourseContext } from '../context/Course/courseContext';
 import { useSearchParams } from 'react-router-dom';
 import RatingStars from '../components/RatingStars';
+import { useSelector } from 'react-redux';
+
+const subjects = [
+  'Machine Learning',
+  'Deep Learning',
+  'Computer Vision',
+  'Software Engineering',
+  'Computer Science',
+  'Data Science',
+  'Web Development',
+  'Algorithms',
+  'Mathematics',
+  'Programming',
+  'Data Structures',
+  'Artificial Intelligence',
+  'Operating Systems',
+  'Computer Architecture',
+  'Databases',
+  'Computer Networks',
+  'Computer Graphics',
+  'Computer Security',
+  'Cyber Security',
+  'Cloud Computing',
+  'Blockchain',
+  'Game Development',
+  'Mobile Development',
+  'Software Testing',
+  'Software Design',
+  'Internet of Things',
+  'Robotics',
+  'Computer Hardware',
+];
 
 const ratingOptions = [1, 2, 3, 4, 5].map((rate) => {
   return (
@@ -78,7 +110,7 @@ const useStyles = makeStyles((theme) => ({
 function SearchResult() {
   const classes = useStyles();
 
-  const { courses } = useCourseContext();
+  const courses = useSelector((state) => state.course?.courses);
 
   const [searchParams, setSearchParams] = useSearchParams();
 
@@ -105,6 +137,7 @@ function SearchResult() {
   const [showFilters, setShowFilters] = useState(true);
 
   useEffect(() => {
+    console.log('Search result useEffect');
     let searchResults = search(searchParams.get('query'));
     setState({
       ...state,
@@ -207,7 +240,7 @@ function SearchResult() {
   const checkCourse = (candidateCourse, topics, prices, ratings) => {
     console.log(topics.length, prices.length, ratings.length);
     let topicFlag =
-      topics.length === 0 || topics.includes(candidateCourse.title)
+      topics.length === 0 || topics.includes(candidateCourse.subject)
         ? true
         : false;
 
@@ -256,7 +289,6 @@ function SearchResult() {
       <div className={classes.body}>
         <section className={`${classes.filterSection}`}>
           <CustomButton
-            // text='Filter'
             onClick={() => setShowFilters(!showFilters)}
             icon={<FaFilter />}
           ></CustomButton>
@@ -265,7 +297,7 @@ function SearchResult() {
               <div>
                 <FilterField
                   title='Topic'
-                  options={courses.map((course) => course.subject)}
+                  options={subjects}
                   onFilter={handleFilter}
                 />
                 <hr className={`${classes.hr}`} />
@@ -282,7 +314,7 @@ function SearchResult() {
                     '10 - 100',
                     '100 - 1000',
                     '1000 - 10000',
-                    '10000+',
+                    '10000 - 1000000',
                   ]}
                   onFilter={handleFilter}
                 />

@@ -11,6 +11,9 @@ import SnackBar from './SnackBar';
 import { useAppContext } from '../context/App/appContext';
 import Loading from './Loading';
 import { useParams } from 'react-router-dom';
+import { updateCourse } from '../store/slices/course-slice';
+import { useDispatch, useSelector } from 'react-redux';
+import Alert from '@material-ui/lab/Alert';
 
 const useStyles = makeStyles((theme) => ({
   container: {
@@ -113,16 +116,25 @@ function PromotionForm({ submitted }) {
   const promotionPercentageRef = useRef();
   const [loading, setLoading] = useState(false);
   const { courseId } = useParams();
-  const { updateCourse } = useCourseContext();
+  const dispatch = useDispatch();
+  const message = useSelector((state) => state.course.message);
+  const type = useSelector((state) => state.course.type);
+  const loadingCourses = useSelector((state) => state.course.coursesIsLoading);
+  const loadingMyCourses = useSelector(
+    (state) => state.course.myCoursesIsLoading
+  );
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     const promotionPercentage = promotionPercentageRef.current.value;
     const startDate = startDateRef.current.value;
     const endDate = endDateRef.current.value;
-
+    console.log(promotionPercentage, startDate, endDate);
     if (!startDate || !endDate || !promotionPercentage) {
-      setAlert('Please fill in all the fields');
+      setAlert({
+        type: 'error',
+        message: 'Please fill in all fields',
+      });
       setTimeout(() => {
         setAlert(null);
       }, 3000);
@@ -130,7 +142,10 @@ function PromotionForm({ submitted }) {
     }
 
     if (promotionPercentage < 0 || promotionPercentage > 100) {
-      setAlert('Promotion percentage must be between 0 and 100');
+      setAlert({
+        type: 'error',
+        message: 'Promotion percentage must be between 0 and 100',
+      });
       setTimeout(() => {
         setAlert(null);
       }, 3000);
@@ -138,43 +153,54 @@ function PromotionForm({ submitted }) {
     }
 
     if (startDate > endDate) {
-      setAlert('Start date must be before end date');
+      setAlert({
+        type: 'error',
+        message: 'Start date must be before end date',
+      });
       setTimeout(() => {
         setAlert(null);
       }, 3000);
       return;
     }
 
-    setLoading(true);
-    setAlert('Promotion code added successfully');
-
-    updateCourse(
-      courseId,
-      {
-        promotion: {
-          promotionPercentage,
-          startDate,
-          endDate,
-        },
+    const promotion = {
+      promotion: {
+        promotionPercentage,
+        startDate,
+        endDate,
       },
-      'promotion'
+    };
+    dispatch(
+      updateCourse({
+        courseId,
+        course: promotion,
+        type: 'promotion',
+      })
     );
-
     setTimeout(() => {
       setAlert(null);
       submitted();
     }, 3000);
-
-    setLoading(false);
   };
 
   return (
     <>
+      {alert && (
+        <Alert
+          className={classes.alert}
+          severity={alert?.type}
+          style={{
+            position: 'fixed',
+            top: '10%',
+            left: '40%',
+          }}
+        >
+          {alert.message}
+        </Alert>
+      )}
       <div className={classes.root}>
         <div className={`${classes.container}`}>
           <h1 className={`${classes.title}`}>Add Promotion</h1>
-          {loading && <Loading type='spin' color='white' />}
-          {alert && <SnackBar content={alert} />}
           <Form className={`${classes.form}`} onSubmit={handleSubmit}>
             <Row className='mb-3'>
               <Form.Group as={Col} controlId='formGridNumberOfHours'>

@@ -13,6 +13,7 @@ import { FaStar } from 'react-icons/fa';
 import RatingStars from '../RatingStars';
 import { Box } from '@material-ui/core';
 import { useAppContext } from '../../context/App/appContext';
+import { useSelector } from 'react-redux';
 
 const useStyles = makeStyles((theme) => ({
   img: {
@@ -140,10 +141,11 @@ function Demo({
   instructor,
   subject,
   style,
+  courseId,
 }) {
   const classes = useStyles();
+  const navigate = useNavigate();
 
-  console.log(title);
   return (
     <>
       <div className={classes.demo}>
@@ -180,15 +182,9 @@ function Demo({
         <div className={classes.demoFooter}>
           <button
             className={classes.addToCartBtn}
-            onClick={() => console.log('add to cart')}
+            onClick={() => navigate(`/course/${courseId}`)}
           >
-            Add to Cart <AiOutlineShoppingCart />
-          </button>
-          <button
-            className={classes.likeBtn}
-            onClick={() => console.log('Like')}
-          >
-            <AiOutlineHeart />
+            Go to course <AiOutlineShoppingCart />
           </button>
         </div>
       </div>
@@ -217,7 +213,7 @@ function CourseComponent({
   const [showDemo, setShowDemo] = useState(false);
   const courseRef = useRef();
   const navigate = useNavigate();
-  const { user } = useAppContext();
+  const user = useSelector((state) => state.auth.user);
 
   return (
     <>
@@ -312,7 +308,9 @@ function CourseComponent({
                 </Grid>
                 <Grid>
                   <Typography variant='body2' color='textSecondary'>
-                    {price && `${price} ${currency}`}
+                    {price && price}
+                    {currency && currency}
+                    {!currency && price && ' $'}
                   </Typography>
                 </Grid>
               </Grid>
@@ -353,6 +351,7 @@ function CourseComponent({
                   numOfVideos={numOfVideos}
                   numOfHours={numOfHours}
                   numberOfStudents={numberOfStudents}
+                  courseId={courseId}
                 />
               )}
             </div>
@@ -360,36 +359,10 @@ function CourseComponent({
         </div>
       )}
       {!horizontal && (
-        <div
-          className={`${classes.course}`}
-          // style={{
-          //   position: 'absolute',
-          //   top: courseRef.current?.offsetTop,
-          //   left: Number(
-          //     courseRef.current?.offsetLeft +
-          //       courseRef.current?.offsetWidth +
-          //       400 >=
-          //       document.body.clientWidth
-          //       ? courseRef.current?.offsetLeft - 400
-          //       : courseRef.current?.offsetLeft + courseRef.current?.offsetWidth
-          //   )
-          //     ? Number(
-          //         courseRef.current?.offsetLeft +
-          //           courseRef.current?.offsetWidth +
-          //           400 >=
-          //           document.body.clientWidth
-          //           ? courseRef.current?.offsetLeft - 400
-          //           : courseRef.current?.offsetLeft +
-          //               courseRef.current?.offsetWidth
-          //       )
-          //     : 0,
-          // }}
-        >
+        <div className={`${classes.course}`}>
           <Link
             to={`/course/${courseId}`}
             style={{ textDecoration: 'none', color: 'black' }}
-            // onMouseEnter={() => setShowDemo(true)}
-            // onMouseLeave={() => setShowDemo(false)}
           >
             <img
               className={classes.imgVertical}
@@ -416,8 +389,9 @@ function CourseComponent({
               </Typography>
               {price && (
                 <Typography variant='subtitle1'>
-                  {price}
-                  {currency}
+                  {price && price}
+                  {currency && currency}
+                  {!currency && price && ' $'}
                 </Typography>
               )}
               {progress && (
@@ -453,6 +427,7 @@ function CourseComponent({
               numOfHours={numOfHours}
               currency={currency}
               numberOfStudents={numberOfStudents}
+              courseId={courseId}
             />
           )}
         </div>

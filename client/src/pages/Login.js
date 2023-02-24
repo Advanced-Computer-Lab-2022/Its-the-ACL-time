@@ -14,24 +14,13 @@ import {
 } from '@material-ui/core';
 import { Loading } from '../components';
 import Alert from '@material-ui/lab/Alert';
-import LockOutlinedIcon from '@material-ui/icons/LockOutlined';
 import { makeStyles } from '@material-ui/core/styles';
-import { useAppContext } from '../context/App/appContext';
 import { Navigate, useNavigate } from 'react-router-dom';
-import axios from 'axios';
-
-function Copyright() {
-  return (
-    <Typography variant='body2' color='textSecondary' align='center'>
-      {'Copyright © '}
-      <Link color='inherit' href='https://mui.com/'>
-        Nerd academy
-      </Link>{' '}
-      {new Date().getFullYear()}
-      {'.'}
-    </Typography>
-  );
-}
+import SchoolOutlinedIcon from '@material-ui/icons/SchoolOutlined';
+import Copyright from '../components/Copyright';
+import { login } from '../store/slices/auth-slice';
+import { useDispatch, useSelector } from 'react-redux';
+import { useEffect } from 'react';
 
 const useStyles = makeStyles((theme) => ({
   paper: {
@@ -56,55 +45,56 @@ const useStyles = makeStyles((theme) => ({
 export default function Login() {
   const classes = useStyles();
 
-  const { setup } = useAppContext();
-
   const email = useRef();
   const password = useRef();
   const navigate = useNavigate();
   const [alert, setAlert] = useState(null);
-  const [loading, setLoading] = useState(false);
   const [alertType, setAlertType] = useState(null);
+  const loading = useSelector((state) => state.auth.isLoading);
+  const message = useSelector((state) => state.auth.message);
+  const type = useSelector((state) => state.auth.type);
+  const isAdmin = useSelector((state) => state.auth.isAdmin);
+  const isLoggedIn = useSelector((state) => state.auth.isLoggedIn);
+  const dispatch = useDispatch();
+
+  const clearAlert = () => {
+    setTimeout(() => {
+      setAlert(null);
+      setAlertType(null);
+    }, 3000);
+  };
+
+  useEffect(() => {
+    if (message && type) {
+      setAlert(message);
+      setAlertType(type);
+      clearAlert();
+    }
+  }, [message, type]);
+
+  useEffect(() => {
+    if (isLoggedIn) {
+      if (isAdmin) {
+        navigate('/admin');
+      } else {
+        navigate('/');
+      }
+    }
+  }, [isLoggedIn]);
 
   const handleLogin = async (e) => {
     e.preventDefault();
-    setLoading(true);
     const user = {
       email: email.current.value,
       password: password.current.value,
-      endPoint: 'login',
     };
     if (!user.email || !user.password) {
       setAlert('Please fill in all fields');
       setAlertType('error');
-      setTimeout(() => {
-        setAlert(null);
-        setAlertType(null);
-      }, 3000);
+      clearAlert();
     } else {
-      const result = await setup(user);
-      if (result.type) {
-        setAlert(result.msg);
-        setAlertType('success');
-        let redirect = '/';
-        if (result.admin) {
-          redirect = '/admin';
-        }
-        console.log('login result', result);
-        setTimeout(() => {
-          setAlert(null);
-          setAlertType(null);
-          navigate(redirect);
-        }, 3000);
-      } else {
-        setAlert(result.msg);
-        setAlertType('error');
-        setTimeout(() => {
-          setAlert(null);
-          setAlertType(null);
-        }, 3000);
-      }
+      dispatch(login(user));
     }
-    setLoading(false);
   };
 
   return (
@@ -112,7 +102,7 @@ export default function Login() {
       <CssBaseline />
       <div className={classes.paper}>
         <Avatar className={classes.avatar}>
-          <LockOutlinedIcon />
+          <SchoolOutlinedIcon />
         </Avatar>
         <Typography component='h1' variant='h5'>
           Sign in

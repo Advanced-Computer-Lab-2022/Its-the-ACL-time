@@ -63,7 +63,6 @@ export default function Register() {
   const password = useRef(null);
   const username = useRef(null);
   const email = useRef(null);
-  const category = useRef(null);
   const [country, setCountry] = useState('Country');
   const [showCompanyPolicy, setShowCompanyPolicy] = useState(true);
   const [disable, setDisable] = useState(true);
@@ -71,7 +70,12 @@ export default function Register() {
   const [loading, setLoading] = useState(false);
   const [alert, setAlert] = useState(null);
   const [alertType, setAlertType] = useState(null);
+  const { user, token } = useAppContext();
   const navigate = useNavigate();
+
+  if (user && token) {
+    navigate('/');
+  }
 
   const downloadContract = () => {
     const element = document.createElement('a');
@@ -90,7 +94,7 @@ export default function Register() {
       username: username.current.value,
       password: password.current.value,
       email: email.current.value,
-      type: "Individual trainee",
+      type: 'Individual trainee',
       country: country.value,
       endPoint: 'register',
     };
@@ -118,7 +122,7 @@ export default function Register() {
         setTimeout(() => {
           setAlert(null);
           setAlertType(null);
-          navigate('/login');
+          navigate('/');
         }, 3000);
       } else {
         setAlert(result.msg);
@@ -159,6 +163,29 @@ export default function Register() {
           <Grid container spacing={2}>
             <Grid item xs={12}>
               <TextField
+                variant='outlined'
+                required
+                fullWidth
+                id='username'
+                label='First name'
+                name='username'
+                autoComplete='username'
+              />
+            </Grid>
+            <Grid item xs={12}>
+              <TextField
+                inputRef={username}
+                variant='outlined'
+                required
+                fullWidth
+                id='username'
+                label='Last name'
+                name='username'
+                autoComplete='username'
+              />
+            </Grid>
+            <Grid item xs={12}>
+              <TextField
                 inputRef={username}
                 variant='outlined'
                 required
@@ -194,7 +221,7 @@ export default function Register() {
                 autoComplete='current-password'
               />
             </Grid>
-         
+
             <Grid item xs={12}>
               <label>Country</label>
               <CountrySelector setCountry={setCountry} />

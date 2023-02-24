@@ -17,9 +17,9 @@ import SentimentSatisfiedIcon from '@material-ui/icons/SentimentSatisfied';
 import SentimentSatisfiedAltIcon from '@material-ui/icons/SentimentSatisfiedAltOutlined';
 import SentimentVerySatisfiedIcon from '@material-ui/icons/SentimentVerySatisfied';
 import axios from 'axios';
-import { useAppContext } from '../context/App/appContext';
 import Loading from './Loading';
 import { Link, useNavigate } from 'react-router-dom';
+import { useSelector } from 'react-redux';
 
 const useStyles = makeStyles((theme) => ({
   main: {
@@ -103,12 +103,15 @@ IconContainer.propTypes = {
 
 function InstructorRating({ instructorId, type }) {
   const classes = useStyles();
-  const { token } = useAppContext();
-  const [instructor, setInstructor] = useState({});
-  const [loading, setLoading] = useState(() => true);
-  const [open, setOpen] = useState(() => false);
-  const [rating, setRating] = useState(() => 0);
+  const token = useSelector((state) => state.auth?.token);
+  const user = useSelector((state) => state.auth?.user);
+  const [instructor, setInstructor] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [open, setOpen] = useState(false);
+  const [rating, setRating] = useState(0);
   const navigate = useNavigate();
+  const [ratedByCurrentUser, setRatedByCurrentUser] = useState(false);
+
   useEffect(() => {
     if (instructorId === undefined) return;
     setLoading(true);
@@ -122,15 +125,37 @@ function InstructorRating({ instructorId, type }) {
             },
           }
         );
-        console.log(res.data);
         setInstructor(res.data);
+
+        if (res.data.ratings) {
+          const rating = res.data.ratings.find(
+            (rating) => rating.user === user._id
+          );
+          if (rating) {
+            setRatedByCurrentUser(true);
+          }
+        }
+        setLoading(false);
       } catch (error) {
         console.log(error);
       }
     };
-    fetchInstructorRating(instructor);
-    setLoading(false);
-  }, [instructorId, token]);
+
+    const checkIfRatedByCurrentUser = () => {
+      if (instructor.ratings) {
+        const rating = instructor.ratings.find(
+          (rating) => rating.user === user._id
+        );
+        if (rating) {
+          setRatedByCurrentUser(true);
+        }
+        setLoading(false);
+      }
+    };
+
+    if (!instructor) fetchInstructorRating();
+    else checkIfRatedByCurrentUser();
+  }, [instructorId, token, user]);
 
   const postRating = async (rating) => {
     setLoading(true);
@@ -146,10 +171,11 @@ function InstructorRating({ instructorId, type }) {
       );
       console.log(res.data);
       setInstructor(res.data);
+      setRatedByCurrentUser(true);
+      setLoading(false);
     } catch (error) {
       console.log(error);
     }
-    setLoading(false);
   };
 
   return (
@@ -201,7 +227,8 @@ function InstructorRating({ instructorId, type }) {
           <div className={classes.icon}>
             <i className='fas fa-star'></i>
             <p className={classes.p}>
-              {!loading && instructor?.averageRating} instructor rating
+              {!loading && Math.round(instructor?.averageRating)} instructor
+              rating
             </p>
           </div>
           <div className={classes.icon}>
@@ -217,7 +244,7 @@ function InstructorRating({ instructorId, type }) {
             </p>
           </div>
           <div>
-            {type === 'enrolled' && (
+            {type === 'enrolled' && !ratedByCurrentUser && (
               <span
                 onClick={() => setOpen(true)}
                 style={{
@@ -236,7 +263,9 @@ function InstructorRating({ instructorId, type }) {
 
         <Dialog
           open={open}
-          onClose={() => setOpen(false)}
+          onClose={() => {
+            setOpen(false);
+          }}
           aria-labelledby='form-dialog-title'
         >
           <DialogTitle id='form-dialog-title'>Rate Instructor</DialogTitle>

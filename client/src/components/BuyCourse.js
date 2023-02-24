@@ -1,13 +1,14 @@
 import { handleCheckout } from '../services/Payment';
-import { useAppContext } from '../context/App/appContext';
 import { useEffect, useState } from 'react';
 import axios from 'axios';
 import { backendApi } from '../projectConfig';
 import { useNavigate } from 'react-router-dom';
+import { useSelector } from 'react-redux';
 
 function BuyCourse({ courseId, coursePrice }) {
   const navigate = useNavigate();
-  const { token, user } = useAppContext();
+  const user = useSelector((state) => state.auth?.user);
+  const token = useSelector((state) => state.auth?.token);
   const [wallet, setWallet] = useState(0);
   const [isLoading, setIsLoading] = useState(false);
 
@@ -40,7 +41,9 @@ function BuyCourse({ courseId, coursePrice }) {
       })
       .then((res) => {
         setIsLoading(false);
-        navigate(`/course/${courseId}/content`);
+        alert(
+          'your course added successfully please refresh the page to see it '
+        );
       })
       .catch((err) => {
         setIsLoading(false);
@@ -48,9 +51,8 @@ function BuyCourse({ courseId, coursePrice }) {
         console.log(err);
       });
   }
-  console.log("course price",coursePrice);
+
   let buyFor = coursePrice - wallet;
-  console.log("wallet",wallet);
   if (buyFor < 0) {
     buyFor = 0;
   }

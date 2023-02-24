@@ -7,12 +7,22 @@ import { makeStyles } from '@material-ui/core/styles';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useAppContext } from '../../context/App/appContext';
 import { useCourseContext } from '../../context/Course/courseContext';
-import { FormControl, Select } from '@material-ui/core';
-import { useState } from 'react';
+import {
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
+  FormControl,
+  Select,
+} from '@material-ui/core';
+import { useEffect, useState } from 'react';
 import { useRef } from 'react';
 import Footer from '../Footer';
 import Loading from '../Loading';
 import axios from 'axios';
+import contract from '../../assets/contract.pdf';
+import { useDispatch, useSelector } from 'react-redux';
+import { createCourse } from '../../store/slices/course-slice';
 
 const useStyles = makeStyles((theme) => ({
   main: {
@@ -115,17 +125,67 @@ const subjects = [
   'Computer Hardware',
 ];
 
-function CourseForm({ addCourseFront }) {
+function CourseForm() {
   const classes = useStyles();
 
-  const { courseId } = useParams();
-  const { alert, setAlert, clearAlert, alertText, alertType } = useAppContext();
-  const { createCourse, updateCourse } = useCourseContext();
+  const user = useSelector((state) => state.auth.user);
+  const courses = useSelector((state) => state.course.courses);
   const [subtitles, setSubtitles] = useState(0);
   const [disable, setDisable] = useState(true);
-  const [loading, setLoading] = useState(false);
+  const loading = useSelector((state) => state.course.coursesIsLoading);
+  const [alertType, setAlertType] = useState();
+  const [alertText, setAlertText] = useState();
+  const [alert, setAlert] = useState(false);
   const subtitlesRef = useRef();
   const navigate = useNavigate();
+  const [open, setOpen] = useState(false);
+  const dispatch = useDispatch();
+  const message = useSelector((state) => state.course.message);
+  const type = useSelector((state) => state.course.type);
+  // const downloadContract = () => {
+  //   const element = document.createElement('a');
+  //   element.setAttribute('href', contract);
+  //   element.setAttribute('download', 'contract.pdf');
+  //   element.style.display = 'none';
+  //   document.body.appendChild(element);
+  //   element.click();
+  //   document.body.removeChild(element);
+  // };
+
+  // const checkContracted = () => {
+  //   if (user?.contracted) {
+  //     setOpen(false);
+  //   } else {
+  //     setOpen(true);
+  //   }
+  // };
+
+  // const handleContracted = () => {
+  //   // updateUser({
+  //   //   ...user,
+  //   //   contracted: true,
+  //   // });
+  // };
+
+  // useEffect(() => {
+  //   setLoading(true);
+  //   checkContracted();
+  //   if (user?.contracted === true || user?.contracted === false) {
+  //     setLoading(false);
+  //   }
+  // }, [user]);
+
+  const handleAlert = (type, text) => {
+    setAlertType(type);
+    setAlertText(text);
+    setAlert(true);
+  };
+
+  const clearAlert = () => {
+    setTimeout(() => {
+      setAlert(false);
+    }, 3000);
+  };
 
   const addSubtitle = () => {
     setDisable(false);
@@ -137,81 +197,78 @@ function CourseForm({ addCourseFront }) {
     setSubtitles(subtitles - 1);
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setLoading(true);
-    console.log(e.target[0].value);
-    const title = e.target[0].value;
-    const subject = e.target[1].value;
-    const price = e.target[2].value;
-    const numberOfHours = e.target[3].value;
-    const promotion = e.target[4].value;
-    const previewLink = e.target[5].value;
-    const summary = e.target[6].value;
+  const handleCourse = (e, type) => {
+    if (type === 'collect') {
+      const title = e.target[0].value;
+      const subject = e.target[1].value;
+      const price = e.target[2].value;
+      const numberOfHours = e.target[3].value;
+      const promotion = e.target[4].value;
+      const previewLink = e.target[5].value;
+      const summary = e.target[6].value;
 
-    const course = {
-      title,
-      subject,
-      price,
-      numberOfHours,
-      promotion,
-      previewLink,
-      summary,
-    };
+      const course = {
+        title,
+        subject,
+        price,
+        numberOfHours,
+        promotion,
+        previewLink,
+        summary,
+      };
+      const titleAlreadyExists = courses.find(
+        (course) => course.title === title
+      );
 
-    if (!title || !subject || !price || !numberOfHours || !summary) {
-      setAlert('error', 'Please fill all the fields');
-      clearAlert();
-      setLoading(false);
-      return;
-    }
-
-    let id = '';
-    try {
-      if (courseId) {
-        await updateCourse(courseId, course);
-      } else {
-        id = await createCourse(course);
+      if (titleAlreadyExists) {
+        handleAlert('error', 'Course title already exists');
+        clearAlert();
+        return;
       }
-      if (addCourseFront) {
-        addCourseFront(course);
+
+      if (!title || !subject || !price || !numberOfHours || !summary) {
+        handleAlert('error', 'Please fill all the fields');
+        clearAlert();
+        return;
       }
-      setAlert('success', `${title} Course Created successfully`);
-      clearAlert();
-    } catch (error) {
-      console.log('error' + error);
-      const { msg } = error.response.data;
-
-      console.log(error.response.data.msg);
-
-      setAlert('error', msg);
-
-      clearAlert();
+      return course;
+    } else {
+      e.target[0].value = '';
+      e.target[1].value = '';
+      e.target[2].value = '';
+      e.target[3].value = '';
+      e.target[4].value = '';
+      e.target[5].value = '';
+      e.target[6].value = '';
     }
+  };
 
-    if (id) {
-      let subtitlesContent = [];
-      for (let i = 0; i < subtitles; i++) {
+  const handleSubtitle = (type) => {
+    const length = subtitlesRef.current.children.length;
+    if (type === 'collect') {
+      let subtitles = [];
+      for (let i = 0; i < length; i++) {
         const title =
-          subtitlesRef.current.children[i + 2].children[1].children[1].value;
+          subtitlesRef.current.children[i].children[1].children[1].value;
         const link =
-          subtitlesRef.current.children[i + 2].children[2].children[0]
-            .children[1].value;
+          subtitlesRef.current.children[i].children[2].children[0].children[1]
+            .value;
         const duration =
-          subtitlesRef.current.children[i + 2].children[2].children[1]
-            .children[1].value;
+          subtitlesRef.current.children[i].children[2].children[1].children[1]
+            .value;
 
         const description =
-          subtitlesRef.current.children[i + 2].children[3].children[1].value;
+          subtitlesRef.current.children[i].children[3].children[1].value;
+
+        console.log(title, link, duration, description);
 
         if (!title || !link || !duration || !description) {
-          setAlert('error', 'Please fill all fields');
+          handleAlert('error', 'Please fill all fields');
           clearAlert();
-          setLoading(false);
           return;
         }
 
-        subtitlesContent.push({
+        subtitles.push({
           title,
           link,
           duration,
@@ -219,171 +276,238 @@ function CourseForm({ addCourseFront }) {
         });
       }
 
-      try {
-        const response = await axios.post(
-          `http://localhost:8080/api/v1/course/${id}/subtitle`,
-          subtitlesContent,
-          {
-            headers: {
-              'Content-Type': 'application/json',
-              Authorization: `Bearer ${localStorage.getItem('token')}`,
-            },
-          }
-        );
-        console.log(response);
-        navigate('/profile');
-      } catch (error) {
-        console.log(error);
-      }
+      return subtitles;
     } else {
-      setAlert(
-        'error',
-        'Choose a different title as this one is already taken'
-      );
-      clearAlert();
+      for (let i = 0; i < length; i++) {
+        subtitlesRef.current.children[i].children[1].children[1].value = '';
+        subtitlesRef.current.children[
+          i
+        ].children[2].children[0].children[1].value = '';
+        subtitlesRef.current.children[
+          i
+        ].children[2].children[1].children[1].value = '';
+        subtitlesRef.current.children[i].children[3].children[1].value = '';
+      }
     }
-
-    setLoading(false);
   };
 
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    console.log('handle submit');
+    const course = handleCourse(e, 'collect');
+    const subtitles = handleSubtitle('collect');
+    if (course && subtitles) {
+      dispatch(createCourse({ course, subtitles }));
+      handleCourse(e, 'clear');
+      handleSubtitle('clear');
+    }
+  };
+
+  useEffect(() => {
+    if (message && type) {
+      setAlert(true);
+      setAlertType(type);
+      setAlertText(message);
+      clearAlert();
+    }
+  }, [message, type]);
+
   return (
-    <main className={classes.main}>
+    <>
       {loading && <Loading></Loading>}
-
-      <div className={`${classes.container}`}>
-        <h1 className={`${classes.title}`}>
-          {courseId ? 'Update' : 'Add'} Course
-        </h1>
-
+      <>
         {alert && (
-          <Alert variant='filled' severity={alertType} sx={{ width: 20 }}>
+          <Alert
+            variant='filled'
+            severity={alertType}
+            sx={{ width: 20 }}
+            style={{ position: 'fixed', top: '10%', left: '40%' }}
+          >
             {alertText}
           </Alert>
         )}
-        <Form className={`${classes.form}`} onSubmit={handleSubmit}>
-          <Row className='mb-3'>
-            <Form.Group as={Col} controlId='formGridTitle'>
-              <Form.Label>Title</Form.Label>
-              <Form.Control type='text' placeholder='Enter course title' />
-            </Form.Group>
-
-            <Form.Group as={Col} controlId='formGridSubject'>
-              <FormControl variant='filled' className={classes.formControl}>
-                <Form.Label>Subject</Form.Label>
-
-                <Select
-                  native
-                  inputProps={{
-                    name: 'age',
-                    id: 'subject',
-                  }}
-                  className={classes.select}
-                >
-                  <option aria-label='None' value='' />
-                  {subjects.map((subject, i) => (
-                    <option value={subject} key={i}>
-                      {subject}
-                    </option>
-                  ))}
-                </Select>
-              </FormControl>
-            </Form.Group>
-          </Row>
-          <Row className='mb-3'>
-            <Form.Group as={Col} controlId='formGridPrice'>
-              <Form.Label>Price</Form.Label>
-              <Form.Control type='number' placeholder='Enter course price' />
-            </Form.Group>
-
-            <Form.Group as={Col} controlId='formGridNumberOfHours'>
-              <Form.Label>Number Of Hours</Form.Label>
-              <Form.Control type='number' placeholder='Number Of Hours' />
-            </Form.Group>
-
-            <Form.Group as={Col} controlId='formGridPromotion'>
-              <Form.Label>Promotion</Form.Label>
-              <Form.Control type='number' placeholder='Promotion' />
-            </Form.Group>
-          </Row>
-          <Form.Group className='mb-3' controlId='formGridPreviewLink'>
-            <Form.Label>Preview Link</Form.Label>
-            <Form.Control placeholder='Preview Link' />
-          </Form.Group>
-
-          <Form.Group className='mb-3' controlId='formGridSummary'>
-            <Form.Label>Summary</Form.Label>
-            <Form.Control as='textarea' placeholder='Summary' />
-          </Form.Group>
-
-          {subtitles > 0 && (
-            <div className={`${classes.subtitles}`} ref={subtitlesRef}>
-              <div className={`${classes.line}`}></div>
-              <h3 className={`${classes.subtitleTitle}`}>Subtitles</h3>
-              {[...Array(subtitles)].map((e, i) => {
-                return (
-                  <div className={`${classes.subtitle}`} key={i}>
-                    <h4>Subtitle {i + 1}</h4>
-                    <Form.Group className='mb-3' controlId='formGridTitle'>
-                      <Form.Label>Title</Form.Label>
-                      <Form.Control placeholder='Title' />
-                    </Form.Group>
-
-                    <Row className='mb-3'>
-                      <Form.Group as={Col} controlId='formGridLink'>
-                        <Form.Label>Link</Form.Label>
-                        <Form.Control type='text' placeholder='Link' />
-                      </Form.Group>
-
-                      <Form.Group as={Col} controlId='formGridDuration'>
-                        <Form.Label>Duration</Form.Label>
-                        <Form.Control type='number' placeholder='Duration' />
-                      </Form.Group>
-                    </Row>
-
-                    <Form.Group
-                      className='mb-3'
-                      controlId='formGridDescription'
-                    >
-                      <Form.Label>Description</Form.Label>
-                      <Form.Control as='textarea' placeholder='Description' />
-                    </Form.Group>
-                  </div>
-                );
-              })}
-            </div>
-          )}
-
-          <div className={`${classes.buttons}`}>
-            <Button
-              variant='secondary'
-              onClick={addSubtitle}
-              className={`${classes.addSubtitleButton}`}
-            >
-              Add Subtitle
-            </Button>
-            {subtitles > 0 && (
+        <main className={classes.main}>
+          <Dialog open={open} aria-labelledby='form-dialog-title'>
+            <DialogTitle id='form-dialog-title'>Contract</DialogTitle>
+            <DialogContent>
+              introduction These Website Standard Terms and Conditions written
+              on this webpage shall manage your use of our website, nerd academy
+              accessible at https://www.nerd.org/.These Terms will be applied
+              fully and affect your use of this Website. By using this Website,
+              you agreed to accept all terms and conditions written here. You
+              must not use this Website if you disagree with any of these
+              Website's Standard Terms and Conditions. Minors or people below 18
+              years old are not allowed to use this Website. Intellectual
+              Property Rights Other than the content you own, under these Terms,
+              Nerd Academy and its licensors own all the intellectual property
+              rights and materials contained in this Website. You are granted a
+              limited license only for viewing the material on this Website.
+              Restrictions You are specifically restricted from all of the
+              following: publish any Website material in any other media; sell,
+              rent or sub-license material from the Website; reproduce,
+              duplicate or copy material from the Website; republish or
+              redistribute material from this Website; this shall include
+              framing or similar techniques that are used to enclose any
+              trademark, logo, or other proprietary information (including
+              images, text, page layout, or form) of Nerd Academy without
+              express written consent.
+            </DialogContent>
+            <DialogActions>
               <Button
-                variant='secondary'
-                className={`${classes.removeSubtitleButton}`}
-                onClick={removeSubtitle}
+                onClick={() => {
+                  // handleContracted();
+                  // downloadContract();
+                  setOpen(false);
+                }}
+                color='primary'
               >
-                Remove Subtitle
+                Agree
               </Button>
-            )}
+            </DialogActions>
+          </Dialog>
+          <div className={`${classes.container}`}>
+            <h1 className={`${classes.title}`}>Add Course</h1>
+
+            <Form className={`${classes.form}`} onSubmit={handleSubmit}>
+              <Row className='mb-3'>
+                <Form.Group as={Col} controlId='formGridTitle'>
+                  <Form.Label>Title</Form.Label>
+                  <Form.Control type='text' placeholder='Enter course title' />
+                </Form.Group>
+
+                <Form.Group as={Col} controlId='formGridSubject'>
+                  <FormControl variant='filled' className={classes.formControl}>
+                    <Form.Label>Subject</Form.Label>
+
+                    <Select
+                      native
+                      inputProps={{
+                        name: 'age',
+                        id: 'subject',
+                      }}
+                      className={classes.select}
+                    >
+                      <option aria-label='None' value='' />
+                      {subjects.map((subject, i) => (
+                        <option value={subject} key={i}>
+                          {subject}
+                        </option>
+                      ))}
+                    </Select>
+                  </FormControl>
+                </Form.Group>
+              </Row>
+              <Row className='mb-3'>
+                <Form.Group as={Col} controlId='formGridPrice'>
+                  <Form.Label>Price</Form.Label>
+                  <Form.Control type='number' placeholder='Price in dollars' />
+                </Form.Group>
+
+                <Form.Group as={Col} controlId='formGridNumberOfHours'>
+                  <Form.Label>Number Of Hours</Form.Label>
+                  <Form.Control type='number' placeholder='Number Of Hours' />
+                </Form.Group>
+
+                <Form.Group as={Col} controlId='formGridPromotion'>
+                  <Form.Label>Promotion</Form.Label>
+                  <Form.Control
+                    type='number'
+                    placeholder='Promotion percentage'
+                  />
+                </Form.Group>
+              </Row>
+              <Form.Group className='mb-3' controlId='formGridPreviewLink'>
+                <Form.Label>Preview Link</Form.Label>
+                <Form.Control placeholder='Preview Link' />
+              </Form.Group>
+
+              <Form.Group className='mb-3' controlId='formGridSummary'>
+                <Form.Label>Summary</Form.Label>
+                <Form.Control as='textarea' placeholder='Summary' />
+              </Form.Group>
+
+              {subtitles > 0 && (
+                <div className={`${classes.subtitles}`}>
+                  <div className={`${classes.line}`}></div>
+                  <h3 className={`${classes.subtitleTitle}`}>Subtitles</h3>
+                  <div ref={subtitlesRef}>
+                    {[...Array(subtitles)].map((e, i) => {
+                      return (
+                        <div className={`${classes.subtitle}`} key={i}>
+                          <h4>Subtitle {i + 1}</h4>
+                          <Form.Group
+                            className='mb-3'
+                            controlId='formGridTitle'
+                          >
+                            <Form.Label>Title</Form.Label>
+                            <Form.Control placeholder='Title' />
+                          </Form.Group>
+
+                          <Row className='mb-3'>
+                            <Form.Group as={Col} controlId='formGridLink'>
+                              <Form.Label>Link</Form.Label>
+                              <Form.Control type='text' placeholder='Link' />
+                            </Form.Group>
+
+                            <Form.Group as={Col} controlId='formGridDuration'>
+                              <Form.Label>Duration</Form.Label>
+                              <Form.Control
+                                type='number'
+                                placeholder='Duration'
+                              />
+                            </Form.Group>
+                          </Row>
+
+                          <Form.Group
+                            className='mb-3'
+                            controlId='formGridDescription'
+                          >
+                            <Form.Label>Description</Form.Label>
+                            <Form.Control
+                              as='textarea'
+                              placeholder='Description'
+                            />
+                          </Form.Group>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
+
+              <div className={`${classes.buttons}`}>
+                <Button
+                  variant='secondary'
+                  onClick={addSubtitle}
+                  className={`${classes.addSubtitleButton}`}
+                >
+                  Add Subtitle
+                </Button>
+                {subtitles > 0 && (
+                  <Button
+                    variant='secondary'
+                    className={`${classes.removeSubtitleButton}`}
+                    onClick={removeSubtitle}
+                  >
+                    Remove Subtitle
+                  </Button>
+                )}
+              </div>
+              <Button
+                variant='primary'
+                type='submit'
+                className={`${classes.addCourseButton}`}
+                id='addCourseButton'
+                disabled={disable}
+              >
+                Add Course
+              </Button>
+            </Form>
           </div>
-          <Button
-            variant='primary'
-            type='submit'
-            className={`${classes.addCourseButton}`}
-            id='addCourseButton'
-            disabled={disable}
-          >
-            Add Course
-          </Button>
-        </Form>
-      </div>
-      <Footer />
-    </main>
+          <Footer />
+        </main>
+      </>
+    </>
   );
 }
 

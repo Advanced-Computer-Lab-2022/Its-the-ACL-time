@@ -26,6 +26,8 @@ import { BsClock } from 'react-icons/bs';
 import { BsPeople } from 'react-icons/bs';
 import StarBorderIcon from '@material-ui/icons/StarBorder';
 import BuyCourse from '../components/BuyCourse';
+import { useSelector } from 'react-redux';
+import Video from '../components/Video';
 
 const useStyles = makeStyles((theme) => ({
   main: {
@@ -86,6 +88,9 @@ const useStyles = makeStyles((theme) => ({
   },
   Items: {
     overflow: 'auto',
+    display: 'flex',
+    flexDirection: 'row',
+    justifyContent: 'center',
   },
   reviewCourse: {
     width: '25rem',
@@ -245,39 +250,48 @@ const CoursePage = () => {
   const classes = useStyles();
   const { courseId } = useParams();
   const [subtitles, setSubtitles] = useState(null);
-  const { courses, myCourses } = useCourseContext();
+  const courses = useSelector((state) => state.course?.courses);
+  const myCourses = useSelector((state) => state.myCourses?.myCourses);
+  const user = useSelector((state) => state.auth?.user);
+  const token = useSelector((state) => state.auth?.token);
+  const coursesIsLoading = useSelector(
+    (state) => state.course?.coursesIsLoading
+  );
+  const myCoursesIsLoading = useSelector(
+    (state) => state.myCourses?.myCoursesIsLoading
+  );
   const [course, setCourse] = useState({});
-  const { token, user } = useAppContext();
   const [showDescription, setShowDescription] = useState(false);
-  const [applyCoupon, setApplyCoupon] = useState(false);
   const [requestRefund, setRequestRefund] = useState(false);
   const [showRefundForm, setShowRefundForm] = useState(false);
   const [isOwner, setIsOwner] = useState(false);
   const [isEnrolled, setIsEnrolled] = useState(false);
   const [discountPrice, setDiscountPrice] = useState(null);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [showExamForm, setShowExamForm] = useState(false);
   const [showSubtitleForm, setShowSubtitleForm] = useState(false);
   const [alert, setAlert] = useState(null);
   const [showPromotionForm, setShowPromotionForm] = useState(false);
   const inputRef = useRef();
+  const [progress, setProgress] = useState();
 
-  console.log('course', course);
   const updateSubtitles = (newSubtitles) => {
     setSubtitles([...subtitles, ...newSubtitles]);
   };
 
   useEffect(() => {
-    setLoading(true);
+    setLoading(coursesIsLoading || myCoursesIsLoading);
+  }, [coursesIsLoading, myCoursesIsLoading]);
 
-    function getCourse() {
+  useEffect(() => {
+    if (!loading) {
       const course = courses.find(
         (course) => course._id.toString() === courseId.toString()
       );
 
-      courses.map((course) => {
-        if (!course.price) course.price = course.originalPrice;
-      });
+      if (!course?.price) {
+        course.price = course.originalPrice;
+      }
 
       setCourse(course);
       if (course && course.promotion) {
@@ -292,10 +306,11 @@ const CoursePage = () => {
           );
         }
       }
-      setLoading(false);
     }
+  }, [loading]);
 
-    async function getSubtitles() {
+  useEffect(() => {
+    async function getSubtitles(courseId) {
       const response = await axios.get(
         `http://localhost:8080/api/v1/course/${courseId}/subtitle`,
         {
@@ -307,47 +322,33 @@ const CoursePage = () => {
       setSubtitles(response.data.subTitles);
     }
 
+    if (courseId && !subtitles) {
+      getSubtitles(courseId);
+    }
+  }, [courseId]);
+
+  useEffect(() => {
     function checkOwnership() {
       const course = myCourses.find(
         (course) => course._id.toString() === courseId.toString()
       );
       if (course) {
-        if (course.createdBy.toString() === user?._id.toString()) {
+        if (course?.createdBy?.toString() === user?._id.toString()) {
           setIsOwner(true);
         } else {
           setIsEnrolled(true);
+          setProgress(() => course?.progress);
         }
       }
     }
 
-    async function checkRefundState() {
-      const response = await axios.get(
-        `http://localhost:8080/api/v1/refund`,
-        {
-          courseId,
-        },
-        {
-          headers: {
-            authorization: `Bearer ${token}`,
-          },
-        }
-      );
-    }
-
-    checkOwnership();
-    getCourse();
-
-    if (!subtitles) {
-      getSubtitles();
-    }
-
-    if (isEnrolled) {
-      checkRefundState();
+    if (user) {
+      checkOwnership();
     }
   }, [courseId, courses, myCourses, token]);
 
   const requestRefundHandler = () => {
-    setLoading(true);
+    // setLoading(true);
     setRequestRefund(false);
     try {
       const response = axios.post(
@@ -367,19 +368,15 @@ const CoursePage = () => {
       console.log(error);
       setAlert('You have requested a refund before');
     }
-    setLoading(false);
+    // setLoading(false);
     setTimeout(() => {
       setAlert(null);
     }, 3000);
   };
 
-  const applyCouponHandler = () => {
-    console.log('apply coupon');
-  };
-  console.log(isEnrolled);
   return (
     <>
-      {loading && <Loading type={'spin'} color={'#3f51b5'} />}
+      {loading && <Loading />}
       {!loading && (
         <main className={`${classes.main}`}>
           <div className={`${classes.background}`}>
@@ -446,15 +443,11 @@ const CoursePage = () => {
 
             <Box className={`${classes.reviewCourse}`}>
               <div className={`${classes.reviewVideo}`}>
-                <iframe
-                  width='400'
-                  height='240'
-                  src={course?.previewLink}
-                  title='YouTube video player'
-                  frameBorder='0'
-                  allow='accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture'
-                  allowFullScreen
-                ></iframe>
+                <Video
+                  videoUrl={course?.previewLink}
+                  width={'400'}
+                  height={'240'}
+                ></Video>
               </div>
               {!isEnrolled && (
                 <div className={`${classes.finalPrice}`}>
@@ -464,7 +457,7 @@ const CoursePage = () => {
                   >
                     {discountPrice && Math.floor(discountPrice)}
                     {!discountPrice && (course?.price || course?.originalPrice)}
-                    {course?.currency}
+                    {course?.currency || ' $'}
                   </Typography>
                   <Typography variant='h6' className={`${classes.actualPrice}`}>
                     {discountPrice && (course?.price || course?.originalPrice)}
@@ -476,20 +469,28 @@ const CoursePage = () => {
                   </Typography>
                 </div>
               )}
-              {/* 
-              {isEnrolled || isOwner ? (
+
+              {(isEnrolled || isOwner) && (
                 <button className={`${classes.addToCart}`}>
                   <Link to={`/course/${courseId}/content`}>Go to course</Link>
                 </button>
-              ) : user.type === 'Individual trainee' ||
-                user.type === 'Instructor' ? (
-                <BuyCourse
-                  courseId={courseId}
-                  coursePrice={course?.originalPrice}
-                ></BuyCourse>
-              ) : (
-                <RequestCourse courseId={courseId}></RequestCourse>
-              )} */}
+              )}
+
+              {!isEnrolled &&
+                !isOwner &&
+                user?.type === 'Individual trainee' && (
+                  <BuyCourse
+                    courseId={courseId}
+                    coursePrice={course?.originalPrice}
+                  ></BuyCourse>
+                )}
+
+              {!isEnrolled &&
+                !isOwner &&
+                user?.type === 'Corporate trainee' && (
+                  <RequestCourse courseId={courseId}></RequestCourse>
+                )}
+
               <p>
                 <AiOutlineCheck /> 30-Day Money-Back Guarantee
               </p>
@@ -497,77 +498,38 @@ const CoursePage = () => {
                 <AiOutlineCheck />
                 Full Lifetime Access
               </p>
-              {isEnrolled && applyCoupon && (
-                <>
-                  <hr className={`${classes.line}`} />
-                  <div className={`{${classes.applyCoupon}}`}>
-                    <input
-                      type={'text'}
-                      placeholder={'Enter the reason'}
-                      className={`${classes.applyCouponInput}`}
-                      ref={inputRef}
-                    />
-                    <button
-                      className={classes.applyCouponButton}
-                      onClick={() => {
-                        isEnrolled
-                          ? setRequestRefund(true)
-                          : applyCouponHandler();
-                      }}
-                    >
-                      Request
-                    </button>
-                  </div>
-                </>
-              )}
-              {isEnrolled && !applyCoupon && (
+              {isEnrolled &&
+                user?.type === 'Individual trainee' &&
+                showRefundForm && (
+                  <>
+                    <hr className={`${classes.line}`} />
+                    <div className={`{${classes.applyCoupon}}`}>
+                      <input
+                        type={'text'}
+                        placeholder={'Enter the reason'}
+                        className={`${classes.applyCouponInput}`}
+                        ref={inputRef}
+                      />
+                      <button
+                        className={classes.applyCouponButton}
+                        onClick={() => setRequestRefund(true)}
+                      >
+                        Request
+                      </button>
+                    </div>
+                  </>
+                )}
+              {isEnrolled && !showRefundForm && progress < 50 && (
                 <>
                   <button
                     className={classes.coupon}
-                    onClick={() => setApplyCoupon(true)}
+                    onClick={() => setShowRefundForm(true)}
                   >
-                    {isEnrolled ? <>Request Refund</> : <>Apply Coupon</>}
+                    Request Refund
                   </button>
                 </>
               )}
-
-              {/* {!applyCoupon && (
-                <button
-                  className={classes.coupon}
-                  onClick={() => setApplyCoupon(true)}
-                >
-                  {isEnrolled ? <>Request Refund</> : <>Apply Coupon</>}
-                </button>
-              )} */}
-              {/* {applyCoupon && (
-                <>
-                  <hr className={`${classes.line}`} />
-                  <div className={`{${classes.applyCoupon}}`}>
-                    <input
-                      type={isEnrolled ? 'number' : 'text'}
-                      placeholder={
-                        isEnrolled
-                          ? 'Enter the amount of money'
-                          : 'Enter coupon'
-                      }
-                      className={`${classes.applyCouponInput}`}
-                      ref={inputRef}
-                    />
-                    <button
-                      className={classes.applyCouponButton}
-                      onClick={() => {
-                        isEnrolled
-                          ? setRequestRefund(true)
-                          : applyCouponHandler();
-                      }}
-                    >
-                      {isEnrolled ? 'Request' : 'Apply'}
-                    </button>
-                  </div>
-                </>
-              )} */}
             </Box>
-            {/* frame for youtube video here  */}
           </div>
           <div className={`${classes.content}`}>
             <section className={`${classes.description}`}>

@@ -6,6 +6,7 @@ const useStyles = makeStyles((theme) => ({
   review: {
     minWidth: '20rem',
     minHeight: '10rem',
+    maxWidth: '20rem',
     padding: '1rem',
     border: '1px solid #ccc',
     display: 'flex',

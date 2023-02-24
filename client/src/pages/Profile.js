@@ -42,6 +42,8 @@ import FilterField from '../components/FilterField';
 import RatingStars from '../components/RatingStars';
 import useWallet from '../components/CustomHooks/getWallet';
 import contract from '../assets/contract.pdf';
+import { useDispatch, useSelector } from 'react-redux';
+import { updateUser } from '../store/slices/auth-slice';
 
 const drawerWidth = 240;
 
@@ -75,16 +77,8 @@ const InstructorSideBar = [
     icon: <BookIcon />,
   },
   {
-    title: 'Wallet',
+    title: 'Earning',
     icon: <AccountBalanceWalletIcon />,
-  },
-  {
-    title: 'Performance',
-    icon: <AssessmentIcon />,
-  },
-  {
-    title: 'Messages',
-    icon: <MessageIcon />,
   },
   {
     title: 'Contract',
@@ -92,21 +86,12 @@ const InstructorSideBar = [
   },
 ];
 
-const CorporateSideBar = [
-  {
-    title: 'Messages',
-    icon: <MessageIcon />,
-  },
-];
+const CorporateSideBar = [];
 
 const IndividualSideBar = [
   {
     title: 'Refund',
     icon: <RefundIcon />,
-  },
-  {
-    title: 'Messages',
-    icon: <MessageIcon />,
   },
 ];
 
@@ -408,7 +393,7 @@ function InstructorProfile({ courses }) {
 
   const checkCourse = (candidateCourse, topics, prices, ratings) => {
     let topicFlag =
-      topics.length === 0 || topics.includes(candidateCourse.title)
+      topics.length === 0 || topics.includes(candidateCourse.subject)
         ? true
         : false;
 
@@ -630,7 +615,7 @@ function InstructorProfile({ courses }) {
                   '10 - 100',
                   '100 - 1000',
                   '1000 - 10000',
-                  '10000+',
+                  '10000 - 1000000',
                 ]}
                 onFilter={handleResult}
               />
@@ -743,9 +728,22 @@ function InstructorProfile({ courses }) {
 const Settings = () => {
   const classes = useStyles();
   const [value, setValue] = useState(0);
-  const { updateUser } = useAppContext();
   const [alert, setAlert] = useState(null);
   const [alertType, setAlertType] = useState(null);
+  const { message, type } = useSelector((state) => state.auth);
+  const dispatch = useDispatch();
+
+  useEffect(() => {
+    if (message) {
+      setAlert(message);
+      setAlertType(type);
+
+      setTimeout(() => {
+        setAlert(null);
+        setAlertType(null);
+      }, 3000);
+    }
+  }, [message, type]);
 
   const cleanForm = () => {
     document.getElementById('username').value = '';
@@ -788,37 +786,36 @@ const Settings = () => {
       return;
     }
 
-    const result = await updateUser({
-      username,
-      email,
-      oldPassword,
-      newPassword,
-      biography,
-      country,
-    });
-
-    if (result.type) {
-      setAlert(result.msg);
-      setAlertType('success');
-      setTimeout(() => {
-        setAlert(null);
-        setAlertType(null);
-        cleanForm();
-      }, 2000);
-    } else {
-      setAlert(result.msg);
-      setAlertType('error');
-      setTimeout(() => {
-        setAlert(null);
-        setAlertType(null);
-        cleanForm();
-      }, 2000);
-    }
+    dispatch(
+      updateUser({
+        username,
+        email,
+        oldPassword,
+        newPassword,
+        biography,
+        country,
+      })
+    );
+    setTimeout(() => {
+      cleanForm();
+    }, 1000);
   };
 
   return (
     <div>
-      {alert && <Alert severity={alertType}>{alert}</Alert>}
+      {alert && (
+        <Alert
+          severity={alertType}
+          style={{
+            position: 'fixed',
+            top: '12%',
+            left: '45%',
+            zIndex: '1000',
+          }}
+        >
+          {alert}
+        </Alert>
+      )}
       <h1>Profile Settings</h1>
       <Paper className={classes.tabs}>
         <Tabs
@@ -893,18 +890,25 @@ const Settings = () => {
 export default function Profile() {
   const classes = useStyles();
   const theme = useTheme();
-  const wallet = useWallet();
+  // const wallet = useWallet();
   const [open, setOpen] = React.useState(false);
   const [component, setComponent] = useState('My Courses');
-  const { myCourses } = useCourseContext();
-  const { user, token } = useAppContext();
+  const myCourses = useSelector((state) => state.myCourses.myCourses);
+  const user = useSelector((state) => state.auth.user);
+  const token = useSelector((state) => state.auth.token);
   const [value, setValue] = React.useState(0);
   const [loading, setLoading] = useState(true);
   const [courses, setCourses] = useState([]);
   const [refunds, setRefunds] = useState([]);
   const [refundPage, setRefundPage] = useState(0);
+  const { coursesIsLoading } = useSelector((state) => state.course);
+  const { myCoursesIsLoading } = useSelector((state) => state.myCourses);
 
   const navigate = useNavigate();
+
+  useEffect(() => {
+    setLoading(coursesIsLoading || myCoursesIsLoading);
+  }, [myCoursesIsLoading, coursesIsLoading]);
 
   useEffect(() => {
     async function getRefund() {
@@ -942,198 +946,203 @@ export default function Profile() {
   };
 
   return (
-    <div className={classes.root}>
+    <>
       {loading && <Loading />}
-      <CssBaseline />
-      <AppBar
-        position='fixed'
-        className={
-          (clsx(classes.appBar, {
-            [classes.appBarShift]: open,
-          }),
-          'bg-dark')
-        }
-      >
-        <Toolbar
-          style={{
-            marginLeft: '3rem',
-            display: 'flex',
-            justifyContent: 'space-between',
-          }}
-        >
-          <IconButton
-            aria-label='open drawer'
-            onClick={handleDrawerOpen}
-            edge='start'
-            className={clsx(classes.menuButton)}
-          >
-            <MenuIcon />
-          </IconButton>
-          <Link to='/' className={`${classes.name}`}>
-            <i
-              className='fa fa-graduation-cap'
-              style={{ fontSize: '2rem', marginRight: '0.5rem' }}
-            />
-            Nerd Academy
-          </Link>
-          <Avatar>{user.username.toUpperCase().substring(0, 2)}</Avatar>
-        </Toolbar>
-      </AppBar>
-      <Drawer
-        variant='permanent'
-        className={clsx(classes.drawer, {
-          [classes.drawerOpen]: open,
-          [classes.drawerClose]: !open,
-        })}
-        classes={{
-          paper: clsx({
-            [classes.drawerOpen]: open,
-            [classes.drawerClose]: !open,
-          }),
-        }}
-      >
-        <div className={classes.toolbar}>
-          <IconButton onClick={handleDrawerClose}>
-            {theme.direction === 'rtl' ? (
-              <ChevronRightIcon />
-            ) : (
-              <ChevronLeftIcon />
-            )}
-          </IconButton>
-        </div>
-        <Divider />
-        <List>
-          {user.type === 'Instructor' &&
-            InstructorSideBar.map((item, index) => (
-              <ListItem
-                button
-                key={index}
-                onClick={() => {
-                  setComponent(item.title);
-                }}
-              >
-                <ListItemIcon>{item.icon}</ListItemIcon>
-                <ListItemText primary={item.title} />
-              </ListItem>
-            ))}
-          {user.type === 'Corporate trainee' &&
-            CorporateSideBar.map((item, index) => (
-              <ListItem
-                button
-                key={index}
-                onClick={() => {
-                  setComponent(item.title);
-                }}
-              >
-                <ListItemIcon>{item.icon}</ListItemIcon>
-                <ListItemText primary={item.title} />
-              </ListItem>
-            ))}
-          {user.type === 'Individual trainee' &&
-            IndividualSideBar.map((item, index) => (
-              <ListItem
-                button
-                key={index}
-                onClick={() => {
-                  setComponent(item.title);
-                }}
-              >
-                <ListItemIcon>{item.icon}</ListItemIcon>
-                <ListItemText primary={item.title} />
-              </ListItem>
-            ))}
-          <ListItem>
-            <ListItemIcon>
-              <AccountBalanceWalletIcon></AccountBalanceWalletIcon>
-            </ListItemIcon>
-            <ListItemText primary={'wallet ' + wallet + ' $'} />
-          </ListItem>
-        </List>
-        <Divider />
-        <ListItem
-          button
-          onClick={() => {
-            setComponent('Settings');
-          }}
-        >
-          <ListItemIcon>
-            <SettingsIcon />
-          </ListItemIcon>
-          <ListItemText primary={'Settings'} />
-        </ListItem>
-      </Drawer>
       {!loading && (
-        <main className={classes.content}>
-          <div className={classes.biography}>
-            <Avatar
+        <div className={classes.root}>
+          <CssBaseline />
+          <AppBar
+            position='fixed'
+            className={
+              (clsx(classes.appBar, {
+                [classes.appBarShift]: open,
+              }),
+              'bg-dark')
+            }
+          >
+            <Toolbar
               style={{
-                width: '8rem',
-                height: '8rem',
-                fontSize: '2rem',
-                backgroundColor: '#e0e0e0',
-                color: 'black',
-                marginBottom: '1rem',
+                marginLeft: '3rem',
+                display: 'flex',
+                justifyContent: 'space-between',
               }}
             >
-              {user.username.toUpperCase().substring(0, 2)}
-            </Avatar>
-            <p>{user.type === 'Instructor' && user?.biography}</p>
-          </div>
-          {component === 'My Courses' && user.type === 'Instructor' && (
-            <InstructorProfile courses={courses}></InstructorProfile>
-          )}
-          {component === 'Wallet' && user.type === 'Instructor' && (
-            <InstructorWallet></InstructorWallet>
-          )}
-          {component === 'Refund' && (
-            <>
-              <h1>Your refund requests</h1>
-              {refunds
-                ?.slice(
-                  refundPage * 3,
-                  Math.min(refundPage * 3 + 3, refunds.length)
-                )
-                .map((refund) => (
-                  <Refund
-                    key={refund._id}
-                    refundMoney={refund.refundMoney}
-                    courseName={
-                      courses.find(
-                        (course) =>
-                          course._id.toString() === refund.course._id.toString()
-                      )?.title
-                    }
-                    state={refund.state}
-                  />
+              <IconButton
+                aria-label='open drawer'
+                onClick={handleDrawerOpen}
+                edge='start'
+                className={clsx(classes.menuButton)}
+              >
+                <MenuIcon />
+              </IconButton>
+              <Link to='/' className={`${classes.name}`}>
+                <i
+                  className='fa fa-graduation-cap'
+                  style={{ fontSize: '2rem', marginRight: '0.5rem' }}
+                />
+                Nerd Academy
+              </Link>
+              <Avatar>{user?.username.toUpperCase().substring(0, 2)}</Avatar>
+            </Toolbar>
+          </AppBar>
+          <Drawer
+            variant='permanent'
+            className={clsx(classes.drawer, {
+              [classes.drawerOpen]: open,
+              [classes.drawerClose]: !open,
+            })}
+            classes={{
+              paper: clsx({
+                [classes.drawerOpen]: open,
+                [classes.drawerClose]: !open,
+              }),
+            }}
+          >
+            <div className={classes.toolbar}>
+              <IconButton onClick={handleDrawerClose}>
+                {theme.direction === 'rtl' ? (
+                  <ChevronRightIcon />
+                ) : (
+                  <ChevronLeftIcon />
+                )}
+              </IconButton>
+            </div>
+            <Divider />
+            <List>
+              {user?.type === 'Instructor' &&
+                InstructorSideBar.map((item, index) => (
+                  <ListItem
+                    button
+                    key={index}
+                    onClick={() => {
+                      setComponent(item.title);
+                    }}
+                  >
+                    <ListItemIcon>{item.icon}</ListItemIcon>
+                    <ListItemText primary={item.title} />
+                  </ListItem>
                 ))}
-            </>
-          )}
-          {component === 'Refund' && (
-            <Pagination
-              count={Math.ceil(refunds.length / 3)}
-              onChange={(e, v) => {
-                setRefundPage(v - 1);
+              {user?.type === 'Corporate trainee' &&
+                CorporateSideBar.map((item, index) => (
+                  <ListItem
+                    button
+                    key={index}
+                    onClick={() => {
+                      setComponent(item.title);
+                    }}
+                  >
+                    <ListItemIcon>{item.icon}</ListItemIcon>
+                    <ListItemText primary={item.title} />
+                  </ListItem>
+                ))}
+              {user?.type === 'Individual trainee' &&
+                IndividualSideBar.map((item, index) => (
+                  <ListItem
+                    button
+                    key={index}
+                    onClick={() => {
+                      setComponent(item.title);
+                    }}
+                  >
+                    <ListItemIcon>{item.icon}</ListItemIcon>
+                    <ListItemText primary={item.title} />
+                  </ListItem>
+                ))}
+              <ListItem>
+                <ListItemIcon>
+                  <AccountBalanceWalletIcon></AccountBalanceWalletIcon>
+                </ListItemIcon>
+                {/* <ListItemText primary={'wallet ' + wallet + ' $'} /> */}
+              </ListItem>
+            </List>
+            <Divider />
+            <ListItem
+              button
+              onClick={() => {
+                setComponent('Settings');
               }}
-              defaultPage={1}
-              color='primary'
-              size='large'
-              showFirstButton
-              showLastButton
-              classes={{ ul: classes.ul }}
-              style={{ marginTop: '2rem' }}
-            />
-          )}
-          {component === 'Contract' && user.type === 'Instructor' && (
-            <Contract></Contract>
-          )}
+            >
+              <ListItemIcon>
+                <SettingsIcon />
+              </ListItemIcon>
+              <ListItemText primary={'Settings'} />
+            </ListItem>
+          </Drawer>
+          {!loading && (
+            <main className={classes.content}>
+              <div className={classes.biography}>
+                <Avatar
+                  style={{
+                    width: '8rem',
+                    height: '8rem',
+                    fontSize: '2rem',
+                    backgroundColor: '#e0e0e0',
+                    color: 'black',
+                    marginBottom: '1rem',
+                  }}
+                >
+                  {user?.username.toUpperCase().substring(0, 2)}
+                </Avatar>
+                <p>{user?.type === 'Instructor' && user?.biography}</p>
+              </div>
+              {component === 'My Courses' && user?.type === 'Instructor' && (
+                <InstructorProfile courses={courses}></InstructorProfile>
+              )}
+              {component === 'Earning' && user?.type === 'Instructor' && (
+                <>{/* <InstructorWallet></InstructorWallet> */}</>
+              )}
+              {component === 'Refund' && (
+                <>
+                  <h1>Your refund requests</h1>
+                  {refunds
+                    ?.slice(
+                      refundPage * 3,
+                      Math.min(refundPage * 3 + 3, refunds.length)
+                    )
+                    .map((refund) => (
+                      <Refund
+                        key={refund._id}
+                        refundMoney={refund.refundMoney}
+                        courseName={
+                          courses.find(
+                            (course) =>
+                              course._id.toString() ===
+                              refund.course._id.toString()
+                          )?.title
+                        }
+                        state={refund.state}
+                      />
+                    ))}
+                </>
+              )}
+              {component === 'Refund' && (
+                <Pagination
+                  count={Math.ceil(refunds.length / 3)}
+                  onChange={(e, v) => {
+                    setRefundPage(v - 1);
+                  }}
+                  defaultPage={1}
+                  color='primary'
+                  size='large'
+                  showFirstButton
+                  showLastButton
+                  classes={{ ul: classes.ul }}
+                  style={{ marginTop: '2rem' }}
+                />
+              )}
+              {component === 'Contract' && user.type === 'Instructor' && (
+                <Contract></Contract>
+              )}
 
-          {component === 'Settings' && <Settings />}
+              {component === 'Settings' && <Settings />}
 
-          <br />
-          <br />
-          <Footer />
-        </main>
+              <br />
+              <br />
+              <Footer />
+            </main>
+          )}
+        </div>
       )}
-    </div>
+    </>
   );
 }

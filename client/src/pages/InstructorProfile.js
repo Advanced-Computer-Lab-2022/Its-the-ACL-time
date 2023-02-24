@@ -10,6 +10,7 @@ import CourseComponent from '../components/course/CourseComponent';
 import Footer from '../components/Footer';
 import Loading from '../components/Loading';
 import { useParams } from 'react-router-dom';
+import { useSelector } from 'react-redux';
 
 const useStyles = makeStyles((theme) => ({
   content: {
@@ -35,46 +36,56 @@ const useStyles = makeStyles((theme) => ({
 function InstructorProfile() {
   const classes = useStyles();
   const [instructor, setInstructor] = React.useState(null);
-  const { token } = useAppContext();
+  const token = useSelector((state) => state.auth.token);
   const [loading, setLoading] = React.useState(true);
   const [myCourses, setMyCourses] = React.useState();
-  const { courses } = useCourseContext();
+  const courses = useSelector((state) => state.course.courses);
+  const coursesIsLoading = useSelector(
+    (state) => state.course.coursesIsLoading
+  );
   const [page, setPage] = React.useState(0);
+  const [pageLoading, setPageLoading] = React.useState(false);
   const { instructorId } = useParams();
 
   useEffect(() => {
-    setLoading(true);
-    const fetchInstructor = async () => {
-      try {
-        const res = await axios.get(
-          `http://localhost:8080/api/v1/user/${instructorId}`,
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        );
-        setInstructor(res.data);
-      } catch (error) {
-        console.log(error);
-      }
-    };
-
-    const fetchMyCourses = async () => {
-      const myCoursesTmp = courses.filter((course) => {
-        return course.createdBy._id.toString() === instructorId.toString();
-      });
-      setMyCourses(myCoursesTmp);
+    if (coursesIsLoading || pageLoading) {
+      setLoading(true);
+    } else {
       setLoading(false);
-    };
-
-    if (!instructor) {
-      fetchInstructor();
     }
-    if (courses && courses.length > 0) {
+  }, [coursesIsLoading, pageLoading]);
+
+  useEffect(() => {
+    if (!coursesIsLoading) {
+      setPageLoading(true);
+      const fetchInstructor = async () => {
+        try {
+          const res = await axios.get(
+            `http://localhost:8080/api/v1/user/${instructorId}`,
+            {
+              headers: {
+                Authorization: `Bearer ${token}`,
+              },
+            }
+          );
+          setInstructor(res.data);
+        } catch (error) {
+          console.log(error);
+        }
+      };
+
+      const fetchMyCourses = async () => {
+        const myCoursesTmp = courses.filter((course) => {
+          return course.createdBy._id.toString() === instructorId.toString();
+        });
+        setMyCourses(myCoursesTmp);
+        setPageLoading(false);
+      };
+
+      fetchInstructor();
       fetchMyCourses();
     }
-  }, [instructorId, courses]);
+  }, [coursesIsLoading]);
 
   return (
     <main>

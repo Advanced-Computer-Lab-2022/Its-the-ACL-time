@@ -6,11 +6,10 @@ import Alert from '@material-ui/lab/Alert';
 import axios from 'axios';
 import { makeStyles } from '@material-ui/core/styles';
 import { useParams } from 'react-router-dom';
-import { useAppContext } from '../context/App/appContext';
 import { useState } from 'react';
 import { useRef } from 'react';
 import Loading from './Loading';
-import { useCourseContext } from '../context/Course/courseContext';
+import { useSelector } from 'react-redux';
 
 const useStyles = makeStyles((theme) => ({
   container: {
@@ -118,6 +117,7 @@ function ExamForm({ submitted }) {
   const secondsRef = useRef();
   const questionsRef = useRef();
   const [alert, setAlert] = useState(null);
+  const token = useSelector((state) => state.auth.token);
 
   const setAlertFunc = (type, message) => {
     setAlert({ type, message });
@@ -137,10 +137,11 @@ function ExamForm({ submitted }) {
     setQuestions(questions - 1);
   };
 
-  const setError = () => {
-    setAlertFunc('error', "Exam's not been created successfully");
+  const setError = (msg) => {
+    setAlertFunc('error', msg);
     setTimeout(() => {
       clearAlert();
+      setDisableAddExamButton(false);
     }, 3000);
   };
 
@@ -157,7 +158,7 @@ function ExamForm({ submitted }) {
       exam['duration']['minutes'] === '' ||
       exam['duration']['seconds'] === ''
     ) {
-      setError();
+      setError('Exam duration can not be empty');
       return;
     }
 
@@ -169,7 +170,7 @@ function ExamForm({ submitted }) {
         questionsRef.current.children[i].children[1].children[1].value;
 
       if (question['title'] === '') {
-        setError();
+        setError("Question's title can't be empty");
         return;
       }
 
@@ -179,7 +180,7 @@ function ExamForm({ submitted }) {
         let row = choices.children[i];
 
         if (row.children[0].children[0].children[1].value === '') {
-          setError();
+          setError('Choices can not be empty');
           return;
         }
 
@@ -193,7 +194,7 @@ function ExamForm({ submitted }) {
       questions.push(question);
 
       if (answer === -1) {
-        setError();
+        setError('You must choose the correct answer');
         return;
       }
     }
@@ -206,7 +207,7 @@ function ExamForm({ submitted }) {
     e.preventDefault();
 
     setLoading(true);
-
+    setDisableAddExamButton(true);
     const exam = await getExamData();
 
     if (exam) {
@@ -217,150 +218,160 @@ function ExamForm({ submitted }) {
           {
             headers: {
               'Content-Type': 'application/json',
-              Authorization: `Bearer ${localStorage.getItem('token')}`,
+              Authorization: `Bearer ${token}`,
             },
           }
         );
         console.log(res);
         setAlertFunc('success', "Exam's been created successfully");
+        setLoading(false);
         setTimeout(() => {
           clearAlert();
           submitted();
+          setDisableAddExamButton(false);
         }, 3000);
       } catch (error) {
-        setAlertFunc('error', "Exam's not been created successfully");
+        const msg = error.response.data?.message || error.response.data?.msg;
+        setAlertFunc('error', msg);
+        setLoading(false);
         setTimeout(() => {
           clearAlert();
-          submitted();
+          setDisableAddExamButton(false);
         }, 3000);
       }
-      setLoading(false);
     }
   };
 
   return (
-    <div className={`${classes.container}`}>
-      <h1 className={`${classes.title}`}>Create Exam</h1>
-
+    <>
       {loading && <Loading></Loading>}
       {alert && (
-        <Alert variant='filled' severity={alert?.type} sx={{ width: 20 }}>
+        <Alert
+          variant='filled'
+          severity={alert?.type}
+          sx={{ width: 20 }}
+          style={{ position: 'fixed', top: '10%', left: '40%' }}
+        >
           {alert?.message}
         </Alert>
       )}
-      <Form className={`${classes.form}`} onSubmit={handleSubmit}>
-        <Row className='mb-3'>
-          <Form.Group as={Col} controlId='formGridNumberOfHours' id='hours'>
-            <Form.Label>Hours</Form.Label>
-            <Form.Control type='number' placeholder='Hours' ref={hoursRef} />
-          </Form.Group>
+      <div className={`${classes.container}`}>
+        <h1 className={`${classes.title}`}>Create Exam</h1>
 
-          <Form.Group as={Col} controlId='formGridPromotion' id='minutes'>
-            <Form.Label>Minutes</Form.Label>
-            <Form.Control
-              type='number'
-              placeholder='Minutes'
-              ref={minutesRef}
-            />
-          </Form.Group>
-          <Form.Group
-            as={Col}
-            controlId='formGridPromotionDuration'
-            id='seconds'
-          >
-            <Form.Label>Seconds</Form.Label>
-            <Form.Control
-              type='number'
-              placeholder='seconds'
-              ref={secondsRef}
-            />
-          </Form.Group>
-        </Row>
+        <Form className={`${classes.form}`} onSubmit={handleSubmit}>
+          <Row className='mb-3'>
+            <Form.Group as={Col} controlId='formGridNumberOfHours' id='hours'>
+              <Form.Label>Hours</Form.Label>
+              <Form.Control type='number' placeholder='Hours' ref={hoursRef} />
+            </Form.Group>
 
-        {questions > 0 && (
-          <div className={`${classes.subtitles}`}>
-            <div className={`${classes.line}`}></div>
-            <h3 className={`${classes.subtitleTitle}`}>Questions</h3>
-            <div ref={questionsRef}>
-              {[...Array(questions)].map((e, i) => {
-                return (
-                  <div className={`${classes.question}`} key={i}>
-                    <h3>Question {i + 1}</h3>
-                    <Form.Group
-                      className='mb-3'
-                      style={{
-                        width: '30rem',
-                      }}
-                    >
-                      <Form.Label>Title</Form.Label>
-                      <Form.Control placeholder='Title' id='title' />
-                    </Form.Group>
-                    <div>
-                      {[...Array(4)].map((e, i) => {
-                        return (
-                          <Row className='mb-3' key={i}>
-                            <Form.Group
-                              as={Col}
-                              style={{
-                                display: 'flex',
-                                alignItems: 'center',
-                                justifyContent: 'center',
-                              }}
-                            >
-                              <div className={classes.choice}>
-                                <Form.Label>choice {i + 1}</Form.Label>
-                                <Form.Control
-                                  type='text'
-                                  placeholder='Put the choice here'
-                                />
-                                <Form.Check
-                                  type='checkbox'
-                                  label='Check the box if this is the correct answer'
-                                  style={{ marginTop: '1rem' }}
-                                />
-                              </div>
-                            </Form.Group>
-                          </Row>
-                        );
-                      })}
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-          </div>
-        )}
+            <Form.Group as={Col} controlId='formGridPromotion' id='minutes'>
+              <Form.Label>Minutes</Form.Label>
+              <Form.Control
+                type='number'
+                placeholder='Minutes'
+                ref={minutesRef}
+              />
+            </Form.Group>
+            <Form.Group
+              as={Col}
+              controlId='formGridPromotionDuration'
+              id='seconds'
+            >
+              <Form.Label>Seconds</Form.Label>
+              <Form.Control
+                type='number'
+                placeholder='seconds'
+                ref={secondsRef}
+              />
+            </Form.Group>
+          </Row>
 
-        <div className={`${classes.buttons}`}>
-          <Button
-            variant='secondary'
-            onClick={addQuestion}
-            className={`${classes.addSubtitleButton}`}
-          >
-            Add Question
-          </Button>
           {questions > 0 && (
+            <div className={`${classes.subtitles}`}>
+              <div className={`${classes.line}`}></div>
+              <h3 className={`${classes.subtitleTitle}`}>Questions</h3>
+              <div ref={questionsRef}>
+                {[...Array(questions)].map((e, i) => {
+                  return (
+                    <div className={`${classes.question}`} key={i}>
+                      <h3>Question {i + 1}</h3>
+                      <Form.Group
+                        className='mb-3'
+                        style={{
+                          width: '30rem',
+                        }}
+                      >
+                        <Form.Label>Title</Form.Label>
+                        <Form.Control placeholder='Title' id='title' />
+                      </Form.Group>
+                      <div>
+                        {[...Array(4)].map((e, i) => {
+                          return (
+                            <Row className='mb-3' key={i}>
+                              <Form.Group
+                                as={Col}
+                                style={{
+                                  display: 'flex',
+                                  alignItems: 'center',
+                                  justifyContent: 'center',
+                                }}
+                              >
+                                <div className={classes.choice}>
+                                  <Form.Label>choice {i + 1}</Form.Label>
+                                  <Form.Control
+                                    type='text'
+                                    placeholder='Put the choice here'
+                                  />
+                                  <Form.Check
+                                    type='checkbox'
+                                    label='Check the box if this is the correct answer'
+                                    style={{ marginTop: '1rem' }}
+                                  />
+                                </div>
+                              </Form.Group>
+                            </Row>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          )}
+
+          <div className={`${classes.buttons}`}>
             <Button
               variant='secondary'
-              className={`${classes.removeSubtitleButton}`}
-              onClick={removeQuestion}
+              onClick={addQuestion}
+              className={`${classes.addSubtitleButton}`}
             >
-              Remove Question
+              Add Question
             </Button>
-          )}
-        </div>
-        <Button
-          variant='primary'
-          type='submit'
-          className={`${classes.addCourseButton}`}
-          ref={addExamButtonRef}
-          id='addCourseButton'
-          disabled={disableAddExamButton}
-        >
-          Add Exam
-        </Button>
-      </Form>
-    </div>
+            {questions > 0 && (
+              <Button
+                variant='secondary'
+                className={`${classes.removeSubtitleButton}`}
+                onClick={removeQuestion}
+              >
+                Remove Question
+              </Button>
+            )}
+          </div>
+          <Button
+            variant='primary'
+            type='submit'
+            className={`${classes.addCourseButton}`}
+            ref={addExamButtonRef}
+            id='addCourseButton'
+            disabled={disableAddExamButton}
+          >
+            Add Exam
+          </Button>
+        </Form>
+      </div>
+    </>
   );
 }
 

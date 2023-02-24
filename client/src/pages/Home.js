@@ -4,12 +4,12 @@ import { makeStyles } from '@material-ui/core/styles';
 import Paper from '@material-ui/core/Paper';
 import Tabs from '@material-ui/core/Tabs';
 import Tab from '@material-ui/core/Tab';
-import { useCourseContext } from '../context/Course/courseContext';
-import { useAppContext } from '../context/App/appContext';
 import { Pagination } from '@material-ui/lab';
 import motivationalImage from '../assets/images/motivational.jpg';
 import Footer from '../components/Footer';
-import { useNavigate } from 'react-router-dom';
+import { useDispatch, useSelector } from 'react-redux';
+import { getCourses } from '../store/slices/course-slice';
+import { getMyCourses } from '../store/slices/myCourses_slice';
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -115,9 +115,9 @@ function EmptyCard() {
 function CenteredTabs({ changeTab }) {
   const classes = useStyles();
   const [value, setValue] = useState(0);
-  const { user, token } = useAppContext();
+  const user = useSelector((state) => state.auth.user);
+  const token = useSelector((state) => state.auth.token);
 
-  console.log("user",user);
   const handleChange = (event, newValue) => {
     changeTab(newValue);
     setValue(newValue);
@@ -151,39 +151,50 @@ function CenteredTabs({ changeTab }) {
 
 const Home = () => {
   const classes = useStyles();
-  const navigate = useNavigate();
-  const {user,token} = useAppContext();
   const [tab, setTab] = useState(0);
-  const { courses, myCourses } = useCourseContext();
-  const [sortedCourses, setSortedCourses] = useState();
-  const [inProgress, setInprogress] = useState();
-  const [completed, setCompleted] = useState();
+  const [sortedCourses, setSortedCourses] = useState([]);
+  const [inProgress, setInprogress] = useState([]);
+  const [completed, setCompleted] = useState([]);
   const [page, setPage] = useState(0);
   const [loading, setLoading] = useState(true);
-  
+  const coursesIsLoading = useSelector(
+    (state) => state.course.coursesIsLoading
+  );
+  const myCoursesIsLoading = useSelector(
+    (state) => state.myCourses.myCoursesIsLoading
+  );
+  const courses = useSelector((state) => state.course.courses);
+  const myCourses = useSelector((state) => state.myCourses.myCourses);
+
   useEffect(() => {
-    setLoading(true);
-    if (myCourses && courses && courses.length > 0) {
+    if (!myCoursesIsLoading) {
       const inprogress = myCourses.filter((course) => {
         return course.progress !== 100;
       });
       const completed = myCourses.filter((course) => course.progress === 100);
-      courses.sort((a, b) => {
-        return b.rating - a.rating;
-      });
-      setSortedCourses(courses);
       setInprogress(inprogress);
       setCompleted(completed);
-      if (completed && inprogress && courses) {
-        setLoading(false);
-      }
     }
-  }, [myCourses, courses]);
+  }, [myCoursesIsLoading, myCourses]);
+
+  useEffect(() => {
+    if (!coursesIsLoading) {
+      let tmpCourses = courses;
+      tmpCourses = tmpCourses.slice().sort((a, b) => b.rating - a.rating);
+      setSortedCourses(tmpCourses);
+    }
+  }, [courses, coursesIsLoading]);
+
+  useEffect(() => {
+    if (!coursesIsLoading && !myCoursesIsLoading) {
+      setLoading(false);
+    }
+  }, [coursesIsLoading, myCoursesIsLoading]);
 
   return (
     <>
       {loading && <Loading />}
-      {!loading && (
+      {!loading && !myCoursesIsLoading && (
         <main className={`${classes.main}`}>
           <PageHeader />
           <CenteredTabs changeTab={(tab) => setTab(tab)} />
@@ -199,18 +210,18 @@ const Home = () => {
                       title={course?.title}
                       subject={course?.subject}
                       description={course?.summary}
-                      instructor={course?.createdBy.username}
+                      instructor={course?.createdBy?.username}
                       courseId={course?._id}
                       horizontal={true}
                       rating={course?.rating}
-                      progress={course?.progress}
+                      progress={course?.courseProgress.progress}
                       demo={false}
                     />
                   );
                 })}
             {tab === 2 &&
               completed
-                .slice(3 * page, Math.min(3 * page + 3, completed.length))
+                .slice(3 * page, Math.min(3 * page + 3, completed?.length))
                 .map((course) => {
                   return (
                     <CourseComponent
@@ -222,14 +233,14 @@ const Home = () => {
                       courseId={course?._id}
                       horizontal={true}
                       rating={course?.rating}
-                      progress={course?.progress}
+                      progress={course?.courseProgress.progress}
                       demo={false}
                       currency={course?.currency}
                     />
                   );
                 })}
           </div>
-          {(tab === 0 && courses.length !== 0) ||
+          {(tab === 0 && courses?.length !== 0) ||
           (tab === 1 && inProgress.length !== 0) ||
           (tab === 2 && completed.length !== 0) ? (
             <div
@@ -243,7 +254,7 @@ const Home = () => {
               <Pagination
                 count={
                   tab === 0
-                    ? Math.ceil(courses.length / 3)
+                    ? Math.ceil(courses?.length / 3)
                     : tab === 1
                     ? Math.ceil(inProgress.length / 3)
                     : Math.ceil(completed.length / 3)
@@ -306,7 +317,7 @@ const Home = () => {
             </h2>
             <div className={classes.topRatedCourses}>
               {sortedCourses
-                .slice(0, Math.min(9, courses.length))
+                .slice(0, Math.min(9, sortedCourses.length))
                 .map((course) => {
                   return (
                     <CourseComponent

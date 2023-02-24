@@ -4,12 +4,14 @@ import SearchIcon from '@material-ui/icons/Search';
 import CloseIcon from '@material-ui/icons/Close';
 import Wrapper from '../assets/Wrappers/SearchWrapper';
 import { Box } from '@material-ui/core';
-// import { useSearchContext } from '../context/Search/searchContext';
 import { makeStyles } from '@material-ui/core/styles';
 import { useNavigate } from 'react-router-dom';
 import { useRef } from 'react';
 import { useEffect } from 'react';
 import { AiOutlineSearch } from 'react-icons/ai';
+import { useSelector } from 'react-redux';
+// import store
+import store from '../store/slices/index';
 
 const useStyles = makeStyles((theme) => ({
   item: {
@@ -25,7 +27,7 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 const Search = () => {
-  const { courses } = useCourseContext();
+  const courses = useSelector((state) => state.course?.courses);
   const classes = useStyles();
   const [state, setState] = useState({
     query: '',
@@ -58,7 +60,7 @@ const Search = () => {
     const searchResults = {};
 
     const filteredCourses = [];
-    courses.forEach((course) => {
+    courses?.forEach((course) => {
       const title = course.title.toLowerCase().includes(term.toLowerCase());
       const subject = course.subject.toLowerCase().includes(term.toLowerCase());
       const createdBy = course.createdBy?.username;
@@ -81,7 +83,6 @@ const Search = () => {
       query: term,
       filteredCourses,
     });
-    // setQueriedCourses(filteredCourses);
   };
 
   const clearInput = () => {
@@ -119,7 +120,7 @@ const Search = () => {
             className='searchIcon position-absolute rounded rounded-5'
             style={{ right: '0px' }}
           >
-            {courses.length === 0 ? (
+            {courses?.length === 0 ? (
               <SearchIcon />
             ) : (
               <CloseIcon id='clearBtn' onClick={clearInput} />

@@ -135,24 +135,26 @@ const CourseProvider = ({ children }) => {
   };
 
   useEffect(() => {
+    console.log('courseContext useEffect1');
+
     const getAllCourses = async () => {
       try {
         const response = await axios.get('http://localhost:8080/api/v1/course');
         const { data } = response;
         const { courses } = data;
 
-        const country = countryAbbreviation[user?.country] | 'EG';
         let convertedCourses = courses;
 
-        if (!user || !user.country) {
+        if (user) {
+          const country = countryAbbreviation[user?.country] || 'EG';
           convertedCourses = await Promise.all(
             courses.map(async (course) => {
-              const { price, currency } = await currencyConverter(
+              const { newPrice, currency } = await currencyConverter(
                 country,
                 course.price
               );
               let originalPrice = course.price;
-              return { ...course, price, originalPrice, currency };
+              return { ...course, price: newPrice, originalPrice, currency };
             })
           );
         }
@@ -166,8 +168,8 @@ const CourseProvider = ({ children }) => {
       }
     };
 
-    getAllCourses();
-  }, [token]);
+    // getAllCourses();
+  }, [token, user]);
 
   useEffect(() => {
     const getMyCourses = async () => {
@@ -191,7 +193,8 @@ const CourseProvider = ({ children }) => {
     };
 
     if (token && state.courses.length > 0) {
-      getMyCourses();
+      console.log('courseContext useEffect2');
+      // getMyCourses();
     }
   }, [state.courses, token, user]);
 
